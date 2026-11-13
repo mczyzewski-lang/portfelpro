@@ -52,7 +52,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <div className="mt-3.5">
           {share?.ok ? (
             <StagePaths assets={share.assets} serviceName={service.name}
-              consultationExtra={<ClientHandoff serviceId={service.id} sensitive={service.sensitive} />}} />
+              consultationExtra={<ClientHandoff serviceId={service.id} sensitive={service.sensitive} />} />
           ) : (
             <div className="rounded-3xl border border-line bg-white p-5 shadow-(--shadow-card)">
               <p className="flex items-center gap-2 font-bold text-leather-dark"><Lock className="size-4" aria-hidden />{state.can ? "Linki chwilowo niedostępne" : recommendBlockLabel[state.reason]}</p>
