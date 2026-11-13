@@ -8,13 +8,18 @@ export type PartnerStats = {
   starterConfirmed: boolean; hasPhoto: boolean;
 };
 
+export type StarTier = "ice" | "glass" | "stone" | "steel" | "bronze" | "silver" | "gold";
+
+/** Gwiazdy partnera — kolejne materiały aż do złotej przy 50 potwierdzonych klientach. */
 export const LEVELS = [
-  { name: "Start", min: 0 },
-  { name: "Brązowy", min: 1 },
-  { name: "Srebrny", min: 3 },
-  { name: "Złoty", min: 10 },
-  { name: "Platynowy", min: 25 },
-] as const;
+  { tier: "ice", name: "Lodowa", min: 0 },
+  { tier: "glass", name: "Szklana", min: 1 },
+  { tier: "stone", name: "Kamienna", min: 3 },
+  { tier: "steel", name: "Stalowa", min: 5 },
+  { tier: "bronze", name: "Brązowa", min: 10 },
+  { tier: "silver", name: "Srebrna", min: 25 },
+  { tier: "gold", name: "Złota", min: 50 },
+] as const satisfies readonly { tier: StarTier; name: string; min: number }[];
 
 export function levelFor(clients: number) {
   let index = 0;

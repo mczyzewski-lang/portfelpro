@@ -114,7 +114,7 @@ Content-Type: application/json
 
 ### Pakiet startowy i poziomy
 
-Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny w widoku partnera w panelu admina). Dopóki go nie wpisze, na pulpicie wisi okienko „Potwierdzenie odbioru pakietu startowego”. Kod konta demo: `F3F4F5`. Nowe osiągnięcia i poziomy sygnalizuje confetti przy ikonie Poziomy; po wejściu w zakładkę oznaczają się jako obejrzane.
+Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny w widoku partnera w panelu admina). Dopóki go nie wpisze, na pulpicie wisi okienko „Potwierdzenie odbioru pakietu startowego”. Kod konta demo: `F3F4F5`. Poziomy to gwiazdy z kolejnych materiałów — Lodowa, Szklana (1 klient), Kamienna (3), Stalowa (5), Brązowa (10), Srebrna (25), Złota (50) — pokazane w zakładce Gwiazdy jako droga; gwiazda aktualnego poziomu jest w okienku pakietu startowego i przy awatarze. Nowe osiągnięcia i gwiazdy sygnalizuje confetti przy ikonie Gwiazdy; po wejściu w zakładkę oznaczają się jako obejrzane.
 
 ### Portfel Publiczny
 

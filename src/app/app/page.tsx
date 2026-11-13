@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { dismissFirstSuccessAction } from "@/app/actions/partner";
 import { CountUp } from "@/components/client";
+import { StarMark } from "@/components/star";
 import { StarterCard } from "@/components/starter-card";
 import { Feed } from "@/components/feed";
 import { btn } from "@/components/ui";
@@ -37,7 +38,7 @@ export default async function Dashboard() {
         </section>
       )}
 
-      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard hasPhoto={!!partner.avatar} avatarSrc={avatarSrc(partner)} initials={initialsOf(user)} />}
+      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard hasPhoto={!!partner.avatar} avatarSrc={avatarSrc(partner)} initials={initialsOf(user)} tier={level.current.tier} tierName={level.current.name} />}
 
       <section aria-labelledby="pulpit">
         <p className="text-sm text-muted">Dzień dobry, {user.firstName}</p>
@@ -71,9 +72,9 @@ export default async function Dashboard() {
           <Link href="/app/uslugi" className="leather-grad press flex min-h-14 items-center justify-between gap-3 rounded-2xl px-5 font-bold" data-testid="go-wallet">
             Poleć usługę<ArrowRight className="size-5" aria-hidden />
           </Link>
-          <Link href="/app/poziomy" className="press flex min-h-14 flex-col justify-center rounded-2xl border border-line bg-white px-4">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Poziom</span>
-            <span className="text-sm font-extrabold text-leather-dark">{level.current.name}</span>
+          <Link href="/app/poziomy" className="press flex min-h-14 flex-col justify-center rounded-2xl border border-line bg-white px-4" data-testid="dash-star">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Gwiazda</span>
+            <span className="flex items-center gap-1.5 text-sm font-extrabold text-leather-dark"><StarMark tier={level.current.tier} size={20} />{level.current.name}</span>
           </Link>
         </div>
       </section>

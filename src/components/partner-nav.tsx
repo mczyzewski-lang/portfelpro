@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, ListChecks, MessageCircle, Trophy, Wallet } from "lucide-react";
+import { Home, ListChecks, MessageCircle, Star, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -11,7 +11,7 @@ const items = [
   { href: "/app", label: "Pulpit", icon: Home, exact: true },
   { href: "/app/uslugi", label: "Portfel", icon: Wallet },
   { href: "/app/polecenia", label: "Polecenia", icon: ListChecks },
-  { href: "/app/poziomy", label: "Poziomy", icon: Trophy },
+  { href: "/app/poziomy", label: "Gwiazdy", icon: Star },
   { href: "/app/wiadomosci", label: "Wiadomości", icon: MessageCircle },
 ];
 

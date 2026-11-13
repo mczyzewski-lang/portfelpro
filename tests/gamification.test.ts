@@ -3,17 +3,21 @@ import { achievementsFor, levelFor, newSince } from "@/lib/gamification";
 
 const zero = { clicks: 0, leads: 0, clients: 0, paid: 0, servicesShared: 0, stagesUsed: 0, handoffs: 0, starterConfirmed: false, hasPhoto: false };
 
-describe("poziomy", () => {
-  it("startuje od poziomu Start i liczy brakujących klientów", () => {
+describe("gwiazdy (poziomy)", () => {
+  it("zaczyna od gwiazdy Lodowej i liczy brakujących klientów", () => {
     expect(levelFor(0)).toMatchObject({ index: 0, missing: 1, progress: 0 });
-    expect(levelFor(0).current.name).toBe("Start");
+    expect(levelFor(0).current).toMatchObject({ name: "Lodowa", tier: "ice" });
   });
-  it("progi: 1, 3, 10, 25 potwierdzonych klientów", () => {
-    expect(levelFor(1).current.name).toBe("Brązowy");
+  it("progi: 1, 3, 5, 10, 25 i 50 potwierdzonych klientów", () => {
+    expect(levelFor(1).current.name).toBe("Szklana");
     expect(levelFor(2)).toMatchObject({ missing: 1, progress: 0.5 });
-    expect(levelFor(3).current.name).toBe("Srebrny");
-    expect(levelFor(10).current.name).toBe("Złoty");
-    expect(levelFor(40)).toMatchObject({ next: null, progress: 1, missing: 0 });
+    expect(levelFor(3).current.name).toBe("Kamienna");
+    expect(levelFor(5).current.name).toBe("Stalowa");
+    expect(levelFor(10).current.name).toBe("Brązowa");
+    expect(levelFor(25).current.name).toBe("Srebrna");
+    expect(levelFor(49).current.name).toBe("Srebrna");
+    expect(levelFor(50)).toMatchObject({ next: null, progress: 1, missing: 0 });
+    expect(levelFor(50).current).toMatchObject({ name: "Złota", tier: "gold" });
   });
 });
 

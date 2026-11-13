@@ -8,13 +8,14 @@ import { AvatarEditor } from "./avatar";
 import type { FormState } from "./client";
 import { toast } from "./client";
 import { ConfettiBurst } from "./confetti";
+import type { StarTier } from "@/lib/gamification";
 import { StarMark } from "./star";
 
 /**
  * „Wiszące” okienko na pulpicie: potwierdzenie odbioru pakietu startowego.
  * Krok 1 — zdjęcie profilowe, krok 2 — kod z przesyłki. Po poprawnym kodzie gwiazdka leci do awatara w nagłówku.
  */
-export function StarterCard({ hasPhoto, avatarSrc, initials }: { hasPhoto: boolean; avatarSrc: string | null; initials: string }) {
+export function StarterCard({ hasPhoto, avatarSrc, initials, tier, tierName }: { hasPhoto: boolean; avatarSrc: string | null; initials: string; tier: StarTier; tierName: string }) {
   const router = useRouter();
   const star = useRef<HTMLSpanElement>(null);
   const [done, setDone] = useState(false);
@@ -63,10 +64,10 @@ export function StarterCard({ hasPhoto, avatarSrc, initials }: { hasPhoto: boole
   return (
     <section className="rise relative rounded-3xl border border-gold/60 bg-white p-4 shadow-[0_18px_40px_-18px_rgba(50,27,18,0.45)]" aria-labelledby="starter-h" data-testid="starter-card">
       <div className="flex items-start gap-3">
-        <span ref={star} className="relative block shrink-0" data-testid="starter-star"><StarMark size={48} /></span>
+        <span ref={star} className="relative block shrink-0" data-testid="starter-star"><StarMark size={52} tier={tier} /></span>
         <div>
           <h2 id="starter-h" className="font-extrabold leading-snug text-leather-dark">Potwierdzenie odbioru pakietu startowego</h2>
-          <p className="mt-0.5 text-[13px] leading-snug text-muted">Dwa kroki i gwiazdka trafia do Twojego profilu.</p>
+          <p className="mt-0.5 text-[13px] leading-snug text-muted">Dwa kroki i Twoja pierwsza gwiazda — <b className="text-leather-dark">{tierName}</b> — trafia do profilu.</p>
         </div>
       </div>
 
