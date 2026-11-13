@@ -28,14 +28,14 @@ export async function getPublicWallet(slug: string) {
     const [learn, talk] = [await link("education"), await link("consultation")];
     if (!learn && !talk) continue;
     items.push({
-      id: s.id, slug: s.slug, name: s.name, benefit: s.clientBenefit, learn, talk,
+      id: s.id, slug: s.slug, name: s.name, benefit: s.clientBenefit, learn, talk, sensitive: s.sensitive,
       // tylko treści dla klienta — bez wskazówek sprzedażowych i prowizji
       description: s.description, problems: s.problems, audience: s.audience, faq: s.faq, provider: s.provider,
       company: { name: c.name, color: c.color, iconUrl: c.iconUrl, googleRating: c.googleRating, googleReviews: c.googleReviews },
     });
   }
   return {
-    name: `${row.firstName} ${row.lastName}`, initials: `${row.firstName[0] ?? ""}${row.lastName[0] ?? ""}`.toUpperCase(),
+    partnerId: row.p.id, name: `${row.firstName} ${row.lastName}`, initials: `${row.firstName[0] ?? ""}${row.lastName[0] ?? ""}`.toUpperCase(),
     bio: row.p.publicBio, companyName: row.p.companyName, hasPhoto: !!row.p.avatar, photoVersion: row.p.avatarUpdatedAt?.getTime() ?? 1, items,
   };
 }

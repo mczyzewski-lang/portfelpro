@@ -33,7 +33,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   return (
     // Pełnoekranowy widok „focus”: zakrywa nagłówek i dolną nawigację, wsuwa się z prawej jak otwierany artykuł.
     <div className="slide-in-right fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-cream" data-testid="service-screen">
-      <div className="sticky top-0 z-10 border-b border-line bg-cream/95 backdrop-blur">
+      <div className="sticky top-0 z-30 border-b border-line bg-white shadow-[0_6px_18px_-12px_rgba(50,27,18,0.35)]">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-3 py-2">
           <Link href="/app/uslugi" className="press inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel usług</Link>
           <p className="min-w-0 flex-1 truncate text-center text-[13px] font-bold text-muted">{company.name}</p>

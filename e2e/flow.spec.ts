@@ -340,8 +340,8 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   expect(publicUrl).toMatch(/\/p\/anna-testowa$/); // adres z imieniem i nazwiskiem
   const visitor = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
   await visitor.goto(publicUrl);
-  await expect(visitor.getByRole("heading", { name: "Anna Testowa" })).toBeVisible();
-  await expect(visitor.getByText("Agencja marketingowa · Poznań")).toBeVisible();
+  await expect(visitor.getByTestId("public-hero").getByRole("heading", { name: "Anna Testowa" })).toBeVisible();
+  await expect(visitor.getByTestId("public-hero")).toContainText("Agencja marketingowa · Poznań"); // duży, wycentrowany nagłówek
   await expect(visitor.getByText("300 zł")).toHaveCount(0); // klient nie widzi prowizji
   await expect(visitor.getByText("Psychoterapia online")).toHaveCount(0); // tylko usługi, które partner może polecać
   expect((await visitor.request.get(publicUrl + "/photo")).headers()["content-type"]).toBe("image/jpeg");
@@ -351,11 +351,22 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await visitor.getByTestId("public-item-znak-towarowy").click();
   await expect(visitor.getByTestId("public-detail")).toContainText("W czym pomaga");
   await expect(visitor.getByTestId("public-list")).toHaveCount(0);
-  await expect(visitor.getByRole("heading", { name: "Anna Testowa" })).toBeInViewport();
+  await expect(visitor.getByTestId("public-bar")).toContainText("Anna Testowa"); // partner zwinięty do białego paska u góry
+  await expect(visitor.getByTestId("public-bar")).toBeInViewport();
   await expect(visitor.getByText("Czego nie należy obiecywać")).toHaveCount(0); // bez treści dla partnera
   expect(visitor.url()).toBe(publicUrl);
   await visitor.getByTestId("public-back").click();
   await expect(visitor.getByTestId("public-list")).toBeVisible();
+  // formularz kontaktowy w szczegółach usługi → polecenie przypisane do partnera
+  await visitor.getByTestId("public-item-ulga-ip-box").or(visitor.getByTestId("public-item-ip-box")).click();
+  await visitor.getByTestId("public-form").locator("input[name=name]").fill("Klient Publiczny");
+  await visitor.getByTestId("public-form").locator("input[name=phone]").fill("601 602 603");
+  await visitor.getByTestId("public-form").getByLabel(/Zgadzam się/).check();
+  await visitor.getByTestId("public-form-submit").click();
+  await expect(visitor.getByTestId("public-form-success")).toBeVisible();
+  await admin.goto("/admin/polecenia");
+  await expect(admin.getByRole("row", { name: /Klient Publiczny/ })).toContainText("Anna Testowa");
+  await visitor.getByTestId("public-back").click();
   await visitor.getByTestId("public-item-znak-towarowy").click();
   await visitor.getByTestId("public-detail").getByRole("link", { name: "Porozmawiaj" }).click();
   await expect(visitor).toHaveURL(/ocena-mozliwosci-rejestracji\?pp_ref=/); // link polecający partnera

@@ -42,3 +42,10 @@ export function fieldErrors(err: z.ZodError): Record<string, string> {
   for (const i of err.issues) { const k = String(i.path[0] ?? "_"); if (!out[k]) out[k] = i.message; }
   return out;
 }
+
+export const publicLeadSchema = z.object({
+  name: z.string().trim().min(2, "Podaj imię").max(120),
+  phone: z.string().trim().max(40).optional(),
+  email: z.union([z.literal(""), emailSchema]).optional(),
+  consent: z.literal("on", { message: "Zgoda jest wymagana, abyśmy mogli się skontaktować" }),
+}).refine((v) => (v.phone && v.phone.replace(/\D/g, "").length >= 7) || v.email, { message: "Podaj telefon lub e-mail" });

@@ -16,10 +16,12 @@ export default async function PublicWallet({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const w = await getPublicWallet(slug);
   if (!w) notFound();
+  const { partnerId: _internal, ...publicData } = w; // wewnętrzny identyfikator nie trafia do przeglądarki
+  void _internal;
   return (
     <>
-      <PublicWalletView wallet={w} photoUrl={w.hasPhoto ? `/p/${slug}/photo?v=${w.photoVersion}` : null} />
-      <footer className="mx-auto flex w-full max-w-xl flex-col items-center gap-2 px-5 pb-28 pt-6 text-center text-xs text-muted">
+      <PublicWalletView wallet={publicData} slug={slug} photoUrl={w.hasPhoto ? `/p/${slug}/photo?v=${w.photoVersion}` : null} />
+      <footer className="mx-auto flex w-full max-w-xl flex-col items-center gap-2 px-5 pb-10 pt-6 text-center text-xs text-muted">
         <Link href="/" className="inline-flex items-center gap-2 font-bold text-leather-dark"><Logo size={22} />Portfel.pro</Link>
         <p className="max-w-xs">Usługi realizują wskazane firmy. Linki na tej stronie są linkami polecającymi — {w.name.split(" ")[0]} może otrzymać wynagrodzenie za polecenie.</p>
         <Link href="/prywatnosc" className="underline">Prywatność i cookies</Link>
