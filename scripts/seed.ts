@@ -123,5 +123,12 @@ async function seedDemoLeads(email: string) {
     await db.update(s.commissions).set({ createdAt: new Date(end) }).where(eq(s.commissions.leadId, lead.id));
   }
   await db.update(s.partners).set({ firstSuccessSeenAt: new Date() }).where(eq(s.partners.id, row.p.id)); // bez ekranu „pierwszy sukces” na koncie demo
+  const [firstAdmin] = await db.select().from(s.users).where(eq(s.users.role, "admin")).orderBy(asc(s.users.createdAt)).limit(1);
+  if (firstAdmin) {
+    await db.insert(s.messages).values({
+      partnerId: row.p.id, fromPartner: false, senderUserId: firstAdmin.id, createdAt: new Date(Date.now() - 3 * 3600_000),
+      body: "Dzień dobry! Jestem Twoim opiekunem w Portfel.pro. Jeśli masz pytanie o usługę, prowizję albo konkretnego klienta — napisz tutaj. (wiadomość przykładowa na koncie demo)",
+    });
+  }
   console.log("✓ Dodano 5 przykładowych poleceń na koncie demo");
 }

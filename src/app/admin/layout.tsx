@@ -3,6 +3,7 @@ import { AdminNav } from "@/components/admin-nav";
 import { Badge, Wordmark } from "@/components/ui";
 import { requireAdmin } from "@/lib/auth";
 import { env } from "@/lib/env";
+import { unreadForManagers } from "@/lib/messages";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Administracja", robots: { index: false } };
@@ -16,7 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <form action={logoutAction} className="flex items-center gap-3"><span className="hidden text-xs text-muted sm:inline">{user.email}</span><button className="min-h-10 rounded-full px-3 text-sm font-bold text-leather hover:bg-sand">Wyloguj</button></form>
       </header>
       <div className="grid gap-5 lg:grid-cols-[210px_1fr]">
-        <aside className="lg:sticky lg:top-4 lg:self-start"><AdminNav /></aside>
+        <aside className="lg:sticky lg:top-4 lg:self-start"><AdminNav unread={await unreadForManagers()} /></aside>
         <main id="tresc" className="min-w-0">{children}</main>
       </div>
     </div>

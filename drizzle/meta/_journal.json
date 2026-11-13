@@ -36,6 +36,13 @@
       "when": 1794592772385,
       "tag": "0004_partner_avatar",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794594017370,
+      "tag": "0005_messages_and_manager",
+      "breakpoints": true
     }
   ]
 }

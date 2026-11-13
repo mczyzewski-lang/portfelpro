@@ -112,6 +112,10 @@ Content-Type: application/json
 - Zwrot: prowizja niewypłacona jest anulowana; wypłacona dostaje ujemną **korektę**, która pomniejsza kolejną wypłatę.
 - Ręczna zmiana przypisania partnera wymaga powodu; wszystko trafia do historii leada i dziennika zmian (`/admin/dziennik`).
 
+### Wiadomości i opiekun
+
+Zakładka „Wiadomości” w panelu partnera pokazuje kartę opiekuna (imię, stanowisko, telefon, e-mail) i czat z nim. Opiekunem jest konto administratora: domyślnie pierwszy administrator, innego przypisuje się w widoku partnera. Swój telefon i stanowisko opiekun ustawia w `/admin/ustawienia`, na rozmowy odpowiada w `/admin/wiadomosci`. Czat odświeża się co kilka sekund; powiadomień e-mail ani push nie ma.
+
 ### Prywatność
 
 - Partner nie widzi danych klienta, który zgłosił się przez link — tylko numer polecenia, usługę, etap procesu i prowizję. Przy zgłoszeniach, które sam przekazał do konsultacji (za zgodą klienta), widzi wpisane przez siebie imię i nazwisko. Przy usługach wrażliwych formularz wymaga dodatkowego potwierdzenia, że klient wie, iż partner zobaczy etap zgłoszenia.

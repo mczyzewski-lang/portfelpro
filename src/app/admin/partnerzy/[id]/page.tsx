@@ -1,13 +1,13 @@
 import { asc, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { setPartnerNoteAction, setPartnerStatusAction, setPartnerTermAction } from "@/app/actions/admin";
+import { setPartnerManagerAction, setPartnerNoteAction, setPartnerStatusAction, setPartnerTermAction } from "@/app/actions/admin";
 import { PageHeader, Panel, Stat, Table, textareaCls } from "@/components/admin";
 import { ActionForm, SubmitButton } from "@/components/client";
 import { Rate } from "@/components/rate";
 import { RateInputs } from "@/components/rate-inputs";
 import { CommissionStatusBadge, LeadStatusBadge, PartnerStatusBadge } from "@/components/status";
-import { Badge, Field, inputCls } from "@/components/ui";
+import { Badge, Field, btnSm, inputCls } from "@/components/ui";
 import { db } from "@/db";
 import { partners, professions, services, users } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
@@ -15,6 +15,7 @@ import { displayRate, formatPLN } from "@/lib/commission";
 import { env } from "@/lib/env";
 import { accessLabel, activityLabel, fmtDate, leadRef, partnerId } from "@/lib/labels";
 import { getPartnerReferrals, getWalletSummary } from "@/lib/partner-data";
+import { listManagers } from "@/lib/messages";
 import { getPartnerTerms } from "@/lib/queries";
 
 export default async function PartnerDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -25,6 +26,7 @@ export default async function PartnerDetail({ params }: { params: Promise<{ id: 
     .innerJoin(users, eq(users.id, partners.userId)).leftJoin(professions, eq(professions.slug, partners.professionSlug)).where(eq(partners.id, id));
   if (!row) notFound();
   const { p, u, prof } = row;
+  const managers = await listManagers();
   const [sum, terms, allServices, referrals] = await Promise.all([
     getWalletSummary(p.id), getPartnerTerms(p.id), db.select().from(services).orderBy(asc(services.sort)), getPartnerReferrals(p.id, 30),
   ]);
@@ -60,6 +62,17 @@ export default async function PartnerDetail({ params }: { params: Promise<{ id: 
               <Field label="Powód (opcjonalnie)"><input name="reason" className={inputCls} /></Field>
             </div>
             <SubmitButton small variant="primary" className="mt-3" data-testid="partner-status-save">Zapisz status</SubmitButton>
+          </ActionForm>
+          <ActionForm action={setPartnerManagerAction} className="mt-4 flex flex-wrap items-end gap-2 border-t border-line pt-4">
+            <input type="hidden" name="partnerId" value={p.id} />
+            <Field label="Opiekun partnera">
+              <select name="managerUserId" defaultValue={p.managerUserId ?? ""} className={inputCls}>
+                <option value="">Domyślny ({managers[0] ? `${managers[0].firstName} ${managers[0].lastName}` : "brak"})</option>
+                {managers.map((m) => <option key={m.id} value={m.id}>{m.firstName} {m.lastName}</option>)}
+              </select>
+            </Field>
+            <SubmitButton small variant="secondary">Zapisz</SubmitButton>
+            <Link href={`/admin/wiadomosci/${p.id}`} className={btnSm("primary")}>Napisz do partnera</Link>
           </ActionForm>
           <ActionForm action={setPartnerNoteAction} className="mt-4 border-t border-line pt-4">
             <input type="hidden" name="partnerId" value={p.id} />

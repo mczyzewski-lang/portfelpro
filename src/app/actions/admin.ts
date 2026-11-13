@@ -8,7 +8,7 @@ import type { FormState } from "@/components/client";
 import { db } from "@/db";
 import {
   companies, contentAssets, conversions, landingFaqs, leads, partnerServiceTerms, partners, professions,
-  referralLinks, serviceProfessions, services,
+  referralLinks, serviceProfessions, services, users,
 } from "@/db/schema";
 import { logAudit, type Actor } from "@/lib/audit";
 import { requireAdmin } from "@/lib/auth";
@@ -18,7 +18,9 @@ import {
   setCommissionStatus, setLeadStatus,
 } from "@/lib/conversions";
 import { parseCsv, slugify } from "@/lib/csv";
+import { hashPassword } from "@/lib/crypto";
 import { getPlace, googleKeyConfigured, searchPlace } from "@/lib/google-places";
+import { postMessage } from "@/lib/messages";
 import { setSetting } from "@/lib/settings";
 import { createLead } from "@/lib/tracking";
 
@@ -101,6 +103,54 @@ export const setPartnerTermAction = adminAction(async (fd, actor) => {
     .onConflictDoUpdate({ target: [partnerServiceTerms.partnerId, partnerServiceTerms.serviceId], set: values });
   await logAudit(db, actor, "partner.service_terms", "partner", partnerId, { before: before ?? null, after: { serviceId, ...values } });
   return "Zapisano warunki. Dotyczą tylko przyszłych naliczeń — historia prowizji pozostaje bez zmian.";
+});
+
+/* ================= opiekunowie i wiadomości ================= */
+/** Odpowiedź opiekuna w rozmowie z partnerem (własny format zwrotny — bez komunikatu „Zapisano”). */
+export async function replyMessageAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { user } = await requireAdmin();
+  const partnerId = str(fd, "partnerId");
+  const [p] = await db.select({ id: partners.id }).from(partners).where(eq(partners.id, partnerId));
+  if (!p) return { error: "Nie znaleziono partnera." };
+  const res = await postMessage(partnerId, false, user.id, str(fd, "body"));
+  if ("error" in res) return { error: res.error };
+  revalidatePath("/admin/wiadomosci", "layout");
+  return null;
+}
+
+const phoneSchema = z.string().max(30).regex(/^[+\d][\d\s-]{6,}$|^$/, "Telefon: cyfry, spacje i opcjonalnie + na początku");
+
+export const saveMyProfileAction = adminAction(async (fd) => {
+  const { user } = await requireAdmin();
+  await db.update(users).set({
+    firstName: z.string().min(2, "Podaj imię").max(80).parse(str(fd, "firstName")), lastName: z.string().min(2, "Podaj nazwisko").max(80).parse(str(fd, "lastName")),
+    jobTitle: str(fd, "jobTitle").slice(0, 80) || null, phone: phoneSchema.parse(str(fd, "phone")) || null,
+  }).where(eq(users.id, user.id));
+  return "Zapisano profil opiekuna.";
+});
+
+/** Nowy opiekun = nowe konto administratora (pełne uprawnienia panelu). */
+export const createManagerAction = adminAction(async (fd, actor) => {
+  const email = z.string().trim().toLowerCase().email("Podaj poprawny e-mail").parse(str(fd, "email"));
+  const password = z.string().min(10, "Hasło musi mieć co najmniej 10 znaków").parse(str(fd, "password"));
+  const [u] = await db.insert(users).values({
+    email, passwordHash: await hashPassword(password), role: "admin",
+    firstName: z.string().min(2, "Podaj imię").parse(str(fd, "firstName")), lastName: z.string().min(2, "Podaj nazwisko").parse(str(fd, "lastName")),
+    jobTitle: str(fd, "jobTitle") || "Opiekun partnerów", phone: phoneSchema.parse(str(fd, "phone")) || null,
+  }).returning();
+  await logAudit(db, actor, "manager.create", "user", u.id, { after: { email } });
+  return `Dodano opiekuna ${email}.`;
+});
+
+export const setPartnerManagerAction = adminAction(async (fd, actor) => {
+  const partnerId = str(fd, "partnerId"), managerId = str(fd, "managerUserId");
+  if (managerId) {
+    const [m] = await db.select({ id: users.id }).from(users).where(and(eq(users.id, managerId), eq(users.role, "admin")));
+    if (!m) throw new DomainError("Nie znaleziono opiekuna");
+  }
+  await db.update(partners).set({ managerUserId: managerId || null }).where(eq(partners.id, partnerId));
+  await logAudit(db, actor, "partner.manager", "partner", partnerId, { after: { managerUserId: managerId || null } });
+  return "Zmieniono opiekuna partnera.";
 });
 
 /* ================= spółki ================= */

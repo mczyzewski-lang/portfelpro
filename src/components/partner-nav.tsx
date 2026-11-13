@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, ListChecks, Trophy, User, Wallet } from "lucide-react";
+import { Home, ListChecks, MessageCircle, Trophy, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
@@ -10,10 +10,12 @@ const items = [
   { href: "/app/uslugi", label: "Portfel", icon: Wallet },
   { href: "/app/polecenia", label: "Polecenia", icon: ListChecks },
   { href: "/app/poziomy", label: "Poziomy", icon: Trophy },
-  { href: "/app/konto", label: "Konto", icon: User },
+  { href: "/app/wiadomosci", label: "Wiadomości", icon: MessageCircle },
 ];
 
-export function PartnerNav({ variant }: { variant: "bottom" | "top" }) {
+export function PartnerNav({ variant, unread = 0 }: { variant: "bottom" | "top"; unread?: number }) {
+  const dot = (href: string) => href === "/app/wiadomosci" && unread > 0
+    ? <span className="absolute right-[22%] top-1.5 grid min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold leading-4 text-white" data-testid="unread-badge">{unread}</span> : null;
   const path = usePathname();
   const active = (i: (typeof items)[number]) => (i.exact ? path === i.href : path.startsWith(i.href));
   if (variant === "top") {
@@ -22,7 +24,7 @@ export function PartnerNav({ variant }: { variant: "bottom" | "top" }) {
         {items.map((i) => (
           <Link key={i.href} href={i.href} aria-current={active(i) ? "page" : undefined}
             className={cn("press inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-bold", active(i) ? "bg-leather text-white" : "text-leather-dark hover:bg-sand")}>
-            <i.icon className="size-4" aria-hidden />{i.label}
+            <i.icon className="size-4" aria-hidden />{i.label}{i.href === "/app/wiadomosci" && unread > 0 && <span className="rounded-full bg-danger px-1.5 text-[10px] font-bold text-white">{unread}</span>}
           </Link>
         ))}
       </nav>
@@ -36,8 +38,8 @@ export function PartnerNav({ variant }: { variant: "bottom" | "top" }) {
         {items.map((i) => (
           <li key={i.href} className="relative z-10">
             <Link href={i.href} aria-current={active(i) ? "page" : undefined}
-              className={cn("press flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[20px] text-[11px] font-bold transition-colors", active(i) ? "text-white" : "text-muted")}>
-              <i.icon className={cn("size-[21px]", active(i) && "text-gold-light")} aria-hidden />{i.label}
+              className={cn("press flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[20px] text-[10.5px] font-bold transition-colors", active(i) ? "text-white" : "text-muted")}>
+              <i.icon className={cn("size-[21px]", active(i) && "text-gold-light")} aria-hidden />{i.label}{dot(i.href)}
             </Link>
           </li>
         ))}

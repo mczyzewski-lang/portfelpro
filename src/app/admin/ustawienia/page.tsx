@@ -1,5 +1,5 @@
 import { asc } from "drizzle-orm";
-import { saveFaqAction, saveProfessionAction, saveSettingsAction } from "@/app/actions/admin";
+import { createManagerAction, saveFaqAction, saveMyProfileAction, saveProfessionAction, saveSettingsAction } from "@/app/actions/admin";
 import { PageHeader, Panel, textareaCls } from "@/components/admin";
 import { ActionForm, SubmitButton } from "@/components/client";
 import { Field, Notice, inputCls } from "@/components/ui";
@@ -7,10 +7,12 @@ import { db } from "@/db";
 import { landingFaqs, professions } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
 import { env } from "@/lib/env";
+import { listManagers } from "@/lib/messages";
 import { getSettings } from "@/lib/settings";
 
 export default async function SettingsPage() {
-  await requireAdmin();
+  const { user: me } = await requireAdmin();
+  const managers = await listManagers();
   const [cfg, faqs, profs] = await Promise.all([getSettings(), db.select().from(landingFaqs).orderBy(asc(landingFaqs.sort)), db.select().from(professions).orderBy(asc(professions.sort))]);
   const webhookReady = !!env.webhookSecret && !env.webhookSecret.startsWith("change-me");
   return (
@@ -38,6 +40,39 @@ Idempotency-Key: <unikalny identyfikator zdarzenia>
   "external_id": "CRM-1001", "ref": "<pp_ref>", "net_amount": 2500 }`}</pre>
           <p className="mt-2 text-xs text-muted">Typy: lead.created, lead.status, sale.confirmed, sale.refunded. Żadna integracja zewnętrzna nie jest obecnie podłączona — system pokazuje wyłącznie dane, które faktycznie otrzymał. Szczegóły w README.</p>
           <p className="mt-2 text-xs text-muted">Tryb demo: <b>{env.demoMode ? "włączony" : "wyłączony"}</b> (zmienna DEMO_MODE). Poza trybem demo stawki „Demo” są ukryte jako „Stawka do ustalenia”.</p>
+        </Panel>
+
+        <Panel title="Opiekunowie partnerów" className="lg:col-span-2">
+          <p className="mb-3 text-sm text-muted">Partner widzi swojego opiekuna (imię, stanowisko, telefon, e-mail) w zakładce Wiadomości i może do niego pisać. Domyślnym opiekunem jest pierwszy administrator; innego przypiszesz w widoku partnera.</p>
+          <div className="grid gap-5 lg:grid-cols-2">
+            <ActionForm action={saveMyProfileAction} className="space-y-3">
+              <p className="text-sm font-extrabold text-leather-dark">Mój profil opiekuna</p>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Imię"><input name="firstName" defaultValue={me.firstName} required className={inputCls} /></Field>
+                <Field label="Nazwisko"><input name="lastName" defaultValue={me.lastName} required className={inputCls} /></Field>
+              </div>
+              <Field label="Stanowisko"><input name="jobTitle" defaultValue={me.jobTitle ?? ""} placeholder="Opiekun partnerów" className={inputCls} /></Field>
+              <Field label="Telefon dla partnerów"><input name="phone" type="tel" defaultValue={me.phone ?? ""} placeholder="+48 600 000 000" className={inputCls} data-testid="my-phone" /></Field>
+              <SubmitButton small data-testid="my-profile-save">Zapisz profil</SubmitButton>
+            </ActionForm>
+            <div>
+              <p className="text-sm font-extrabold text-leather-dark">Zespół ({managers.length})</p>
+              <ul className="mt-2 divide-y divide-line rounded-xl border border-line text-sm">
+                {managers.map((m) => <li key={m.id} className="flex flex-wrap justify-between gap-2 px-3 py-2"><span className="font-semibold">{m.firstName} {m.lastName}</span><span className="text-muted">{m.phone ?? "brak telefonu"} · {m.email}</span></li>)}
+              </ul>
+              <details className="mt-3 rounded-xl border border-line px-3">
+                <summary className="flex min-h-11 items-center text-sm font-bold text-leather">+ Dodaj opiekuna</summary>
+                <ActionForm action={createManagerAction} resetOnOk className="space-y-2 pb-3">
+                  <div className="grid grid-cols-2 gap-2"><input name="firstName" placeholder="Imię" aria-label="Imię" required className={inputCls} /><input name="lastName" placeholder="Nazwisko" aria-label="Nazwisko" required className={inputCls} /></div>
+                  <input name="email" type="email" placeholder="E-mail (login)" aria-label="E-mail" required className={inputCls} />
+                  <div className="grid grid-cols-2 gap-2"><input name="phone" type="tel" placeholder="Telefon" aria-label="Telefon" className={inputCls} /><input name="jobTitle" placeholder="Stanowisko" aria-label="Stanowisko" className={inputCls} /></div>
+                  <input name="password" type="password" placeholder="Hasło (min. 10 znaków)" aria-label="Hasło" required minLength={10} autoComplete="new-password" className={inputCls} />
+                  <p className="text-xs text-warn">Opiekun otrzymuje pełny dostęp do panelu administratora.</p>
+                  <SubmitButton small variant="secondary">Dodaj opiekuna</SubmitButton>
+                </ActionForm>
+              </details>
+            </div>
+          </div>
         </Panel>
 
         <Panel title="FAQ na stronie głównej" className="lg:col-span-2">

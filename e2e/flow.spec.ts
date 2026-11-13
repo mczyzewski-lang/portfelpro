@@ -280,6 +280,30 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(p2.getByRole("heading", { name: "Nie znaleźliśmy tej strony" })).toBeVisible();
   await admin.goto("/admin/polecenia");
   await expect(admin.getByRole("row", { name: /Piotr Przekazany/ })).toContainText("Anna Testowa");
+  // Wiadomości: opiekun z telefonem nad czatem, rozmowa w obie strony
+  await admin.goto("/admin/ustawienia");
+  await admin.getByTestId("my-phone").fill("+48 600 100 200");
+  await admin.getByTestId("my-profile-save").click();
+  await expect(admin.getByText("Zapisano profil opiekuna.")).toBeVisible();
+  await page.goto("/app/wiadomosci");
+  await expect(page.getByTestId("manager-card")).toContainText("Twój opiekun");
+  await expect(page.getByTestId("manager-card").getByRole("link", { name: "+48 600 100 200" })).toHaveAttribute("href", "tel:+48600100200");
+  await page.getByLabel("Treść wiadomości").fill("Dzień dobry, kiedy wypłata za L-01001?");
+  await page.getByTestId("chat-send").click();
+  await expect(page.getByTestId("chat-thread")).toContainText("kiedy wypłata");
+  await admin.goto("/admin/wiadomosci");
+  await expect(admin.getByTestId("inbox-row").filter({ hasText: "Anna Testowa" })).toContainText("1 nowe");
+  await admin.getByTestId("inbox-row").filter({ hasText: "Anna Testowa" }).click();
+  await admin.getByLabel("Treść wiadomości").fill("Dzień dobry! Wypłata jest już zrealizowana.");
+  await admin.getByTestId("chat-send").click();
+  await expect(admin.getByTestId("chat-thread")).toContainText("już zrealizowana");
+  await page.goto("/app");
+  await expect(page.getByTestId("unread-badge")).toHaveText("1"); // nieprzeczytana odpowiedź opiekuna
+  await page.goto("/app/wiadomosci");
+  await expect(page.getByTestId("chat-thread")).toContainText("już zrealizowana");
+  await p2.goto("/app/wiadomosci"); // inny partner nie widzi cudzej rozmowy
+  await expect(p2.getByTestId("chat-thread")).not.toContainText("kiedy wypłata");
+
   // Konto: zdjęcie z kadrowaniem, branża z ikonami nad statusem, zmiana hasła jako link
   await page.goto("/app/konto");
   await page.getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");

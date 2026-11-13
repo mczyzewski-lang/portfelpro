@@ -10,6 +10,7 @@ import { requirePartner } from "@/lib/auth";
 import { hashPassword, verifyPassword } from "@/lib/crypto";
 import { DEMO_ACCOUNT } from "@/lib/demo";
 import type { Stage } from "@/lib/labels";
+import { postMessage } from "@/lib/messages";
 import { getPublishedAssets } from "@/lib/queries";
 import { assetTargetUrl, createLead, getOrCreateLink, recommendBlockLabel, recommendState } from "@/lib/tracking";
 import { z } from "zod";
@@ -141,4 +142,13 @@ export async function removeAvatarAction() {
   const { partner } = await requirePartner();
   await db.update(partners).set({ avatar: null, avatarUpdatedAt: null }).where(eq(partners.id, partner.id));
   revalidatePath("/app", "layout");
+}
+
+export async function sendMessageAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { user, partner } = await requirePartner();
+  if (!(await rateLimit(`msg:${partner.id}`, 30, 600))) return { error: "Wysyłasz wiadomości zbyt szybko. Spróbuj za chwilę." };
+  const res = await postMessage(partner.id, true, user.id, String(fd.get("body") ?? ""));
+  if ("error" in res) return { error: res.error };
+  revalidatePath("/app/wiadomosci");
+  return null;
 }

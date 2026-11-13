@@ -40,6 +40,8 @@ export const users = pgTable("users", {
   role: userRole("role").notNull().default("partner"),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
+  phone: text("phone"),          // telefon opiekuna pokazywany partnerom
+  jobTitle: text("job_title"),   // np. „Opiekun partnerów”
   createdAt: createdAt(),
 });
 
@@ -73,6 +75,7 @@ export const partners = pgTable("partners", {
   termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }).notNull(),
   termsVersion: text("terms_version").notNull(),
   marketingConsentAt: ts("marketing_consent_at"),
+  managerUserId: uuid("manager_user_id").references(() => users.id, { onDelete: "set null" }), // przypisany opiekun (null = domyślny)
   adminNote: text("admin_note"),
   avatar: text("avatar"),                     // wykadrowane zdjęcie 320×320 jako data URL (JPEG, ok. 20–40 kB)
   avatarUpdatedAt: ts("avatar_updated_at"),
@@ -294,6 +297,17 @@ export const commissions = pgTable("commissions", {
   uniqueIndex("commission_conversion_kind").on(t.conversionId, t.kind).where(sql`status <> 'cancelled'`),
   index("commission_partner").on(t.partnerId, t.status),
 ]);
+
+/* ---------- wiadomości partner ↔ opiekun ---------- */
+export const messages = pgTable("messages", {
+  id: id(),
+  partnerId: uuid("partner_id").notNull().references(() => partners.id, { onDelete: "cascade" }),
+  fromPartner: boolean("from_partner").notNull(),
+  senderUserId: uuid("sender_user_id").references(() => users.id, { onDelete: "set null" }),
+  body: text("body").notNull(),
+  readAt: ts("read_at"), // kiedy druga strona przeczytała
+  createdAt: createdAt(),
+}, (t) => [index("message_partner").on(t.partnerId, t.createdAt)]);
 
 /* ---------- system ---------- */
 export const webhookEvents = pgTable("webhook_events", {
