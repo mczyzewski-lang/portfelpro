@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { GoogleRating } from "@/components/google";
 import { Rate } from "@/components/rate";
 import { ServiceDetails } from "@/components/service-details";
 import { SiteFooter } from "@/components/site";
@@ -25,7 +26,7 @@ export default async function PublicService({ params }: { params: Promise<{ slug
     <>
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4"><Wordmark /><LinkButton href="/rejestracja" className="min-h-10 px-4 text-sm">Załóż Portfel</LinkButton></header>
       <main id="tresc" className="mx-auto w-full max-w-3xl flex-1 px-5 pb-16">
-        <CompanyMark name={company.name} color={company.color} iconUrl={company.iconUrl} />
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1"><CompanyMark name={company.name} color={company.color} iconUrl={company.iconUrl} /><GoogleRating rating={company.googleRating} reviews={company.googleReviews} url={company.googleUrl} /></div>
         <h1 className="mt-1 text-[30px] font-extrabold leading-tight text-leather-dark">{service.name}</h1>
         <p className="mt-2 text-[15px] text-ink/85">{service.clientBenefit}</p>
         <div className="wallet mt-5 rounded-[24px] p-5">

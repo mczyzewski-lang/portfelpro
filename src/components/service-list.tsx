@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import type { CatalogItem } from "@/lib/queries";
+import { GoogleRating } from "./google";
 import { Rate } from "./rate";
 import { CompanyIcon } from "./ui";
 
@@ -57,6 +58,7 @@ export function ServiceList({ items }: { items: PickerItem[] }) {
                 <span className="mt-0.5 block text-[13px] leading-snug text-muted">{i.audienceShort}</span>
                 <span className="mt-2.5 flex flex-wrap items-center gap-2">
                   <span className="rounded-xl bg-cream px-2.5 py-1"><Rate rate={i.rate} size="sm" /></span>
+                  <GoogleRating rating={i.company.googleRating} reviews={i.company.googleReviews} compact />
                   {i.blocked && <span className="inline-flex items-center gap-1 rounded-full bg-sand px-2.5 py-1 text-[11px] font-bold text-muted"><Lock className="size-3" aria-hidden />{i.access === "approval_required" ? "Wymaga zgody" : "Wkrótce"}</span>}
                 </span>
               </span>

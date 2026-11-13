@@ -1,13 +1,14 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { CatalogItem } from "@/lib/queries";
+import { GoogleRating } from "./google";
 import { Rate } from "./rate";
 import { Card, CompanyMark } from "./ui";
 
 export function ServiceCard({ item, href, cta = "Poznaj usługę", reason }: { item: CatalogItem; href: string; cta?: string; reason?: string }) {
   return (
     <Card className="flex h-full flex-col p-5">
-      <CompanyMark {...item.company} />
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1"><CompanyMark {...item.company} /><GoogleRating rating={item.company.googleRating} reviews={item.company.googleReviews} compact /></div>
       <h3 className="mt-2 text-lg font-extrabold leading-snug text-leather-dark">
         <Link href={href} className="after:absolute after:inset-0 hover:underline">{item.name}</Link>
       </h3>

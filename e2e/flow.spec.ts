@@ -71,6 +71,8 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByTestId("google-criteria")).toContainText("min. 100 opinii");
   await expect(page.getByTestId("google-criteria")).toContainText("powyżej 4,7/5");
   await expect(page.locator('img[src="/brands/risify.svg"]')).toHaveCount(1); // logotypy spółek
+  await expect(page.getByTestId("google-trust")).toContainText(">4,7/5");
+  await expect(page.getByTestId("google-trust").getByRole("img", { name: "Google" })).toBeVisible();
 
   // 3–4. Rejestracja i unikalny numer partnera
   const pid = await register(page, "anna@e2e.test", "Anna");
@@ -92,6 +94,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByText("Wersja demonstracyjna")).toHaveCount(0); // belka demo ukryta
   await page.getByTestId("go-wallet").click(); // Portfel = lista usług
   await page.waitForURL("**/app/uslugi");
+  await expect(page.getByTestId("google-trust")).toContainText("Tylko firmy sprawdzone przez klientów"); // także w panelu partnera
   await page.getByTestId("service-znak-towarowy").click();
   await page.waitForURL("**/app/uslugi/znak-towarowy");
   await expect(page.getByRole("heading", { name: "Na jakim etapie jest Twój klient?" })).toBeVisible();

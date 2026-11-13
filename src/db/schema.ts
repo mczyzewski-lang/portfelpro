@@ -87,6 +87,12 @@ export const companies = pgTable("companies", {
   logoUrl: text("logo_url"),   // pełny znak (wordmark)
   iconUrl: text("icon_url"),   // kwadratowa ikona — używana na kartach usług
   color: text("color").notNull().default("#713B20"),
+  // Ocena w Google — wpisywana ręcznie lub pobierana z Google Places API; null = brak danych (nic nie pokazujemy)
+  googleRating: integer("google_rating"),       // średnia × 10, np. 49 = 4,9
+  googleReviews: integer("google_reviews"),     // liczba opinii
+  googlePlaceId: text("google_place_id"),
+  googleUrl: text("google_url"),                // link do wizytówki / opinii
+  googleCheckedAt: ts("google_checked_at"),
   published: boolean("published").notNull().default(true),
   sort: integer("sort").notNull().default(0),
   createdAt: createdAt(),

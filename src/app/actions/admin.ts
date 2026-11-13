@@ -18,6 +18,7 @@ import {
   setCommissionStatus, setLeadStatus,
 } from "@/lib/conversions";
 import { parseCsv, slugify } from "@/lib/csv";
+import { getPlace, googleKeyConfigured, searchPlace } from "@/lib/google-places";
 import { setSetting } from "@/lib/settings";
 import { createLead } from "@/lib/tracking";
 
@@ -112,10 +113,40 @@ export const saveCompanyAction = adminAction(async (fd, actor) => {
   for (const u of [data.logoUrl, data.iconUrl]) {
     if (u && !/^(https:\/\/|\/(?!\/))/.test(u)) throw new DomainError("Logo / ikona: podaj adres https:// lub ścieżkę zaczynającą się od /");
   }
-  const values = { ...data, logoUrl: data.logoUrl || null, iconUrl: data.iconUrl || null, published: str(fd, "published") === "on", sort: Number(str(fd, "sort")) || 0 };
-  if (id) await db.update(companies).set(values).where(eq(companies.id, id));
-  else await db.insert(companies).values({ ...values, slug: slugify(data.name) });
+  const ratingRaw = str(fd, "googleRating").replace(",", ".");
+  const rating = ratingRaw ? Number(ratingRaw) : null;
+  if (rating != null && (!Number.isFinite(rating) || rating < 1 || rating > 5)) throw new DomainError("Ocena Google: liczba od 1 do 5, np. 4,9");
+  const reviewsRaw = str(fd, "googleReviews");
+  const reviews = reviewsRaw ? Number(reviewsRaw) : null;
+  if (reviews != null && (!Number.isInteger(reviews) || reviews < 0)) throw new DomainError("Liczba opinii Google musi być liczbą całkowitą");
+  if ((rating == null) !== (reviews == null)) throw new DomainError("Podaj jednocześnie ocenę i liczbę opinii Google (albo zostaw oba pola puste)");
+  const googleUrl = str(fd, "googleUrl");
+  if (googleUrl && !/^https:\/\//.test(googleUrl)) throw new DomainError("Link do opinii Google musi zaczynać się od https://");
+  const google = { googleRating: rating != null ? Math.round(rating * 10) : null, googleReviews: reviews, googleUrl: googleUrl || null };
+  const values = { ...data, ...google, logoUrl: data.logoUrl || null, iconUrl: data.iconUrl || null, published: str(fd, "published") === "on", sort: Number(str(fd, "sort")) || 0 };
+  if (id) {
+    const [prev] = await db.select().from(companies).where(eq(companies.id, id));
+    const changed = prev && (prev.googleRating !== google.googleRating || prev.googleReviews !== google.googleReviews);
+    await db.update(companies).set({ ...values, ...(changed ? { googleCheckedAt: google.googleRating != null ? new Date() : null } : {}) }).where(eq(companies.id, id));
+  } else await db.insert(companies).values({ ...values, slug: slugify(data.name), googleCheckedAt: google.googleRating != null ? new Date() : null });
   await logAudit(db, actor, id ? "company.update" : "company.create", "company", id || null, { after: values });
+});
+
+/** Pobiera ocenę i liczbę opinii spółki z Google Places API. Wyszukuje po Place ID albo po podanym zapytaniu. */
+export const refreshGoogleAction = adminAction(async (fd, actor) => {
+  if (!googleKeyConfigured()) throw new DomainError("Brak klucza GOOGLE_MAPS_API_KEY — wpisz ocenę ręcznie albo dodaj klucz w zmiennych środowiskowych.");
+  const [c] = await db.select().from(companies).where(eq(companies.id, str(fd, "id")));
+  if (!c) throw new DomainError("Nie znaleziono spółki");
+  const query = str(fd, "query");
+  let place;
+  try { place = query ? await searchPlace(query) : c.googlePlaceId ? await getPlace(c.googlePlaceId) : await searchPlace(c.name); }
+  catch (e) { throw new DomainError(e instanceof Error ? e.message : "Błąd Google Places API"); }
+  if (!place) throw new DomainError("Google nie znalazł takiej wizytówki. Doprecyzuj zapytanie (nazwa + miasto).");
+  if (place.rating == null || place.reviews == null) throw new DomainError(`Wizytówka „${place.name}” nie ma jeszcze ocen w Google.`);
+  const values = { googleRating: Math.round(place.rating * 10), googleReviews: place.reviews, googlePlaceId: place.placeId, googleUrl: place.url, googleCheckedAt: new Date() };
+  await db.update(companies).set(values).where(eq(companies.id, c.id));
+  await logAudit(db, actor, "company.google_refresh", "company", c.id, { after: { ...values, matched: place.name, address: place.address } });
+  return `Pobrano z Google: „${place.name}”, ${place.address} — ${place.rating.toFixed(1).replace(".", ",")}/5, ${place.reviews} opinii. Sprawdź, czy to właściwa wizytówka.`;
 });
 
 /* ================= usługi ================= */

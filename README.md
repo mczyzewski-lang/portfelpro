@@ -57,6 +57,7 @@ Logowanie administratora: `ADMIN_EMAIL` / `ADMIN_PASSWORD` z `.env` → `/logowa
 | `WEBHOOK_SECRET` | token Bearer dla `/api/v1/events`; bez niego webhook odpowiada 503 |
 | `DEMO_MODE` | `true` = stawki „Demo” widoczne z etykietą DEMO i używane do naliczeń; `false` = pokazywane jako „Stawka do ustalenia” i nienaliczane automatycznie |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | konto tworzone przez seed |
+| `GOOGLE_MAPS_API_KEY` | opcjonalnie: klucz Google z włączonym „Places API (New)” — włącza przycisk „Pobierz z Google” przy spółce |
 
 ## Jak to działa
 
@@ -119,6 +120,10 @@ Content-Type: application/json
 - Formularze nie zbierają opisu sytuacji klienta (istotne dla usług zdrowotnych i rodzinnych).
 - Adresy IP są przechowywane wyłącznie jako HMAC. Brak zewnętrznych skryptów analitycznych.
 - Cookies: `pp_session` (logowanie, HttpOnly) i `pp_vid` (atrybucja, HttpOnly, ważne przez okno atrybucji).
+
+### Oceny Google
+
+Na stronie i w panelu widnieje kryterium katalogu (min. 100 opinii, średnia powyżej 4,7/5). Rzeczywistą ocenę i liczbę opinii każdej spółki ustawia się w `/admin/spolki`: ręcznie albo przyciskiem „Pobierz z Google” (wymaga `GOOGLE_MAPS_API_KEY`). Dopóki spółka nie ma danych, jej ocena nie jest nigdzie pokazywana; spółka poniżej kryterium dostaje w panelu ostrzeżenie.
 
 ### Logotypy spółek
 

@@ -7,7 +7,7 @@ import { env } from "./env";
 export type CatalogItem = {
   id: string; slug: string; name: string; category: string; clientBenefit: string; audienceShort: string;
   commissionCondition: string; access: "open" | "approval_required";
-  company: { name: string; color: string; logoUrl: string | null; iconUrl: string | null; slug: string };
+  company: { name: string; color: string; logoUrl: string | null; iconUrl: string | null; slug: string; googleRating: number | null; googleReviews: number | null };
   rate: RateDisplay;
   professions: { slug: string; reason: string }[];
 };
@@ -23,7 +23,7 @@ export async function getCatalog(terms: PartnerServiceTerm[] = []): Promise<Cata
   return rows.map(({ s, c }) => ({
     id: s.id, slug: s.slug, name: s.name, category: s.category, clientBenefit: s.clientBenefit, audienceShort: s.audienceShort,
     commissionCondition: s.commissionCondition, access: s.access,
-    company: { name: c.name, color: c.color, logoUrl: c.logoUrl, iconUrl: c.iconUrl, slug: c.slug },
+    company: { name: c.name, color: c.color, logoUrl: c.logoUrl, iconUrl: c.iconUrl, slug: c.slug, googleRating: c.googleRating, googleReviews: c.googleReviews },
     rate: displayRate(s, termBy.get(s.id), env.demoMode),
     professions: sp.filter((x) => x.serviceId === s.id).map((x) => ({ slug: x.professionSlug, reason: x.reason })),
   }));

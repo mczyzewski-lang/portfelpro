@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShareData, requestAccessAction } from "@/app/actions/partner";
 import { ActionForm, CopyButton, SubmitButton } from "@/components/client";
+import { GoogleRating, GoogleTrustCard } from "@/components/google";
 import { Rate } from "@/components/rate";
 import { ServiceDetails } from "@/components/service-details";
 import { ClientHandoff } from "@/components/client-handoff";
@@ -35,6 +36,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <div className="relative z-10 flex items-center gap-2.5">
           <CompanyIcon name={company.name} color={company.color} iconUrl={company.iconUrl} size={34} />
           <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/75">{company.name}</span>
+          <GoogleRating rating={company.googleRating} reviews={company.googleReviews} url={company.googleUrl} onDark className="ml-auto rounded-full bg-white/10 px-2.5 py-1" />
         </div>
         <h1 className="relative z-10 mt-3 text-[26px] font-extrabold leading-[1.12]">{service.name}</h1>
         <p className="relative z-10 mt-1.5 text-sm leading-snug text-white/80">{service.clientBenefit}</p>
@@ -85,6 +87,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <h2 id="poznaj" className="text-xl font-extrabold text-leather-dark">Poznaj usługę</h2>
         <div className="mt-3"><ServiceDetails service={service} company={company} collapsible /></div>
       </section>
+      <GoogleTrustCard compact className="mt-6" />
     </article>
   );
 }

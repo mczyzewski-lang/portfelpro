@@ -1,3 +1,4 @@
+import { GoogleTrustCard } from "@/components/google";
 import { ServiceList } from "@/components/service-list";
 import { requirePartner } from "@/lib/auth";
 import { getPickerItems } from "@/lib/picker";
@@ -15,6 +16,7 @@ export default async function ServicesPage() {
         {partner.status === "active" ? `Wybierz usługę — w środku dobierzesz link do etapu klienta. Dostępne: ${available} z ${items.length}.` : "Przeglądaj katalog — linki aktywujemy po zatwierdzeniu konta."}
       </p>
       <div className="mt-4"><ServiceList items={items} /></div>
+      <GoogleTrustCard compact className="mt-6" />
     </>
   );
 }
