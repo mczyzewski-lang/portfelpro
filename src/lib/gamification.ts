@@ -25,7 +25,11 @@ export function levelFor(clients: number) {
   return { index, current, next, progress, missing: next ? next.min - clients : 0 };
 }
 
-export type Achievement = { id: string; title: string; description: string; done: boolean; current: number; target: number };
+export type Achievement = {
+  id: string; title: string; description: string; done: boolean; current: number; target: number;
+  /** dalekie progi: dopóki nie są zdobyte, pokazujemy je tylko jako zasłoniętą zapowiedź */
+  teaser?: boolean;
+};
 
 export function achievementsFor(s: PartnerStats): Achievement[] {
   const a = (id: string, title: string, description: string, current: number, target: number): Achievement =>
@@ -43,6 +47,9 @@ export function achievementsFor(s: PartnerStats): Achievement[] {
     a("ten-leads", "10 poleceń", "Dziesięć osób trafiło do specjalistów dzięki Tobie.", s.leads, 10),
     a("five-clients", "5 klientów", "Pięć potwierdzonych sprzedaży.", s.clients, 5),
     a("ten-clients", "10 klientów", "Dziesięć potwierdzonych sprzedaży — tu czeka na Ciebie niespodzianka.", s.clients, 10),
+    { ...a("twenty-clients", "20 klientów", "Dwadzieścia potwierdzonych sprzedaży.", s.clients, 20), teaser: true },
+    { ...a("thirty-clients", "30 klientów", "Trzydzieści potwierdzonych sprzedaży.", s.clients, 30), teaser: true },
+    { ...a("forty-five-clients", "45 klientów", "Czterdzieści pięć potwierdzonych sprzedaży.", s.clients, 45), teaser: true },
   ];
 }
 

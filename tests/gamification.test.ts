@@ -30,6 +30,13 @@ describe("osiągnięcia", () => {
   });
 });
 
+describe("dalekie progi", () => {
+  it("20, 30 i 45 klientów to zapowiedzi, dopóki nie zostaną zdobyte", () => {
+    const list = achievementsFor({ ...zero, clients: 21 });
+    expect(list.filter((a) => a.teaser).map((a) => [a.id, a.done])).toEqual([["twenty-clients", true], ["thirty-clients", false], ["forty-five-clients", false]]);
+  });
+});
+
 describe("nowości w poziomach", () => {
   it("brak nowości bez żadnych osiągnięć", () => expect(newSince(null, zero).any).toBe(false));
   it("pakiet startowy i nowy poziom są nowością, dopóki partner ich nie zobaczy", () => {

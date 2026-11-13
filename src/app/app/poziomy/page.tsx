@@ -21,7 +21,8 @@ export default async function LevelsPage() {
   const level = levelFor(stats.clients);
   // Zdobyte (zielone) zawsze na górze; w obrębie grup zachowujemy stałą kolejność.
   const all = achievementsFor(stats);
-  const list = [...all.filter((a) => a.done), ...all.filter((a) => !a.done)];
+  const list = [...all.filter((a) => a.done), ...all.filter((a) => !a.done && !a.teaser)];
+  const teasers = all.filter((a) => a.teaser && !a.done); // kolejne progi — tylko zasłonięta zapowiedź
   const doneCount = list.filter((a) => a.done).length;
   const plural = (n: number) => (n === 1 ? "klienta" : "klientów");
 
@@ -98,8 +99,24 @@ export default async function LevelsPage() {
         </ul>
       </section>
 
+      {/* Dalsze progi są celowo zasłonięte: widać, że coś jest dalej, ale nie co. Przycisk leży na nich. */}
+      <div className="relative" data-testid="levels-teaser">
+        {teasers.length > 0 && (
+          <ul aria-hidden className="-mt-3.5 max-h-[150px] select-none space-y-2.5 overflow-hidden">
+            {teasers.map((a) => (
+              <li key={a.id} className="flex gap-3 rounded-3xl border border-line bg-white/60 p-4 blur-[1.5px]">
+                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-sand text-muted"><Lock className="size-4" /></span>
+                <div><p className="font-extrabold text-ink/60">{a.title}</p><p className="text-[13px] text-muted">{a.description}</p></div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className={teasers.length > 0 ? "absolute inset-x-0 bottom-0 flex h-[150px] flex-col justify-end bg-linear-to-b from-cream/0 via-cream/85 to-cream" : undefined}>
+          {teasers.length > 0 && <p className="mb-2 text-center text-xs font-semibold text-muted">Kolejne progi odkryjesz po drodze</p>}
+          <Link href="/app/uslugi" className={btn("primary", "press w-full")}>Poleć kolejną usługę</Link>
+        </div>
+      </div>
       <p className="px-1 text-xs text-muted">Poziomy i osiągnięcia liczymy z faktycznych danych: otwartych linków, poleceń i potwierdzonych sprzedaży. Mają charakter informacyjny i nie zmieniają stawek prowizji.</p>
-      <Link href="/app/uslugi" className={btn("primary", "press w-full")}>Poleć kolejną usługę</Link>
     </div>
   );
 }

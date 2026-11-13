@@ -3,6 +3,7 @@
 import { Home, ListChecks, MessageCircle, Trophy, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { cn } from "@/lib/cn";
 import { MiniConfetti } from "./confetti";
 
@@ -18,6 +19,19 @@ export function PartnerNav({ variant, unread = 0, levelsNew = false }: { variant
   const dot = (href: string) => href === "/app/wiadomosci" && unread > 0
     ? <span className="absolute right-[22%] top-1.5 grid min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold leading-4 text-white" data-testid="unread-badge">{unread}</span> : null;
   const path = usePathname();
+  // iOS: po schowaniu klawiatury strona potrafi zostać „podjechana” w górę, przez co przypięte paski wiszą nad dołem ekranu.
+  // Po wyjściu z pola i przy zmianie rozmiaru widocznego obszaru przywracamy poprawne położenie.
+  useEffect(() => {
+    if (variant !== "bottom") return;
+    const settle = () => {
+      const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      if (window.scrollY > max || (window.visualViewport?.offsetTop ?? 0) > 0) window.scrollTo({ top: Math.min(window.scrollY, max), behavior: "instant" });
+    };
+    const later = () => { setTimeout(settle, 80); setTimeout(settle, 350); };
+    document.addEventListener("focusout", later);
+    window.visualViewport?.addEventListener("resize", later);
+    return () => { document.removeEventListener("focusout", later); window.visualViewport?.removeEventListener("resize", later); };
+  }, [variant]);
   const active = (i: (typeof items)[number]) => (i.exact ? path === i.href : path.startsWith(i.href));
   if (variant === "top") {
     return (
