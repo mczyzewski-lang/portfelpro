@@ -4,6 +4,7 @@ import { Check, Copy, Mail, MessageCircle, Share2 } from "lucide-react";
 import { useActionState, useEffect, useRef, useState, useSyncExternalStore, type ComponentProps, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { cn } from "@/lib/cn";
+import { formatPLN } from "@/lib/commission";
 import { btn, btnSm, type BtnVariant } from "./ui";
 
 export type FormState = { error?: string; ok?: string; fieldErrors?: Record<string, string> } | null;
@@ -19,6 +20,28 @@ export function SubmitButton({ children, variant = "primary", small, className, 
 
 const TOAST = "pp-toast";
 type Toast = { tone: "ok" | "error"; text: string; id: number };
+
+export function toast(text: string, tone: "ok" | "error" = "ok") {
+  window.dispatchEvent(new CustomEvent<Toast>(TOAST, { detail: { tone, text, id: Date.now() + Math.random() } }));
+}
+
+/** Licznik kwoty „nabijający się” przy wejściu na ekran. Bez animacji przy prefers-reduced-motion. */
+export function CountUp({ value, format = "pln", className, testId }: { value: number; format?: "pln" | "int"; className?: string; testId?: string }) {
+  const [shown, setShown] = useState(value);
+  useEffect(() => {
+    if (value === 0 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0; const start = performance.now(); const dur = 750;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / dur);
+      setShown(Math.round(value * (1 - Math.pow(1 - t, 3))));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  const text = format === "int" ? String(shown) : formatPLN(format === "pln" && shown !== value ? Math.round(shown / 100) * 100 : shown);
+  return <span className={className} data-testid={testId} data-value={value}>{text}</span>;
+}
 
 /**
  * Komunikaty po akcjach. Żyją poza formularzem — potwierdzenie nie znika,
@@ -36,7 +59,7 @@ export function Toaster() {
     return () => window.removeEventListener(TOAST, on);
   }, []);
   return (
-    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex flex-col items-center gap-2 px-4 md:bottom-6">
+    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex flex-col items-center gap-2 px-4 md:bottom-6">
       {toasts.map((t) => (
         <p key={t.id} role={t.tone === "error" ? "alert" : "status"}
           className={cn("rise pointer-events-auto max-w-md rounded-2xl px-4 py-3 text-sm font-semibold shadow-lg", t.tone === "ok" ? "bg-leather-dark text-white" : "bg-danger text-white")}>
@@ -56,7 +79,7 @@ export function ActionForm({ action, children, className, resetOnOk, confirm }: 
   const [state, formAction] = useActionState(async (prev: FormState, fd: FormData) => {
     const res = await action(prev, fd);
     const text = res?.ok ?? res?.error;
-    if (text) window.dispatchEvent(new CustomEvent<Toast>(TOAST, { detail: { tone: res?.ok ? "ok" : "error", text, id: Date.now() + Math.random() } }));
+    if (text) toast(text, res?.ok ? "ok" : "error");
     if (res?.ok && resetOnOk) ref.current?.reset();
     return res;
   }, null);
@@ -86,8 +109,8 @@ export function CopyButton({ text, label, copiedLabel = "Skopiowano", variant = 
   return (
     <button type="button" data-testid={testId} data-copy={text}
       onClick={async () => { if (await copyText(text)) { setCopied(true); setTimeout(() => setCopied(false), 2200); } }}
-      className={(small ? btnSm : btn)(copied ? "gold" : variant, className)}>
-      {copied ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}
+      className={(small ? btnSm : btn)(copied ? "gold" : variant, cn("press", className))}>
+      {copied ? <Check className="pop size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}
       <span aria-live="polite">{copied ? copiedLabel : label}</span>
     </button>
   );

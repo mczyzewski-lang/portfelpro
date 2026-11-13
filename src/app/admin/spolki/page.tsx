@@ -14,7 +14,8 @@ function CompanyForm({ c }: { c?: Company }) {
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Nazwa"><input name="name" defaultValue={c?.name} required className={inputCls} /></Field>
         <Field label="Hasło (tagline)"><input name="tagline" defaultValue={c?.tagline} className={inputCls} /></Field>
-        <Field label="Logo (URL https:// lub ścieżka /…)" hint="Puste = znak kolorystyczny z nazwą"><input name="logoUrl" defaultValue={c?.logoUrl ?? ""} className={inputCls} /></Field>
+        <Field label="Logo — pełny znak (https:// lub /…)" hint="Pokazywane na stronie głównej"><input name="logoUrl" defaultValue={c?.logoUrl ?? ""} className={inputCls} /></Field>
+        <Field label="Ikona kwadratowa (https:// lub /…)" hint="Pokazywana na kartach usług. Puste = inicjał na kolorze marki"><input name="iconUrl" defaultValue={c?.iconUrl ?? ""} className={inputCls} /></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Kolor"><input name="color" type="color" defaultValue={c?.color ?? "#713B20"} className={`${inputCls} p-1`} /></Field>
           <Field label="Kolejność"><input name="sort" type="number" defaultValue={c?.sort ?? 0} className={inputCls} /></Field>
@@ -36,7 +37,7 @@ export default async function CompaniesPage() {
       <div className="space-y-2.5">
         {rows.map((c) => (
           <details key={c.id} className="rounded-2xl border border-line bg-white px-4">
-            <summary className="flex min-h-14 items-center justify-between gap-3"><CompanyMark name={c.name} color={c.color} logoUrl={c.logoUrl} /><span className="flex items-center gap-2 text-sm text-muted">{c.tagline}{!c.published && <Badge tone="warn">Ukryta</Badge>}</span></summary>
+            <summary className="flex min-h-14 items-center justify-between gap-3"><CompanyMark name={c.name} color={c.color} iconUrl={c.iconUrl} /><span className="flex items-center gap-2 text-sm text-muted">{c.tagline}{!c.published && <Badge tone="warn">Ukryta</Badge>}</span></summary>
             <CompanyForm c={c} />
           </details>
         ))}

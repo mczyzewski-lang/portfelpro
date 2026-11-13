@@ -1,11 +1,11 @@
-import { ChevronDown, Link2, Search, Wallet } from "lucide-react";
+import { BadgeCheck, ChevronDown, Link2, Search, Star, Wallet } from "lucide-react";
 import Link from "next/link";
 import { asc, eq } from "drizzle-orm";
 import { ProfessionMatcher } from "@/components/profession-matcher";
 import { Rate } from "@/components/rate";
 import { ServiceCard } from "@/components/service-card";
 import { DemoBanner, SiteFooter } from "@/components/site";
-import { CompanyMark, LinkButton, Logo, Wordmark } from "@/components/ui";
+import { CompanyIcon, LinkButton, Logo, Wordmark } from "@/components/ui";
 import { db } from "@/db";
 import { companies, landingFaqs } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
@@ -52,6 +52,10 @@ export default async function Landing() {
               <LinkButton href="/rejestracja" className="min-h-12 px-7">Załóż bezpłatny Portfel</LinkButton>
               <LinkButton href="#uslugi" variant="secondary" className="min-h-12">Zobacz dostępne usługi</LinkButton>
             </div>
+            <p className="mt-4 flex items-start gap-2 text-sm text-ink/80" data-testid="google-criteria">
+              <BadgeCheck className="mt-0.5 size-[18px] shrink-0 text-gold-deep" aria-hidden />
+              <span>Polecasz wyłącznie firmy ocenione w Google: <b className="text-leather-dark">min. 100 opinii</b> i średnia <b className="text-leather-dark">powyżej 4,7/5</b>.</span>
+            </p>
           </div>
 
           {/* Podgląd usług i stawek — widoczny bez wchodzenia głębiej */}
@@ -63,9 +67,12 @@ export default async function Landing() {
             <ul className="relative z-10 mt-3 divide-y divide-white/10">
               {items.map((i) => (
                 <li key={i.id} className="flex items-center justify-between gap-3 py-2.5">
-                  <div className="min-w-0">
-                    <p className="truncate text-[15px] font-bold leading-tight">{i.name}</p>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-white/55">{i.company.name}</p>
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <CompanyIcon {...i.company} size={30} />
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-bold leading-tight">{i.name}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/55">{i.company.name}</p>
+                    </div>
                   </div>
                   <div className="shrink-0 text-right"><Rate rate={i.rate} size="sm" onDark /></div>
                 </li>
@@ -125,14 +132,26 @@ export default async function Landing() {
                 ))}
               </ul>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {brands.map((b) => (
-                <div key={b.id} className="rounded-(--radius-card) border border-line bg-white p-4">
-                  <CompanyMark name={b.name} color={b.color} logoUrl={b.logoUrl} />
-                  <p className="mt-2 text-sm leading-snug text-ink/80">{b.tagline}</p>
-                  <p className="mt-2 text-xs font-semibold text-muted">{items.filter((i) => i.company.slug === b.slug).length} usł. w katalogu</p>
-                </div>
-              ))}
+            <div>
+              <div className="rounded-(--radius-card) border border-gold/40 bg-white p-5">
+                <div className="flex items-center gap-1 text-gold" aria-hidden>{[0, 1, 2, 3, 4].map((i) => <Star key={i} className="size-5 fill-current" />)}</div>
+                <p className="mt-2 text-lg font-extrabold leading-snug text-leather-dark">Tylko firmy sprawdzone przez klientów</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink/80">Do katalogu trafiają wyłącznie usługi firm ocenionych w Google: co najmniej <b>100 opinii</b> i średnia ocena <b>powyżej 4,7/5</b>. Polecasz marki, którym klienci już zaufali.</p>
+              </div>
+              <ul className="mt-3 grid grid-cols-2 gap-3">
+                {brands.map((b) => (
+                  <li key={b.id} className="rounded-(--radius-card) border border-line bg-white p-4">
+                    <div className="flex h-9 items-center gap-2">
+                      {b.logoUrl
+                        // eslint-disable-next-line @next/next/no-img-element -- logo spółki (SVG / adres ustawiany w panelu)
+                        ? <img src={b.logoUrl} alt={b.name} className="max-h-7 w-auto max-w-full" />
+                        : <><CompanyIcon name={b.name} color={b.color} iconUrl={b.iconUrl} size={32} /><span className="text-base font-extrabold tracking-wide text-leather-dark">{b.name}</span></>}
+                    </div>
+                    <p className="mt-2 text-sm leading-snug text-ink/80">{b.tagline}</p>
+                    <p className="mt-2 text-xs font-semibold text-muted">{items.filter((i) => i.company.slug === b.slug).length} usł. w katalogu</p>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>

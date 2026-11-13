@@ -1,5 +1,5 @@
 import type { Partner } from "@/db/schema";
-import type { PickerItem } from "@/components/service-picker";
+import type { PickerItem } from "@/components/service-list";
 import { getCatalog, getPartnerTerms } from "./queries";
 import { recommendBlockLabel, recommendState } from "./tracking";
 

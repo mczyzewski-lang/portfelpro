@@ -1,12 +1,12 @@
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, Lock, MessageSquareQuote } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShareData, requestAccessAction } from "@/app/actions/partner";
-import { ActionForm, SubmitButton } from "@/components/client";
+import { ActionForm, CopyButton, SubmitButton } from "@/components/client";
 import { Rate } from "@/components/rate";
 import { ServiceDetails } from "@/components/service-details";
 import { StagePaths } from "@/components/share";
-import { Card, CompanyMark, Notice } from "@/components/ui";
+import { CompanyIcon, Notice } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { displayRate } from "@/lib/commission";
 import { env } from "@/lib/env";
@@ -26,48 +26,63 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const lockedAssets = state.can ? [] : await getPublishedAssets(service.id);
 
   return (
-    <article>
-      <Link href="/app/uslugi" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Usługi</Link>
+    <article className="mx-auto max-w-2xl">
+      <Link href="/app" className="press -ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel</Link>
 
-      <header className="mt-1">
-        <CompanyMark name={company.name} color={company.color} logoUrl={company.logoUrl} />
-        <h1 className="mt-1 text-[28px] font-extrabold leading-tight text-leather-dark">{service.name}</h1>
-        <p className="mt-1.5 text-[15px] text-ink/85">{service.clientBenefit}</p>
+      {/* Karta usługi: co polecam i ile zarobię */}
+      <header className="wallet wallet-sheen mt-1 rounded-[28px] p-5">
+        <div className="relative z-10 flex items-center gap-2.5">
+          <CompanyIcon name={company.name} color={company.color} iconUrl={company.iconUrl} size={34} />
+          <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/75">{company.name}</span>
+        </div>
+        <h1 className="relative z-10 mt-3 text-[26px] font-extrabold leading-[1.12]">{service.name}</h1>
+        <p className="relative z-10 mt-1.5 text-sm leading-snug text-white/80">{service.clientBenefit}</p>
+        <div className="relative z-10 mt-4 border-t border-white/15 pt-3.5">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twoja prowizja</p>
+          <div className="mt-0.5" data-testid="service-rate"><Rate rate={rate} size="lg" onDark /></div>
+          {service.commissionCondition && <p className="mt-1 text-[13px] text-white/75">{service.commissionCondition}</p>}
+        </div>
       </header>
 
-      <div className="wallet mt-4 rounded-[24px] p-5">
-        <p className="relative z-10 text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twoja prowizja</p>
-        <div className="relative z-10 mt-1" data-testid="service-rate"><Rate rate={rate} size="lg" onDark /></div>
-        {service.commissionCondition && <p className="relative z-10 mt-1.5 text-sm text-white/80"><span className="font-semibold text-white">Warunek:</span> {service.commissionCondition}</p>}
-      </div>
-
+      {/* Najważniejsza akcja: dobierz link do etapu klienta i wyślij */}
       <section className="mt-6" aria-labelledby="polecaj">
-        <h2 id="polecaj" className="text-xl font-extrabold text-leather-dark">Trzy drogi polecenia</h2>
-        <p className="mt-1 text-sm text-muted">Wybierz punkt wejścia pasujący do tego, na ile klient jest gotowy. To nie są obowiązkowe etapy.</p>
-        <div className="mt-4">
+        <h2 id="polecaj" className="text-xl font-extrabold text-leather-dark">Na jakim etapie jest Twój klient?</h2>
+        <p className="mt-0.5 text-sm text-muted">Każdy etap to inny link. Wybierz ten, który pasuje do rozmowy.</p>
+        <div className="mt-3.5">
           {share?.ok ? (
             <StagePaths assets={share.assets} serviceName={service.name} />
           ) : (
-            <Card className="p-5">
+            <div className="rounded-3xl border border-line bg-white p-5 shadow-(--shadow-card)">
               <p className="flex items-center gap-2 font-bold text-leather-dark"><Lock className="size-4" aria-hidden />{state.can ? "Linki chwilowo niedostępne" : recommendBlockLabel[state.reason]}</p>
               {!state.can && state.reason === "needs_access" && (
                 <>
                   <p className="mt-1.5 text-sm text-muted">Ze względu na charakter tej usługi (regulacje prawne, finansowe lub zdrowotne) forma współpracy i warunki prowizji są zatwierdzane indywidualnie.</p>
                   <ActionForm action={requestAccessAction} className="mt-4">
                     <input type="hidden" name="serviceId" value={service.id} />
-                    <SubmitButton>Poproś o dostęp do usługi</SubmitButton>
+                    <SubmitButton className="press w-full">Poproś o dostęp do usługi</SubmitButton>
                   </ActionForm>
                 </>
               )}
               {!state.can && state.reason === "access_requested" && <Notice tone="neutral" className="mt-3">Twój wniosek został przyjęty. Linki pojawią się tutaj po decyzji.</Notice>}
-              <p className="mt-4 text-xs font-bold uppercase tracking-wider text-muted">Materiały, które będziesz mógł udostępniać</p>
+              <p className="mt-4 text-xs font-bold uppercase tracking-wider text-muted">Materiały, które będziesz mógł wysyłać</p>
               <ul className="mt-1.5 space-y-1 text-sm text-ink/85">{lockedAssets.map((a) => <li key={a.id}>• {a.title}</li>)}</ul>
-            </Card>
+            </div>
           )}
         </div>
       </section>
 
-      <Card className="mt-6 p-5"><ServiceDetails service={service} company={company} /></Card>
+      {service.pitch && (
+        <section className="mt-6 rounded-3xl border border-gold/40 bg-white p-5" aria-labelledby="pitch">
+          <h2 id="pitch" className="flex items-center gap-2 text-[17px] font-extrabold text-leather-dark"><MessageSquareQuote className="size-5 text-gold-deep" aria-hidden />Jak to powiedzieć w 20 sekund</h2>
+          <p className="mt-2 text-[15px] italic leading-relaxed text-ink/85">„{service.pitch}”</p>
+          <div className="mt-3"><CopyButton small variant="secondary" text={service.pitch} label="Kopiuj tekst" /></div>
+        </section>
+      )}
+
+      <section className="mt-6" aria-labelledby="poznaj">
+        <h2 id="poznaj" className="text-xl font-extrabold text-leather-dark">Poznaj usługę</h2>
+        <div className="mt-3"><ServiceDetails service={service} company={company} collapsible /></div>
+      </section>
     </article>
   );
 }

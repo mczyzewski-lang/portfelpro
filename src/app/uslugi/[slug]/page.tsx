@@ -26,7 +26,7 @@ export default async function PublicService({ params }: { params: Promise<{ slug
       <DemoBanner />
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4"><Wordmark /><LinkButton href="/rejestracja" className="min-h-10 px-4 text-sm">Załóż Portfel</LinkButton></header>
       <main id="tresc" className="mx-auto w-full max-w-3xl flex-1 px-5 pb-16">
-        <CompanyMark name={company.name} color={company.color} logoUrl={company.logoUrl} />
+        <CompanyMark name={company.name} color={company.color} iconUrl={company.iconUrl} />
         <h1 className="mt-1 text-[30px] font-extrabold leading-tight text-leather-dark">{service.name}</h1>
         <p className="mt-2 text-[15px] text-ink/85">{service.clientBenefit}</p>
         <div className="wallet mt-5 rounded-[24px] p-5">

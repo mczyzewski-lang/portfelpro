@@ -1,9 +1,24 @@
+"use client";
+
 import { ChevronDown, CircleAlert } from "lucide-react";
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import type { Company, Service } from "@/db/schema";
 import { CopyButton } from "./client";
 
+const Ctx = createContext(false);
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
+  const collapsible = useContext(Ctx);
+  if (collapsible) {
+    return (
+      <details className="group border-b border-line last:border-0">
+        <summary className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 text-[15px] font-bold text-leather-dark">
+          {title}<ChevronDown className="size-5 shrink-0 text-muted transition-transform group-open:rotate-180" aria-hidden />
+        </summary>
+        <div className="rise px-4 pb-4 text-[15px] leading-relaxed text-ink/85">{children}</div>
+      </details>
+    );
+  }
   return (
     <section className="border-t border-line py-5 first:border-0 first:pt-0">
       <h2 className="text-[17px] font-extrabold text-leather-dark">{title}</h2>
@@ -16,16 +31,17 @@ const List = ({ items }: { items: string[] }) => (
 );
 
 /** Treść merytoryczna karty usługi — odpowiada na pytania: co, komu, kiedy i jak polecać. */
-export function ServiceDetails({ service, company, showPitchCopy = true }: { service: Service; company: Company; showPitchCopy?: boolean }) {
+export function ServiceDetails({ service, company, showPitchCopy = true, collapsible = false }: { service: Service; company: Company; showPitchCopy?: boolean; collapsible?: boolean }) {
   return (
-    <div>
+    <Ctx.Provider value={collapsible}>
+    <div className={collapsible ? "overflow-hidden rounded-3xl border border-line bg-white shadow-(--shadow-card)" : undefined}>
       {service.description && <Section title="Czym jest ta usługa?"><p>{service.description}</p></Section>}
       {service.problems.length > 0 && <Section title="Jakie problemy klienta rozwiązuje?"><List items={service.problems} /></Section>}
       {service.audience.length > 0 && <Section title="Dla kogo jest przeznaczona?"><List items={service.audience} /></Section>}
       {service.whenToRecommend.length > 0 && <Section title="Kiedy najlepiej ją polecać?"><List items={service.whenToRecommend} /></Section>}
       {service.signals.length > 0 && <Section title="Po czym poznasz, że klient może jej potrzebować?"><List items={service.signals} /></Section>}
       {service.arguments.length > 0 && <Section title="Najważniejsze argumenty"><List items={service.arguments} /></Section>}
-      {service.pitch && (
+      {service.pitch && !collapsible && (
         <Section title="Jak przedstawić ją w 15–30 sekund?">
           <blockquote className="rounded-2xl border-l-4 border-gold bg-cream px-4 py-3 text-[15px] italic">„{service.pitch}”</blockquote>
           {showPitchCopy && <div className="mt-3"><CopyButton small variant="secondary" text={service.pitch} label="Kopiuj tekst" /></div>}
@@ -53,5 +69,6 @@ export function ServiceDetails({ service, company, showPitchCopy = true }: { ser
       <Section title="Kto realizuje usługę?"><p>{service.provider || `Usługę realizuje ${company.name}.`}</p></Section>
       {service.commissionTerms && <Section title="Warunki prowizji"><p className="text-sm text-muted">{service.commissionTerms}</p></Section>}
     </div>
+    </Ctx.Provider>
   );
 }

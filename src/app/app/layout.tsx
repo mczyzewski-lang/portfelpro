@@ -19,7 +19,7 @@ export default async function PartnerLayout({ children }: { children: React.Reac
           <span className="tabular rounded-full bg-white px-3 py-1 text-xs font-bold text-leather-dark ring-1 ring-line" data-testid="partner-id">{partnerId(partner.number)}</span>
         </div>
       </header>
-      <main id="tresc" className="mx-auto w-full max-w-5xl flex-1 px-5 pb-28 pt-5 md:pb-12">
+      <main id="tresc" className="mx-auto w-full max-w-5xl flex-1 px-5 pb-32 pt-4 md:pb-12">
         {partner.status === "pending" && (
           <Notice className="mb-5">Twoje konto czeka na zatwierdzenie. Możesz już przeglądać usługi — linki polecające aktywujemy zaraz po weryfikacji.</Notice>
         )}

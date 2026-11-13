@@ -68,6 +68,9 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(preview.getByText("300 zł").first()).toBeVisible();
   await expect(preview.getByText("DEMO").first()).toBeVisible();
   await expect(preview.getByText("Stawka do ustalenia").first()).toBeVisible(); // brak wymyślonych kwot
+  await expect(page.getByTestId("google-criteria")).toContainText("min. 100 opinii");
+  await expect(page.getByTestId("google-criteria")).toContainText("powyżej 4,7/5");
+  await expect(page.locator('img[src="/brands/risify.svg"]')).toHaveCount(1); // logotypy spółek
 
   // 3–4. Rejestracja i unikalny numer partnera
   const pid = await register(page, "anna@e2e.test", "Anna");
@@ -83,8 +86,14 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   const admin = await adminPage(browser);
   await approvePartner(admin, pid);
 
-  // 5–8. Karta usługi, prowizja, etap Edukacja, skopiowanie osobistego linku
-  await page.goto("/app/uslugi/znak-towarowy");
+  // 5–8. Z portfela wchodzę w usługę; dopiero w niej wybieram etap i kopiuję osobisty link
+  await page.goto("/app");
+  await page.getByTestId("service-znak-towarowy").click();
+  await page.waitForURL("**/app/uslugi/znak-towarowy");
+  await expect(page.getByRole("heading", { name: "Na jakim etapie jest Twój klient?" })).toBeVisible();
+  await page.getByTestId("stage-consultation").click();
+  await expect(page.getByTestId("copy-consultation")).toHaveCount(1);
+  await expect(page.getByTestId("copy-education")).toHaveCount(0); // każdy etap to inne linki
   await expect(page.getByTestId("service-rate")).toContainText("300 zł");
   await expect(page.getByText("Za zakończoną i opłaconą usługę")).toBeVisible();
   const { url: link, copy } = await educationLink(page);

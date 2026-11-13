@@ -71,13 +71,21 @@ export function Wordmark({ href = "/", size = 34 }: { href?: string; size?: numb
   );
 }
 
-export function CompanyMark({ name, color, logoUrl }: { name: string; color: string; logoUrl?: string | null }) {
+type CompanyLike = { name: string; color: string; logoUrl?: string | null; iconUrl?: string | null };
+
+/** Kwadratowa ikona spółki (logo z jej strony) lub inicjał na kolorze marki. */
+export function CompanyIcon({ name, color, iconUrl, size = 20, className }: CompanyLike & { size?: number; className?: string }) {
+  const style = { width: size, height: size, borderRadius: Math.round(size * 0.28) };
+  return iconUrl
+    // eslint-disable-next-line @next/next/no-img-element -- logo spółki ustawiane w panelu (plik lokalny lub adres zewnętrzny)
+    ? <img src={iconUrl} alt="" style={style} className={cn("shrink-0 bg-white object-cover ring-1 ring-black/5", className)} />
+    : <span aria-hidden style={{ ...style, background: color, fontSize: size * 0.5 }} className={cn("grid shrink-0 place-items-center font-extrabold text-white", className)}>{name.slice(0, 1)}</span>;
+}
+
+export function CompanyMark({ name, color, iconUrl, onDark }: CompanyLike & { onDark?: boolean }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-muted">
-      {logoUrl
-        // eslint-disable-next-line @next/next/no-img-element -- logo z zewnętrznego adresu ustawianego w panelu
-        ? <img src={logoUrl} alt="" className="h-4 w-auto" />
-        : <span aria-hidden className="size-2.5 rounded-[3px]" style={{ background: color }} />}
+    <span className={cn("inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em]", onDark ? "text-white/70" : "text-muted")}>
+      <CompanyIcon name={name} color={color} iconUrl={iconUrl} size={18} />
       {name}
     </span>
   );

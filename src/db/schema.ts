@@ -84,7 +84,8 @@ export const companies = pgTable("companies", {
   name: text("name").notNull(),
   tagline: text("tagline").notNull().default(""),
   description: text("description").notNull().default(""),
-  logoUrl: text("logo_url"),
+  logoUrl: text("logo_url"),   // pełny znak (wordmark)
+  iconUrl: text("icon_url"),   // kwadratowa ikona — używana na kartach usług
   color: text("color").notNull().default("#713B20"),
   published: boolean("published").notNull().default(true),
   sort: integer("sort").notNull().default(0),

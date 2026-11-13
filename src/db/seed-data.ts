@@ -36,13 +36,13 @@ export const PROFESSIONS = [
 ];
 
 export const COMPANIES = [
-  { slug: "pravna", name: "PRAVNA", tagline: "Usługi prawne i podatkowe dla firm i osób prywatnych", color: "#1F3A5F",
+  { slug: "pravna", name: "PRAVNA", tagline: "Usługi prawne i podatkowe dla firm i osób prywatnych", color: "#172B4D", logoUrl: null, iconUrl: "/brands/pravna-icon.png",
     description: "Zespół prawników i doradców obsługujący przedsiębiorców oraz konsumentów." },
-  { slug: "nowy-etap", name: "NOWY ETAP", tagline: "Spokojniejsza droga przez rozwód", color: "#5B6B5A",
+  { slug: "nowy-etap", name: "NOWY ETAP", tagline: "Spokojniejsza droga przez rozwód", color: "#2E5A4F", logoUrl: null, iconUrl: "/brands/nowy-etap-icon.png",
     description: "Wsparcie w rozwodzie za porozumieniem, przygotowaniu do rozwodu i mediacjach online." },
-  { slug: "risify", name: "RISIFY", tagline: "Psychoterapia online", color: "#6A5ACD",
+  { slug: "risify", name: "RISIFY", tagline: "Psychoterapia online", color: "#64A286", logoUrl: "/brands/risify.svg", iconUrl: "/brands/risify-icon.png",
     description: "Platforma łącząca z psychoterapeutami pracującymi online." },
-  { slug: "budaro", name: "BUDARO", tagline: "Domy modułowe i szkieletowe", color: "#8A5A2B",
+  { slug: "budaro", name: "BUDARO", tagline: "Domy modułowe i szkieletowe", color: "#0B162A", logoUrl: "/brands/budaro.svg", iconUrl: "/brands/budaro-icon.svg",
     description: "Producent i wykonawca domów modułowych oraz szkieletowych." },
 ];
 

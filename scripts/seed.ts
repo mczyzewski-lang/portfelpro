@@ -16,6 +16,10 @@ async function main() {
     await db.insert(s.companies).values({ ...c, sort: i }).onConflictDoNothing();
     const [row] = await db.select().from(s.companies).where(eq(s.companies.slug, c.slug));
     companyIds[c.slug] = row.id;
+    // Logotypy uzupełniamy tylko tam, gdzie administrator nie ustawił własnych.
+    if (!row.logoUrl && !row.iconUrl && (c.logoUrl || c.iconUrl)) {
+      await db.update(s.companies).set({ logoUrl: c.logoUrl, iconUrl: c.iconUrl, color: c.color }).where(eq(s.companies.id, row.id));
+    }
   }
   // Usługi dodajemy tylko, jeśli jeszcze nie istnieją — seed nie nadpisuje zmian z panelu administratora.
   for (const [i, sv] of SERVICES.entries()) {

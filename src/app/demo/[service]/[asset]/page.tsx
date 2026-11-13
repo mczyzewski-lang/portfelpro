@@ -40,7 +40,7 @@ export default async function DemoAsset({ params, searchParams }: {
     <>
       <div className="bg-sand px-4 py-1.5 text-center text-xs font-medium text-muted">Strona demonstracyjna Portfel.pro — docelowo materiał będzie na stronie {company.name}.</div>
       <main id="tresc" className="mx-auto w-full max-w-xl flex-1 px-5 py-8">
-        <CompanyMark name={company.name} color={company.color} logoUrl={company.logoUrl} />
+        <CompanyMark name={company.name} color={company.color} iconUrl={company.iconUrl} />
         <div className="mt-2"><Badge>{assetTypeLabel[asset.type]}</Badge></div>
         <h1 className="mt-2 text-[28px] font-extrabold leading-tight text-leather-dark">{asset.title}</h1>
 

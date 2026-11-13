@@ -107,10 +107,12 @@ export const saveCompanyAction = adminAction(async (fd, actor) => {
   const id = str(fd, "id");
   const data = z.object({
     name: z.string().min(2, "Podaj nazwę spółki").max(120), tagline: z.string().max(200), description: z.string().max(2000),
-    logoUrl: z.string().max(500), color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Kolor w formacie #RRGGBB"),
-  }).parse({ name: str(fd, "name"), tagline: str(fd, "tagline"), description: str(fd, "description"), logoUrl: str(fd, "logoUrl"), color: str(fd, "color") || "#713B20" });
-  if (data.logoUrl && !/^(https:\/\/|\/)/.test(data.logoUrl)) throw new DomainError("Logo: podaj adres https:// lub ścieżkę zaczynającą się od /");
-  const values = { ...data, logoUrl: data.logoUrl || null, published: str(fd, "published") === "on", sort: Number(str(fd, "sort")) || 0 };
+    logoUrl: z.string().max(500), iconUrl: z.string().max(500), color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Kolor w formacie #RRGGBB"),
+  }).parse({ name: str(fd, "name"), tagline: str(fd, "tagline"), description: str(fd, "description"), logoUrl: str(fd, "logoUrl"), iconUrl: str(fd, "iconUrl"), color: str(fd, "color") || "#713B20" });
+  for (const u of [data.logoUrl, data.iconUrl]) {
+    if (u && !/^(https:\/\/|\/(?!\/))/.test(u)) throw new DomainError("Logo / ikona: podaj adres https:// lub ścieżkę zaczynającą się od /");
+  }
+  const values = { ...data, logoUrl: data.logoUrl || null, iconUrl: data.iconUrl || null, published: str(fd, "published") === "on", sort: Number(str(fd, "sort")) || 0 };
   if (id) await db.update(companies).set(values).where(eq(companies.id, id));
   else await db.insert(companies).values({ ...values, slug: slugify(data.name) });
   await logAudit(db, actor, id ? "company.update" : "company.create", "company", id || null, { after: values });

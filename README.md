@@ -116,6 +116,10 @@ Content-Type: application/json
 - Adresy IP są przechowywane wyłącznie jako HMAC. Brak zewnętrznych skryptów analitycznych.
 - Cookies: `pp_session` (logowanie, HttpOnly) i `pp_vid` (atrybucja, HttpOnly, ważne przez okno atrybucji).
 
+### Logotypy spółek
+
+Pliki w `public/brands/` pochodzą ze stron spółek (pravna.pl, nowy-etap.pl, risify.pl, budaro.pl). Każda spółka ma w panelu dwa pola: pełny znak (strona główna) i kwadratową ikonę (karty usług). PRAVNA i NOWY ETAP mają tylko ikonę — pełny znak Nowego Etapu jest przygotowany na ciemne tło, a pravna.pl nie udostępnia osobnego pliku logo.
+
 ## Struktura
 
 ```
@@ -140,6 +144,8 @@ Aplikacja nie jest wdrożona produkcyjnie. Do wdrożenia potrzebne są:
 4. Reverse proxy musi ustawiać `X-Forwarded-For` (limity i hash IP).
 
 ### Przed startem produkcyjnym
+
+- [ ] Potwierdzić, że każda spółka w katalogu faktycznie spełnia deklarowane na stronie głównej kryterium opinii Google (min. 100 opinii, średnia powyżej 4,7/5) — aplikacja tego nie weryfikuje automatycznie.
 
 - [ ] Zatwierdzić rzeczywiste stawki i ustawić im status „Zatwierdzona” (inaczej partnerzy widzą „Stawka do ustalenia”).
 - [ ] **Weryfikacja prawna**: dopuszczalność i forma wynagradzania za polecenia usług prawnych, finansowych i zdrowotnych; regulamin i polityka prywatności (`/regulamin`, `/prywatnosc` to wzory robocze); podstawa prawna cookie `pp_vid`.
