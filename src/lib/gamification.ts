@@ -37,11 +37,12 @@ export function achievementsFor(s: PartnerStats): Achievement[] {
     a("first-lead", "Pierwsze polecenie", "Klient zostawił kontakt albo przekazałeś go do konsultacji.", s.leads, 1),
     a("first-client", "Pierwszy klient", "Pierwsza potwierdzona sprzedaż z Twojego polecenia.", s.clients, 1),
     a("first-payout", "Pierwsza wypłata", "Prowizja trafiła na Twoje konto.", s.paid > 0 ? 1 : 0, 1),
-    a("three-paths", "Trzy drogi", "Użyłeś linków z edukacji, konsultacji i transakcji.", s.stagesUsed, 3),
+    a("two-paths", "Dwie drogi", "Klienci otworzyli Twoje linki z edukacji i z konsultacji.", s.stagesUsed, 2),
     a("wide-wallet", "Szeroki portfel", "Twoje linki do 3 różnych usług zostały otwarte.", s.servicesShared, 3),
     a("handoff", "Ciepłe przekazanie", "Przekazałeś kontakt klienta bezpośrednio do konsultacji.", s.handoffs, 1),
     a("ten-leads", "10 poleceń", "Dziesięć osób trafiło do specjalistów dzięki Tobie.", s.leads, 10),
     a("five-clients", "5 klientów", "Pięć potwierdzonych sprzedaży.", s.clients, 5),
+    a("ten-clients", "10 klientów", "Dziesięć potwierdzonych sprzedaży — tu czeka na Ciebie niespodzianka.", s.clients, 10),
   ];
 }
 

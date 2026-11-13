@@ -24,7 +24,8 @@ describe("osiągnięcia", () => {
   it("odblokowuje się wyłącznie na podstawie faktycznych liczb", () => {
     const list = achievementsFor({ ...zero, clicks: 4, leads: 2, clients: 1, stagesUsed: 2, handoffs: 1 });
     const done = list.filter((a) => a.done).map((a) => a.id);
-    expect(done).toEqual(["first-click", "first-lead", "first-client", "handoff"]);
+    expect(done).toEqual(["first-click", "first-lead", "first-client", "two-paths", "handoff"]);
+    expect(list.find((a) => a.id === "ten-clients")?.description).toContain("niespodzianka");
     expect(list.find((a) => a.id === "ten-leads")).toMatchObject({ current: 2, target: 10, done: false });
   });
 });

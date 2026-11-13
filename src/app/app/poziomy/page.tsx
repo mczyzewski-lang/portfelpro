@@ -1,4 +1,4 @@
-import { Check, Lock, Trophy } from "lucide-react";
+import { Check, Gift, Lock, Trophy } from "lucide-react";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { ConfettiBurst } from "@/components/confetti";
@@ -19,7 +19,9 @@ export default async function LevelsPage() {
   const fresh = newSince(partner.gamificationSeen, stats);
   if (fresh.any) await db.update(partners).set({ gamificationSeen: { level: fresh.level, achievements: fresh.done } }).where(eq(partners.id, partner.id));
   const level = levelFor(stats.clients);
-  const list = achievementsFor(stats);
+  // Zdobyte (zielone) zawsze na górze; w obrębie grup zachowujemy stałą kolejność.
+  const all = achievementsFor(stats);
+  const list = [...all.filter((a) => a.done), ...all.filter((a) => !a.done)];
   const doneCount = list.filter((a) => a.done).length;
   const plural = (n: number) => (n === 1 ? "klienta" : "klientów");
 
@@ -83,6 +85,7 @@ export default async function LevelsPage() {
                 <p className="text-[13px] leading-snug text-muted">{a.description}</p>
                 {!a.done && a.id === "photo" && <Link href="/app/konto" className={btnSm("gold", "press mt-2")}>Dodaj zdjęcie</Link>}
                 {!a.done && a.id === "starter-pack" && <Link href="/app" className={btnSm("gold", "press mt-2")}>Wpisz kod z pakietu</Link>}
+                {a.id === "ten-clients" && <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-gold-light/50 px-2.5 py-1 text-[11px] font-bold text-leather-dark"><Gift className="size-3.5" aria-hidden />{a.done ? "Niespodzianka czeka — napisz do opiekuna" : "Niespodzianka po zdobyciu"}</p>}
                 {!a.done && a.target > 1 && (
                   <div className="mt-2 flex items-center gap-2">
                     <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-sand"><div className="h-full rounded-full bg-gold" style={{ width: `${(a.current / a.target) * 100}%` }} /></div>

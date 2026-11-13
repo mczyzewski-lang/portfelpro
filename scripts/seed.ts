@@ -28,6 +28,14 @@ async function main() {
       await db.update(s.companies).set({ logoUrl: c.logoUrl, iconUrl: c.iconUrl, color: c.color }).where(eq(s.companies.id, row.id));
     }
   }
+  // Duo terapia była początkowo przypisana do RISIFY — przenosimy ją do marki DUO, jeśli nikt nie zmienił tego w panelu.
+  {
+    const [duo] = await db.select().from(s.services).where(eq(s.services.slug, "duo-terapia-dla-malzenstw"));
+    if (duo && companyIds.duo && companyIds.risify && duo.companyId === companyIds.risify) {
+      const seed = SERVICES.find((x) => x.slug === duo.slug)!;
+      await db.update(s.services).set({ companyId: companyIds.duo, provider: seed.provider, description: seed.description }).where(eq(s.services.id, duo.id));
+    }
+  }
   // Usługi dodajemy tylko, jeśli jeszcze nie istnieją — seed nie nadpisuje zmian z panelu administratora.
   for (const [i, sv] of SERVICES.entries()) {
     const { company, professions, assets, ...rest } = sv;
@@ -80,8 +88,13 @@ async function main() {
     // Opiekun demo: przypisany do konta demo (także wtedy, gdy konto powstało przed dodaniem opiekunów).
     const manager = await demoManager();
     const [dp] = await db.select({ p: s.partners }).from(s.partners).innerJoin(s.users, eq(s.users.id, s.partners.userId)).where(eq(s.users.email, DEMO_ACCOUNT.email));
-    if (dp && !dp.p.starterCode && !dp.p.starterConfirmedAt) {
-      await db.update(s.partners).set({ starterCode: DEMO_ACCOUNT.starterCode }).where(eq(s.partners.id, dp.p.id));
+    if (dp) {
+      // Konto demo: przy każdym wdrożeniu pakiet startowy wraca do stanu „niepotwierdzony”, żeby dało się go pokazać ponownie.
+      const seen = dp.p.gamificationSeen;
+      await db.update(s.partners).set({
+        starterCode: DEMO_ACCOUNT.starterCode, starterConfirmedAt: null,
+        gamificationSeen: seen ? { ...seen, achievements: seen.achievements.filter((a) => a !== "starter-pack") } : null,
+      }).where(eq(s.partners.id, dp.p.id));
     }
     if (manager && dp && !dp.p.managerUserId) {
       await db.update(s.partners).set({ managerUserId: manager.id }).where(eq(s.partners.id, dp.p.id));

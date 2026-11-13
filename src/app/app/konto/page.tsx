@@ -5,10 +5,12 @@ import { removeAvatarAction, saveAvatarAction, setProfessionAction } from "@/app
 import { AvatarEditor } from "@/components/avatar";
 import { CopyButton } from "@/components/client";
 import { ProfessionSelect } from "@/components/profession-select";
+import { PublicWalletCard } from "@/components/public-wallet-card";
 import { PartnerStatusBadge } from "@/components/status";
 import { Card } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { avatarSrc, initialsOf } from "@/lib/avatar";
+import { env } from "@/lib/env";
 import { activityLabel, fmtDate, partnerId } from "@/lib/labels";
 import { getProfessions } from "@/lib/queries";
 
@@ -48,6 +50,9 @@ export default async function AccountPage() {
           <ProfessionSelect professions={professions} value={partner.professionSlug} autoSubmit />
         </form>
       </Card>
+
+      <PublicWalletCard enabled={partner.publicEnabled} bio={partner.publicBio ?? ""} canEnable={partner.status === "active"}
+        url={partner.publicSlug ? `${env.appUrl}/p/${partner.publicSlug}` : null} />
 
       <Card className="divide-y divide-line">
         {rows.map(([l, v]) => (

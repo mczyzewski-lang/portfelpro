@@ -329,6 +329,31 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.getByTestId("change-password-link").click();
   await expect(page.getByRole("heading", { name: "Zmiana hasła" })).toBeVisible();
 
+  // Portfel Publiczny: przełącznik w Koncie, strona dla klienta z przyciskami „Dowiedz się więcej” / „Porozmawiaj”
+  await page.goto("/app/konto");
+  await page.getByTestId("public-wallet-card").locator("input[name=bio]").fill("Agencja marketingowa · Poznań");
+  await page.getByTestId("public-toggle").check({ force: true });
+  await page.getByTestId("public-save").click();
+  await expect(page.getByText("Portfel Publiczny jest aktywny.")).toBeVisible();
+  const publicUrl = "http://" + (await page.getByTestId("public-url").innerText()).trim();
+  expect(publicUrl).toMatch(/\/p\/[A-Za-z0-9]{9}$/);
+  const visitor = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await visitor.goto(publicUrl);
+  await expect(visitor.getByRole("heading", { name: "Anna Testowa" })).toBeVisible();
+  await expect(visitor.getByText("Agencja marketingowa · Poznań")).toBeVisible();
+  await expect(visitor.getByText("300 zł")).toHaveCount(0); // klient nie widzi prowizji
+  await expect(visitor.getByText("Psychoterapia online")).toHaveCount(0); // tylko usługi, które partner może polecać
+  expect((await visitor.request.get(publicUrl + "/photo")).headers()["content-type"]).toBe("image/jpeg");
+  const card = visitor.locator("li").filter({ hasText: SERVICE });
+  await expect(card.getByRole("link", { name: "Dowiedz się więcej" })).toBeVisible();
+  await card.getByRole("link", { name: "Porozmawiaj" }).click();
+  await expect(visitor).toHaveURL(/ocena-mozliwosci-rejestracji\?pp_ref=/); // link polecający partnera
+  await page.getByTestId("public-toggle").uncheck({ force: true });
+  await page.getByTestId("public-save").click();
+  await expect(page.getByText("Portfel Publiczny jest wyłączony.")).toBeVisible();
+  expect((await visitor.request.get(publicUrl)).status()).toBe(404);
+  expect((await visitor.request.get(publicUrl + "/photo")).status()).toBe(404);
+
   // Poziomy: liczone z faktycznych danych (2 potwierdzonych klientów → Brązowy)
   await page.goto("/app");
   await expect(page.locator('nav[aria-label="Główna"] [data-testid="levels-new"]').last()).toBeVisible(); // confetti przy ikonie = coś nowego
@@ -338,7 +363,9 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.goto("/app/poziomy");
   await expect(page.getByTestId("confetti")).toBeVisible(); // nowe poziomy / osiągnięcia = confetti
   await expect(page.getByTestId("level-name")).toContainText("Brązowy");
-  await expect(page.locator('[data-done="true"]')).toHaveCount(6); // zdjęcie, link, polecenie, klient, wypłata, przekazanie
+  await expect(page.locator('[data-done="true"]')).toHaveCount(7); // zdjęcie, link, polecenie, klient, wypłata, dwie drogi, przekazanie
+  await expect(page.locator("[data-done]").first()).toHaveAttribute("data-done", "true"); // zdobyte zawsze na górze
+  await expect(page.locator("[data-done]").last()).toHaveAttribute("data-done", "false");
   await expect(page.getByTestId("new-badge").first()).toBeVisible();
   await page.goto("/app/poziomy"); // po obejrzeniu nie ma już nowości
   await expect(page.getByTestId("new-badge")).toHaveCount(0);
@@ -361,6 +388,12 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByTestId("sum-paid")).toHaveText("0 zł"); // nie widzi danych innych partnerów
   await expect(demo.getByTestId("stat-leads")).toHaveText("5"); // pięć przykładowych poleceń na różnych etapach
   await expect(demo.getByTestId("service-stats")).toContainText("Zastrzeżenie znaku towarowego"); // statystyka per usługa
+  // Pakiet startowy: najpierw zdjęcie (pole kodu jest zablokowane), potem kod — gwiazdka leci do awatara
+  await expect(demo.getByTestId("starter-star")).toBeVisible();
+  await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeDisabled();
+  await demo.getByTestId("starter-card").getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");
+  await demo.getByTestId("avatar-save").click();
+  await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeEnabled();
   await demo.getByTestId("starter-card").locator("input[name=code]").fill("f3f4f5"); // kod pakietu startowego konta demo
   await demo.getByTestId("starter-submit").click();
   await expect(demo.getByText("Pakiet startowy potwierdzony!")).toBeVisible();

@@ -64,6 +64,13 @@
       "when": 1794599970555,
       "tag": "0008_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794600819511,
+      "tag": "0009_public_wallet",
+      "breakpoints": true
     }
   ]
 }

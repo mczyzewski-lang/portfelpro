@@ -129,7 +129,8 @@ export async function getPartnerStats(partner: { id: string; starterConfirmedAt:
   const sum = await getWalletSummary(partnerId);
   const [[svc], [stg], [hand]] = await Promise.all([
     db.select({ n: sql<number>`count(distinct ${referralClicks.serviceId})::int` }).from(referralClicks).where(eq(referralClicks.partnerId, partnerId)),
-    db.select({ n: sql<number>`count(distinct ${referralLinks.stage})::int` }).from(referralClicks).innerJoin(referralLinks, eq(referralLinks.id, referralClicks.linkId)).where(eq(referralClicks.partnerId, partnerId)),
+    db.select({ n: sql<number>`count(distinct ${referralLinks.stage})::int` }).from(referralClicks).innerJoin(referralLinks, eq(referralLinks.id, referralClicks.linkId))
+      .where(and(eq(referralClicks.partnerId, partnerId), inArray(referralLinks.stage, ["education", "consultation"]))),
     db.select({ n: count }).from(leads).where(and(eq(leads.partnerId, partnerId), eq(leads.source, "partner"))),
   ]);
   return { clicks: sum.clicks, leads: sum.leads, clients: sum.clients, paid: sum.paid, servicesShared: svc.n, stagesUsed: stg.n, handoffs: hand.n,

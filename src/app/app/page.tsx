@@ -7,6 +7,7 @@ import { StarterCard } from "@/components/starter-card";
 import { Feed } from "@/components/feed";
 import { btn } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
+import { avatarSrc, initialsOf } from "@/lib/avatar";
 import { levelFor } from "@/lib/gamification";
 import { partnerId } from "@/lib/labels";
 import { getActivity, getServiceStats, getWalletSummary, hasFirstSuccess } from "@/lib/partner-data";
@@ -36,7 +37,7 @@ export default async function Dashboard() {
         </section>
       )}
 
-      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard />}
+      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard hasPhoto={!!partner.avatar} avatarSrc={avatarSrc(partner)} initials={initialsOf(user)} />}
 
       <section aria-labelledby="pulpit">
         <p className="text-sm text-muted">Dzień dobry, {user.firstName}</p>

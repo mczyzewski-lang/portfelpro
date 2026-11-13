@@ -80,6 +80,9 @@ export const partners = pgTable("partners", {
   marketingConsentAt: ts("marketing_consent_at"),
   managerUserId: uuid("manager_user_id").references(() => users.id, { onDelete: "set null" }), // przypisany opiekun (null = domyślny)
   adminNote: text("admin_note"),
+  publicEnabled: boolean("public_enabled").notNull().default(false), // Portfel Publiczny włączony
+  publicSlug: text("public_slug").unique(),                          // losowy adres /p/<slug>
+  publicBio: text("public_bio"),                                     // podpis pod nazwiskiem
   starterCode: text("starter_code"),          // kod z pakietu startowego (wpisywany przez partnera na pulpicie)
   starterConfirmedAt: ts("starter_confirmed_at"),
   gamificationSeen: jsonb("gamification_seen").$type<{ level: number; achievements: string[] }>(), // co partner już widział w „Poziomach”

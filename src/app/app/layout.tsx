@@ -27,7 +27,7 @@ export default async function PartnerLayout({ children }: { children: React.Reac
               <span className="block max-w-[150px] truncate text-[13px] font-extrabold text-leather-dark" data-testid="partner-name">{user.firstName} {user.lastName}</span>
               <span className="tabular block text-[10px] font-semibold text-muted" data-testid="partner-id">{partnerId(partner.number)}</span>
             </span>
-            <Avatar src={avatarSrc(partner)} initials={initialsOf(user)} size={32} className="ring-1" />
+            <span data-avatar-target className="block rounded-full"><Avatar src={avatarSrc(partner)} initials={initialsOf(user)} size={32} className="ring-1" /></span>
           </Link>
         </div>
       </header>

@@ -30,6 +30,10 @@ h1, h2, h3 { letter-spacing: -0.02em; text-wrap: balance; }
 p { text-wrap: pretty; }
 .tabular { font-variant-numeric: tabular-nums; }
 :focus-visible { outline: 2px solid var(--color-leather); outline-offset: 2px; border-radius: 6px; }
+/* pola formularzy mają własną ramkę fokusu — bez podwójnego obrysu */
+:is(input, textarea, select):focus-visible { outline: none; }
+/* podczas pisania w czacie dolna nawigacja znika, żeby oddać miejsce rozmowie */
+body[data-chat-typing] nav[aria-label="Główna"].fixed { display: none; }
 ::selection { background: var(--color-gold-light); color: var(--color-leather-dark); }
 
 /* Karta „portfela” — ciemna skóra jak w logo, z delikatnym załamaniem światła */

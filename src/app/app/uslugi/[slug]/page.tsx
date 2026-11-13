@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShareData, requestAccessAction } from "@/app/actions/partner";
 import { ActionForm, CopyButton, SubmitButton } from "@/components/client";
-import { GoogleRating, GoogleTrustCard } from "@/components/google";
+import { GoogleRating } from "@/components/google";
 import { Rate } from "@/components/rate";
 import { ReelTile } from "@/components/reel";
 import { ServiceDetails } from "@/components/service-details";
@@ -95,7 +95,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <h2 id="poznaj" className="text-xl font-extrabold text-leather-dark">Poznaj usługę</h2>
         <div className="mt-3"><ServiceDetails service={service} company={company} collapsible /></div>
       </section>
-      <GoogleTrustCard compact className="mt-6" />
     </article>
   );
 }

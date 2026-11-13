@@ -116,6 +116,10 @@ Content-Type: application/json
 
 Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny w widoku partnera w panelu admina). Dopóki go nie wpisze, na pulpicie wisi okienko „Potwierdzenie odbioru pakietu startowego”. Kod konta demo: `F3F4F5`. Nowe osiągnięcia i poziomy sygnalizuje confetti przy ikonie Poziomy; po wejściu w zakładkę oznaczają się jako obejrzane.
 
+### Portfel Publiczny
+
+W Koncie partner może włączyć „Portfel Publiczny”: stronę `/p/<losowy-adres>` ze swoim zdjęciem, imieniem i nazwiskiem, podpisem oraz usługami, które może polecać. Każda usługa ma przyciski „Dowiedz się więcej” (link edukacyjny) i „Porozmawiaj” (link do konsultacji) — to linki polecające partnera, liczone osobno jako kampania „portfel publiczny”. Strona nie pokazuje prowizji, a po wyłączeniu przełącznika przestaje istnieć (także zdjęcie).
+
 ### Wideo (reels 9:16)
 
 - **Usługa:** pole „Wideo o usłudze” w edycji usługi — w karcie usługi pojawia się kafelek, który otwiera pionowe wideo na cały ekran.

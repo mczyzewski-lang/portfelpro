@@ -2,7 +2,7 @@
 
 import { Check, CheckCheck, SendHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { FormState } from "./client";
 
@@ -20,6 +20,12 @@ export function Chat({ items, action, hidden, emptyText, placeholder = "Napisz w
   const router = useRouter();
   const end = useRef<HTMLDivElement>(null);
   const form = useRef<HTMLFormElement>(null);
+  const [typing, setTyping] = useState(false);
+  useEffect(() => {
+    if (!page) return;
+    if (typing) document.body.dataset.chatTyping = "1"; else delete document.body.dataset.chatTyping;
+    return () => { delete document.body.dataset.chatTyping; };
+  }, [typing, page]);
   const [state, formAction, pending] = useActionState(async (prev: FormState, fd: FormData) => {
     const res = await action(prev, fd);
     if (!res?.error) form.current?.reset();
@@ -37,7 +43,7 @@ export function Chat({ items, action, hidden, emptyText, placeholder = "Napisz w
 
   return (
     <div className={page ? undefined : "overflow-hidden rounded-3xl border border-line bg-white shadow-(--shadow-card)"}>
-      <div className={page ? "space-y-1.5 pb-24 pt-3" : "max-h-[52dvh] min-h-48 space-y-1.5 overflow-y-auto px-3.5 py-4"} data-testid="chat-thread" aria-live="polite">
+      <div className={page ? cn("space-y-1.5 pt-3", typing ? "pb-16" : "pb-24") : "max-h-[52dvh] min-h-48 space-y-1.5 overflow-y-auto px-3.5 py-4"} data-testid="chat-thread" aria-live="polite">
         {items.length === 0 && <p className="px-4 py-10 text-center text-sm text-muted">{emptyText}</p>}
         {items.map((m, i) => (
           <div key={m.id}>
@@ -57,10 +63,11 @@ export function Chat({ items, action, hidden, emptyText, placeholder = "Napisz w
         <div ref={end} />
       </div>
       <form ref={form} action={formAction} className={page
-        ? "fixed inset-x-0 bottom-[calc(4.9rem+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-2xl items-end gap-2 bg-cream/90 px-4 py-2 backdrop-blur lg:bottom-0 lg:pb-4"
+        ? cn("fixed inset-x-0 z-30 mx-auto flex max-w-2xl items-end gap-2 bg-cream/95 px-4 py-2 backdrop-blur lg:bottom-0 lg:pb-4",
+            typing ? "bottom-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]" : "bottom-[calc(4.9rem+env(safe-area-inset-bottom))]")
         : "flex items-end gap-2 border-t border-line bg-cream/60 p-2.5"}>
         {Object.entries(hidden ?? {}).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
-        <textarea name="body" rows={1} required maxLength={2000} placeholder={placeholder} aria-label="Treść wiadomości"
+        <textarea name="body" rows={1} required onFocus={() => setTyping(true)} onBlur={() => setTimeout(() => setTyping(false), 150)} maxLength={2000} placeholder={placeholder} aria-label="Treść wiadomości"
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && window.matchMedia("(pointer: fine)").matches) { e.preventDefault(); form.current?.requestSubmit(); } }}
           className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-line bg-white px-3.5 py-2.5 text-base shadow-(--shadow-card) focus:border-leather focus:outline-none focus:ring-2 focus:ring-leather/20" />
         <button type="submit" disabled={pending} aria-label="Wyślij" data-testid="chat-send" className="leather-grad press grid size-11 shrink-0 place-items-center rounded-full disabled:opacity-50"><SendHorizontal className="size-5" aria-hidden /></button>
