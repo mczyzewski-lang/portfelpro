@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { partnerServiceTerms, partners, professions, services, users } from "@/db/schema";
 import { requirePartner } from "@/lib/auth";
 import { hashPassword, verifyPassword } from "@/lib/crypto";
+import { DEMO_ACCOUNT } from "@/lib/demo";
 import type { Stage } from "@/lib/labels";
 import { getPublishedAssets } from "@/lib/queries";
 import { assetTargetUrl, getOrCreateLink, recommendBlockLabel, recommendState } from "@/lib/tracking";
@@ -81,6 +82,7 @@ export async function dismissFirstSuccessAction() {
 
 export async function changePasswordAction(_: FormState, fd: FormData): Promise<FormState> {
   const { user } = await requirePartner();
+  if (user.email === DEMO_ACCOUNT.email) return { error: "Na koncie demonstracyjnym nie można zmienić hasła." };
   if (!(await verifyPassword(String(fd.get("current") ?? ""), user.passwordHash))) return { error: "Obecne hasło jest nieprawidłowe." };
   const next = passwordSchema.safeParse(fd.get("next"));
   if (!next.success) return { error: next.error.issues[0].message };

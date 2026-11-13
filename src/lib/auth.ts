@@ -6,6 +6,7 @@ import { cache } from "react";
 import { db } from "@/db";
 import { partners, sessions, users, type Partner, type User } from "@/db/schema";
 import { randomSecret, sha256 } from "./crypto";
+import { DEMO_ACCOUNT } from "./demo";
 import { env } from "./env";
 import type { Actor } from "./audit";
 
@@ -39,6 +40,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     .innerJoin(users, eq(users.id, sessions.userId))
     .leftJoin(partners, eq(partners.userId, users.id))
     .where(and(eq(sessions.tokenHash, sha256(token)), gt(sessions.expiresAt, new Date())));
+  if (row && row.user.email === DEMO_ACCOUNT.email && !env.demoMode) return null;
   return row ?? null;
 });
 

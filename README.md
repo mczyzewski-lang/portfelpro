@@ -33,6 +33,8 @@ npm run db:seed             # spółki, usługi, materiały demo, konto administ
 npm run dev                 # http://localhost:3000
 ```
 
+Konto demo partnera (tylko przy `DEMO_MODE=true`): `demo@demo.pl` / `demo` — dane są pokazane na stronie logowania; przy `DEMO_MODE=false` konto jest zablokowane.
+
 Logowanie administratora: `ADMIN_EMAIL` / `ADMIN_PASSWORD` z `.env` → `/logowanie` → `/admin`.
 
 | Skrypt | Działanie |

@@ -54,6 +54,20 @@ async function main() {
     }).onConflictDoNothing().returning();
     console.log(admin ? `✓ Utworzono administratora: ${adminEmail}` : `• Konto ${adminEmail} już istnieje`);
   }
+  // Konto demo partnera — tylko w trybie demo. Poza nim logowanie na to konto jest zablokowane.
+  const { DEMO_ACCOUNT } = await import("../src/lib/demo");
+  if (process.env.DEMO_MODE === "true") {
+    const [demo] = await db.insert(s.users).values({
+      email: DEMO_ACCOUNT.email, passwordHash: await hashPassword(DEMO_ACCOUNT.password), role: "partner", firstName: "Demo", lastName: "Partner",
+    }).onConflictDoNothing().returning();
+    if (demo) {
+      await db.insert(s.partners).values({
+        userId: demo.id, status: "active", activityType: "individual", professionSlug: "finanse", onboardedAt: new Date(),
+        termsAcceptedAt: new Date(), termsVersion: SETTING_DEFAULTS.terms_version, adminNote: "Publiczne konto demonstracyjne",
+      });
+      console.log(`✓ Utworzono konto demo: ${DEMO_ACCOUNT.email}`);
+    }
+  }
   console.log(`✓ Seed zakończony: ${COMPANIES.length} spółki, ${SERVICES.length} usług`);
   process.exit(0);
 }

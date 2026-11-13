@@ -7,6 +7,8 @@ import { db } from "@/db";
 import { partners, users } from "@/db/schema";
 import { createSession, destroySession } from "@/lib/auth";
 import { hashPassword, verifyPassword } from "@/lib/crypto";
+import { DEMO_ACCOUNT } from "@/lib/demo";
+import { env } from "@/lib/env";
 import { clientIpHash, rateLimit } from "@/lib/rate-limit";
 import { getSettings } from "@/lib/settings";
 import { emailSchema, fieldErrors, registerSchema } from "@/lib/validation";
@@ -53,6 +55,7 @@ export async function loginAction(_: FormState, fd: FormData): Promise<FormState
   // Zawsze wykonujemy weryfikację, aby czas odpowiedzi nie zdradzał istnienia konta.
   const ok = await verifyPassword(password, u?.passwordHash ?? "scrypt$00$00").catch(() => false);
   if (!u || !ok) return generic;
+  if (u.email === DEMO_ACCOUNT.email && !env.demoMode) return generic; // konto demo działa tylko w trybie demo
   await createSession(u.id);
   const next = String(fd.get("next") ?? "");
   redirect(u.role === "admin" ? "/admin" : next.startsWith("/app") ? next : "/app");

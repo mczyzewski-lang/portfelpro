@@ -33,9 +33,9 @@ async function adminPage(browser: Browser) {
   const page = await ctx.newPage();
   page.on("dialog", (d) => d.accept());
   await page.goto("/logowanie");
-  await page.locator("input[name=email]").fill(testEnv.ADMIN_EMAIL);
-  await page.locator("input[name=password]").fill(testEnv.ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Zaloguj się" }).click();
+  await page.locator("input[type=email]").fill(testEnv.ADMIN_EMAIL);
+  await page.locator("input[type=password]").fill(testEnv.ADMIN_PASSWORD);
+  await page.getByRole("button", { name: "Zaloguj się", exact: true }).click();
   await page.waitForURL("**/admin");
   return page;
 }
@@ -244,6 +244,17 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   expect((await request.get("/admin/eksport/leady")).status()).toBe(403);
   await client.goto("/app");
   await expect(client).toHaveURL(/\/logowanie/);
+
+  // Konto demo (tylko w trybie demo): logowanie jednym przyciskiem, bez dostępu do admina
+  const demoCtx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const demo = await demoCtx.newPage();
+  await demo.goto("/logowanie");
+  await expect(demo.getByTestId("demo-login")).toContainText("demo@demo.pl");
+  await demo.getByRole("button", { name: "Zaloguj na konto demo" }).click();
+  await demo.waitForURL("**/app");
+  await expect(demo.getByTestId("sum-paid")).toHaveText("0 zł"); // nie widzi danych innych partnerów
+  await demo.goto("/admin");
+  await expect(demo).toHaveURL(/\/app$/);
 
   // Błędny link polecający
   await client.goto("/r/NieIstnieje1");
