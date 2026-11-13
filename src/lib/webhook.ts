@@ -20,7 +20,7 @@ const contact = z.object({
 
 export const webhookSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("lead.created"), ...base, ref: z.string().max(60).optional(), stage: z.enum(["education", "consultation", "transaction"]).optional(), contact, consent: z.boolean().optional() }),
-  z.object({ type: z.literal("lead.status"), ...base, status: z.enum(["qualified", "in_progress", "rejected", "cancelled"]), note: z.string().max(300).optional() }),
+  z.object({ type: z.literal("lead.status"), ...base, status: z.enum(["contacted", "qualified", "in_progress", "rejected", "cancelled"]), note: z.string().max(300).optional() }),
   z.object({ type: z.literal("sale.confirmed"), ...base, ref: z.string().max(60).optional(), net_amount: z.number().nonnegative().max(100_000_000).optional(), occurred_at: z.string().datetime().optional(), contact }),
   z.object({ type: z.literal("sale.refunded"), ...base, reason: z.string().max(300).optional() }),
 ]);

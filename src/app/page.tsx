@@ -4,7 +4,7 @@ import { asc, eq } from "drizzle-orm";
 import { ProfessionMatcher } from "@/components/profession-matcher";
 import { Rate } from "@/components/rate";
 import { ServiceCard } from "@/components/service-card";
-import { DemoBanner, SiteFooter } from "@/components/site";
+import { SiteFooter } from "@/components/site";
 import { CompanyIcon, LinkButton, Logo, Wordmark } from "@/components/ui";
 import { db } from "@/db";
 import { companies, landingFaqs } from "@/db/schema";
@@ -29,7 +29,6 @@ export default async function Landing() {
 
   return (
     <>
-      <DemoBanner />
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4">
         <Wordmark />
         <Link href={appHref} className="inline-flex min-h-11 items-center rounded-full px-3 text-sm font-bold text-leather hover:bg-sand">

@@ -1,28 +1,30 @@
-import { ChevronRight, MousePointerClick, Sparkles, UserCheck, Users } from "lucide-react";
+import { ArrowRight, ChevronRight, MousePointerClick, Sparkles, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { dismissFirstSuccessAction } from "@/app/actions/partner";
 import { CountUp } from "@/components/client";
-import { ServiceList } from "@/components/service-list";
+import { Feed } from "@/components/feed";
 import { btn } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
+import { levelFor } from "@/lib/gamification";
 import { partnerId } from "@/lib/labels";
-import { getWalletSummary, hasFirstSuccess } from "@/lib/partner-data";
-import { getPickerItems } from "@/lib/picker";
+import { getActivity, getWalletSummary, hasFirstSuccess } from "@/lib/partner-data";
 
+/** Pulpit: liczby i dziennik zdarzeń. Usługi są w zakładce „Portfel”. */
 export default async function Dashboard() {
   const { user, partner } = await requirePartner();
   if (!partner.onboardedAt) redirect("/app/onboarding");
-  const [sum, items, success] = await Promise.all([getWalletSummary(partner.id), getPickerItems(partner), hasFirstSuccess(partner.id)]);
+  const [sum, feed, success] = await Promise.all([getWalletSummary(partner.id), getActivity(partner.id), hasFirstSuccess(partner.id)]);
   const showSuccess = success && !partner.firstSuccessSeenAt;
+  const level = levelFor(sum.clients);
   const stats = [
-    { label: "Kliknięcia", value: sum.clicks, icon: MousePointerClick, test: "stat-clicks" },
-    { label: "Polecenia", value: sum.leads, icon: Users, test: "stat-leads" },
-    { label: "Klienci", value: sum.clients, icon: UserCheck, test: "stat-clients" },
+    { label: "Kliknięcia", value: sum.clicks, icon: MousePointerClick, test: "stat-clicks", href: "/app/polecenia?tab=linki" },
+    { label: "Polecenia", value: sum.leads, icon: Users, test: "stat-leads", href: "/app/polecenia" },
+    { label: "Klienci", value: sum.clients, icon: UserCheck, test: "stat-clients", href: "/app/polecenia" },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-2xl space-y-6">
       {showSuccess && (
         <section className="wallet pop rounded-[28px] p-6 text-center" data-testid="first-success">
           <Sparkles className="relative z-10 mx-auto size-8 text-gold-light" aria-hidden />
@@ -32,13 +34,9 @@ export default async function Dashboard() {
         </section>
       )}
 
-      <section aria-labelledby="portfel">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-sm text-muted">Dzień dobry, {user.firstName}</p>
-            <h1 id="portfel" className="text-[24px] font-extrabold leading-tight text-leather-dark">Twój Portfel Profesjonalisty</h1>
-          </div>
-        </div>
+      <section aria-labelledby="pulpit">
+        <p className="text-sm text-muted">Dzień dobry, {user.firstName}</p>
+        <h1 id="pulpit" className="text-[24px] font-extrabold leading-tight text-leather-dark">Pulpit</h1>
 
         <Link href="/app/polecenia?tab=prowizje" aria-label="Zobacz prowizje" className="wallet wallet-sheen press mt-4 block rounded-[28px] p-5 sm:p-6">
           <div className="relative z-10 flex items-start justify-between gap-3">
@@ -56,20 +54,36 @@ export default async function Dashboard() {
 
         <div className="stagger mt-3 grid grid-cols-3 gap-2.5">
           {stats.map((s, n) => (
-            <Link key={s.label} href={`/app/polecenia?tab=${s.label === "Kliknięcia" ? "linki" : "polecenia"}`} style={{ "--i": n } as React.CSSProperties}
-              className="press rounded-2xl border border-line bg-white px-3 py-3">
+            <Link key={s.label} href={s.href} style={{ "--i": n } as React.CSSProperties} className="press rounded-2xl border border-line bg-white px-3 py-3">
               <s.icon className="size-4 text-gold-deep" aria-hidden />
               <p className="mt-1"><CountUp value={s.value} format="int" testId={s.test} className="tabular text-2xl font-extrabold leading-none text-leather-dark" /></p>
               <p className="mt-0.5 text-xs leading-tight text-muted">{s.label}</p>
             </Link>
           ))}
         </div>
+
+        <div className="mt-3 grid grid-cols-[1fr_auto] gap-2.5">
+          <Link href="/app/uslugi" className="press flex min-h-14 items-center justify-between gap-3 rounded-2xl bg-leather px-5 font-bold text-white shadow-sm" data-testid="go-wallet">
+            Poleć usługę<ArrowRight className="size-5" aria-hidden />
+          </Link>
+          <Link href="/app/poziomy" className="press flex min-h-14 flex-col justify-center rounded-2xl border border-line bg-white px-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Poziom</span>
+            <span className="text-sm font-extrabold text-leather-dark">{level.current.name}</span>
+          </Link>
+        </div>
       </section>
 
-      <section id="polec" className="scroll-mt-20" aria-labelledby="polec-h">
-        <h2 id="polec-h" className="text-xl font-extrabold text-leather-dark">Co chcesz dziś polecić?</h2>
-        <p className="mt-0.5 text-sm text-muted">Wybierz usługę — w środku dobierzesz link do etapu, na którym jest klient.</p>
-        <div className="mt-3"><ServiceList items={items} /></div>
+      <section aria-labelledby="log">
+        <h2 id="log" className="text-xl font-extrabold text-leather-dark">Co się wydarzyło</h2>
+        <div className="mt-3">
+          {feed.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-line bg-white/60 px-6 py-9 text-center">
+              <p className="font-bold text-leather-dark">Tu zobaczysz każdy ruch</p>
+              <p className="mx-auto mt-1 max-w-xs text-sm text-muted">Otwarcia Twoich linków, nowe polecenia, kolejne etapy obsługi klienta i prowizje.</p>
+              <Link href="/app/uslugi" className={btn("secondary", "press mt-4")}>Otwórz Portfel usług</Link>
+            </div>
+          ) : <Feed items={feed} />}
+        </div>
       </section>
     </div>
   );

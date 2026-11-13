@@ -30,7 +30,7 @@ export default async function ImportPage() {
             <li><b>partner_id</b> — opcjonalnie <code>PP-000101</code> (ręczne przypisanie), <b>ref</b> — token <code>pp_ref</code></li>
             <li><b>name, email, phone</b> — dane kontaktowe (opcjonalne)</li>
             <li><b>net_amount</b> — wartość netto sprzedaży w zł (dla <code>sale</code>)</li>
-            <li><b>status</b> — registered / qualified / in_progress / rejected / cancelled</li>
+            <li><b>status</b> — registered / contacted / qualified / in_progress / rejected / cancelled</li>
           </ul>
           <pre className="mt-3 overflow-x-auto rounded-xl bg-cream p-3 text-xs">{sample}</pre>
         </Panel>

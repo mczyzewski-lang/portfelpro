@@ -5,6 +5,7 @@ import { getShareData, requestAccessAction } from "@/app/actions/partner";
 import { ActionForm, CopyButton, SubmitButton } from "@/components/client";
 import { Rate } from "@/components/rate";
 import { ServiceDetails } from "@/components/service-details";
+import { ClientHandoff } from "@/components/client-handoff";
 import { StagePaths } from "@/components/share";
 import { CompanyIcon, Notice } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
@@ -27,7 +28,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
   return (
     <article className="mx-auto max-w-2xl">
-      <Link href="/app" className="press -ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel</Link>
+      <Link href="/app/uslugi" className="press -ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel</Link>
 
       {/* Karta usługi: co polecam i ile zarobię */}
       <header className="wallet wallet-sheen mt-1 rounded-[28px] p-5">
@@ -50,7 +51,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <p className="mt-0.5 text-sm text-muted">Każdy etap to inny link. Wybierz ten, który pasuje do rozmowy.</p>
         <div className="mt-3.5">
           {share?.ok ? (
-            <StagePaths assets={share.assets} serviceName={service.name} />
+            <StagePaths assets={share.assets} serviceName={service.name}
+              consultationExtra={service.sensitive
+                ? <p className="rounded-3xl border border-line bg-white px-4 py-3 text-[13px] leading-snug text-muted">Przy tej usłudze klient zgłasza się sam — ze względu na poufność nie przyjmujemy danych przekazanych przez osoby trzecie.</p>
+                : <ClientHandoff serviceId={service.id} />} />
           ) : (
             <div className="rounded-3xl border border-line bg-white p-5 shadow-(--shadow-card)">
               <p className="flex items-center gap-2 font-bold text-leather-dark"><Lock className="size-4" aria-hidden />{state.can ? "Linki chwilowo niedostępne" : recommendBlockLabel[state.reason]}</p>

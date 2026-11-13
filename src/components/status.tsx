@@ -1,7 +1,7 @@
 import { commissionStatusLabel, leadStatusShort, partnerStatusLabel, publishLabel } from "@/lib/labels";
 import { Badge, type Tone } from "./ui";
 
-const leadTone: Record<string, Tone> = { registered: "neutral", qualified: "gold", in_progress: "gold", won: "ok", rejected: "danger", cancelled: "danger" };
+const leadTone: Record<string, Tone> = { registered: "neutral", contacted: "gold", qualified: "gold", in_progress: "gold", won: "ok", rejected: "danger", cancelled: "danger" };
 const commTone: Record<string, Tone> = { pending: "warn", approved: "gold", paid: "ok", cancelled: "danger" };
 const partnerTone: Record<string, Tone> = { pending: "warn", active: "ok", suspended: "danger" };
 const pubTone: Record<string, Tone> = { draft: "warn", published: "ok", hidden: "neutral" };

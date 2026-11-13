@@ -211,7 +211,7 @@ export const createManualLeadAction = adminAction(async (fd, actor) => {
 });
 
 export const setLeadStatusAction = adminAction(async (fd, actor) => {
-  const status = z.enum(["registered", "qualified", "in_progress", "rejected", "cancelled"]).parse(str(fd, "status"));
+  const status = z.enum(["registered", "contacted", "qualified", "in_progress", "rejected", "cancelled"]).parse(str(fd, "status"));
   const r = await setLeadStatus(str(fd, "leadId"), status, actor, str(fd, "note") || null);
   return r.changed ? "Zmieniono status." : "Status bez zmian.";
 });
@@ -324,7 +324,7 @@ export const importCsvAction = adminAction(async (fd, actor) => {
         const res = await recordConversion({ leadId: lead.id, type: "sale", netAmount: net, externalId: r.external_id, source: "csv", actor });
         if (!res.duplicate) sales++;
       } else if (r.status && r.status !== lead.status) {
-        const st = z.enum(["registered", "qualified", "in_progress", "rejected", "cancelled"]).safeParse(r.status);
+        const st = z.enum(["registered", "contacted", "qualified", "in_progress", "rejected", "cancelled"]).safeParse(r.status);
         if (!st.success) throw new DomainError(`nieznany status „${r.status}”`);
         await setLeadStatus(lead.id, st.data, actor, "Import CSV", "csv"); statuses++;
       }

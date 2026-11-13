@@ -97,7 +97,7 @@ Content-Type: application/json
 | `type` | Pola | Skutek |
 |---|---|---|
 | `lead.created` | `service`, `external_id`, `ref?`, `stage?`, `contact?{name,email,phone}`, `consent?` | lead z atrybucją |
-| `lead.status` | `service`, `external_id`, `status` (`qualified`, `in_progress`, `rejected`, `cancelled`), `note?` | zmiana statusu; `qualified` nalicza prowizję w modelu „za lead” |
+| `lead.status` | `service`, `external_id`, `status` (`contacted`, `qualified`, `in_progress`, `rejected`, `cancelled`), `note?` | zmiana statusu; `qualified` nalicza prowizję w modelu „za lead” |
 | `sale.confirmed` | `service`, `external_id`, `net_amount?` (zł), `ref?`, `occurred_at?` | konwersja + prowizja |
 | `sale.refunded` | `service`, `external_id`, `reason?` | anulowanie lub korekta prowizji |
 
@@ -113,7 +113,9 @@ Content-Type: application/json
 
 ### Prywatność
 
-- Partner **nigdy** nie widzi danych klienta — tylko numer polecenia, usługę, status i prowizję.
+- Partner nie widzi danych klienta, który zgłosił się przez link — tylko numer polecenia, usługę, etap procesu i prowizję. Przy zgłoszeniach, które sam przekazał do konsultacji (za zgodą klienta), widzi wpisane przez siebie imię i nazwisko. Usługi wrażliwe nie przyjmują takich zgłoszeń.
+- Partner widzi cały przebieg polecenia (Zgłoszenie → Kontakt → Kwalifikacja → Realizacja → Sprzedaż oraz kroki prowizji), ale bez notatek administratora.
+- Poziomy i osiągnięcia (`/app/poziomy`) są liczone z faktycznych danych i nie wpływają na stawki.
 - Formularze nie zbierają opisu sytuacji klienta (istotne dla usług zdrowotnych i rodzinnych).
 - Adresy IP są przechowywane wyłącznie jako HMAC. Brak zewnętrznych skryptów analitycznych.
 - Cookies: `pp_session` (logowanie, HttpOnly) i `pp_vid` (atrybucja, HttpOnly, ważne przez okno atrybucji).

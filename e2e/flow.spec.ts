@@ -88,6 +88,10 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
 
   // 5–8. Z portfela wchodzę w usługę; dopiero w niej wybieram etap i kopiuję osobisty link
   await page.goto("/app");
+  await expect(page.getByRole("heading", { name: "Pulpit" })).toBeVisible();
+  await expect(page.getByText("Wersja demonstracyjna")).toHaveCount(0); // belka demo ukryta
+  await page.getByTestId("go-wallet").click(); // Portfel = lista usług
+  await page.waitForURL("**/app/uslugi");
   await page.getByTestId("service-znak-towarowy").click();
   await page.waitForURL("**/app/uslugi/znak-towarowy");
   await expect(page.getByRole("heading", { name: "Na jakim etapie jest Twój klient?" })).toBeVisible();
@@ -161,6 +165,22 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await p2.goto("/app");
   await expect(p2.getByTestId("stat-leads")).toHaveText("0");
   await expect(p2.getByTestId("stat-clicks")).toHaveText("1");
+
+  // Dziennik zdarzeń na pulpicie i pełny przebieg polecenia (nie tylko wejście i sprzedaż)
+  await page.goto("/app");
+  await expect(page.getByTestId("activity").getByText("Klient otworzył Twój link")).toBeVisible();
+  await expect(page.getByTestId("activity").getByText("Nowe polecenie").first()).toBeVisible();
+  await admin.goto("/admin/polecenia");
+  await admin.getByRole("row", { name: /klient@e2e\.test/ }).getByTestId("open-lead").click();
+  await admin.getByTestId("lead-status").selectOption("contacted");
+  await admin.getByTestId("lead-status-save").click();
+  await expect(admin.getByText("Zmieniono status.")).toBeVisible();
+  await page.goto("/app");
+  await page.getByTestId("activity").getByText("Kontakt nawiązany").click();
+  await page.waitForURL("**/app/polecenia/**");
+  await expect(page.getByTestId("process").locator('[aria-current="step"]')).toContainText("Kontakt");
+  await expect(page.getByTestId("timeline")).toContainText("Kontakt nawiązany");
+  await expect(page.getByText("klient@e2e.test")).toHaveCount(0);
 
   // 14–15. Administrator potwierdza sprzedaż → prowizja naliczona wg obowiązującej stawki
   await admin.goto("/admin/polecenia");
@@ -237,6 +257,29 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.goto("/app");
   await expect(page.getByTestId("sum-pending")).toHaveText("450 zł");
   await expect(page.getByTestId("sum-paid")).toHaveText("300 zł");
+
+  // Partner przekazuje dane klienta do konsultacji i od razu widzi przebieg
+  await page.goto("/app/uslugi/znak-towarowy");
+  await page.getByTestId("stage-consultation").click();
+  await page.getByTestId("handoff").locator("summary").click();
+  await page.getByTestId("handoff").locator("input[name=name]").fill("Piotr Przekazany");
+  await page.getByTestId("handoff").locator("input[name=phone]").fill("600 700 800");
+  await page.getByTestId("handoff").getByLabel(/Klient zgodził się/).check();
+  await page.getByTestId("handoff-submit").click();
+  await page.waitForURL("**/app/polecenia/**");
+  await expect(page.getByTestId("handoff-success")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Piotr Przekazany" })).toBeVisible(); // własne zgłoszenie — widzi nazwisko
+  await expect(page.getByTestId("process").locator('[aria-current="step"]')).toContainText("Zgłoszenie");
+  const handoffUrl = page.url();
+  await p2.goto(handoffUrl); // inny partner nie zobaczy cudzego polecenia
+  await expect(p2.getByRole("heading", { name: "Nie znaleźliśmy tej strony" })).toBeVisible();
+  await admin.goto("/admin/polecenia");
+  await expect(admin.getByRole("row", { name: /Piotr Przekazany/ })).toContainText("Anna Testowa");
+  // usługa wrażliwa: brak formularza przekazania (klient zgłasza się sam)
+  // Poziomy: liczone z faktycznych danych (2 potwierdzonych klientów → Brązowy)
+  await page.goto("/app/poziomy");
+  await expect(page.getByTestId("level-name")).toHaveText("Brązowy");
+  await expect(page.locator('[data-done="true"]')).toHaveCount(5); // link, polecenie, klient, wypłata, przekazanie
 
   // Izolacja: partner nie wejdzie do panelu admina, anonim nie wejdzie do panelu partnera
   await page.goto("/admin");

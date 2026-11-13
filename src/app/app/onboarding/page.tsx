@@ -63,8 +63,8 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
         ))}
       </ul>
       <div className="mt-5 flex flex-col gap-2.5">
-        <LinkButton href="/app">Przejdź do Portfela</LinkButton>
-        <LinkButton href="/app/uslugi" variant="secondary">Zobacz cały katalog ({items.length})</LinkButton>
+        <LinkButton href="/app/uslugi">Otwórz Portfel usług ({items.length})</LinkButton>
+        <LinkButton href="/app" variant="secondary">Przejdź do pulpitu</LinkButton>
       </div>
     </div>
   );

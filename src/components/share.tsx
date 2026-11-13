@@ -4,7 +4,7 @@ import {
   BookOpen, CalendarCheck, Calculator, Check, Copy, ExternalLink, FileText, Handshake, ListChecks, Mail, MessageCircle,
   MessagesSquare, PenLine, Presentation, Send, Video, type LucideIcon,
 } from "lucide-react";
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import type { ShareAsset } from "@/app/actions/partner";
 import { cn } from "@/lib/cn";
 import { assetTypeLabel, stageCopyLabel, stageLabel, STAGES, type Stage } from "@/lib/labels";
@@ -83,7 +83,7 @@ function AssetCard({ asset, serviceName, index }: { asset: ShareAsset; serviceNa
  * EDUKACJA → KONSULTACJA → TRANSAKCJA.
  * Partner najpierw odpowiada sobie na pytanie „na jakim etapie jest klient?”, potem wysyła właściwy link.
  */
-export function StagePaths({ assets, serviceName, initial = "education" }: { assets: ShareAsset[]; serviceName: string; initial?: Stage }) {
+export function StagePaths({ assets, serviceName, initial = "education", consultationExtra }: { assets: ShareAsset[]; serviceName: string; initial?: Stage; consultationExtra?: ReactNode }) {
   const [stage, setStage] = useState<Stage>(initial);
   const idx = STAGES.indexOf(stage);
   const list = assets.filter((a) => a.stage === stage);
@@ -105,6 +105,7 @@ export function StagePaths({ assets, serviceName, initial = "education" }: { ass
       </div>
 
       <p key={`lead-${stage}`} className="rise mt-3 px-1 text-sm leading-snug text-ink/80">{stageMeta[stage].lead}</p>
+      {stage === "consultation" && consultationExtra && <div className="rise mt-3">{consultationExtra}</div>}
       <ul key={stage} role="tabpanel" className="stagger mt-3 space-y-3">
         {list.length === 0
           ? <li className="rounded-3xl border border-dashed border-line px-4 py-8 text-center text-sm text-muted">Na tym etapie nie ma jeszcze materiałów.</li>

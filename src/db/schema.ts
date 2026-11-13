@@ -22,9 +22,9 @@ export const assetType = pgEnum("asset_type", [
   "article", "guide", "webinar", "video", "quiz", "calculator", "landing", "form", "booking",
 ]);
 export const leadStatus = pgEnum("lead_status", [
-  "registered", "qualified", "in_progress", "won", "rejected", "cancelled",
+  "registered", "contacted", "qualified", "in_progress", "won", "rejected", "cancelled",
 ]);
-export const leadSource = pgEnum("lead_source", ["form", "webhook", "csv", "manual"]);
+export const leadSource = pgEnum("lead_source", ["form", "webhook", "csv", "manual", "partner"]);
 export const conversionType = pgEnum("conversion_type", ["sale", "qualified_lead"]);
 export const conversionStatus = pgEnum("conversion_status", ["confirmed", "refunded"]);
 export const commissionStatus = pgEnum("commission_status", ["pending", "approved", "paid", "cancelled"]);

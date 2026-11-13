@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Rate } from "@/components/rate";
 import { ServiceDetails } from "@/components/service-details";
-import { DemoBanner, SiteFooter } from "@/components/site";
+import { SiteFooter } from "@/components/site";
 import { Card, CompanyMark, LinkButton, Wordmark } from "@/components/ui";
 import { displayRate } from "@/lib/commission";
 import { env } from "@/lib/env";
@@ -23,7 +23,6 @@ export default async function PublicService({ params }: { params: Promise<{ slug
   const assets = await getPublishedAssets(service.id);
   return (
     <>
-      <DemoBanner />
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4"><Wordmark /><LinkButton href="/rejestracja" className="min-h-10 px-4 text-sm">Załóż Portfel</LinkButton></header>
       <main id="tresc" className="mx-auto w-full max-w-3xl flex-1 px-5 pb-16">
         <CompanyMark name={company.name} color={company.color} iconUrl={company.iconUrl} />

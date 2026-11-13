@@ -59,7 +59,7 @@ export function Toaster() {
     return () => window.removeEventListener(TOAST, on);
   }, []);
   return (
-    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex flex-col items-center gap-2 px-4 md:bottom-6">
+    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex flex-col items-center gap-2 px-4 lg:bottom-6">
       {toasts.map((t) => (
         <p key={t.id} role={t.tone === "error" ? "alert" : "status"}
           className={cn("rise pointer-events-auto max-w-md rounded-2xl px-4 py-3 text-sm font-semibold shadow-lg", t.tone === "ok" ? "bg-leather-dark text-white" : "bg-danger text-white")}>

@@ -11,8 +11,10 @@ import { hashPassword, verifyPassword } from "@/lib/crypto";
 import { DEMO_ACCOUNT } from "@/lib/demo";
 import type { Stage } from "@/lib/labels";
 import { getPublishedAssets } from "@/lib/queries";
-import { assetTargetUrl, getOrCreateLink, recommendBlockLabel, recommendState } from "@/lib/tracking";
-import { passwordSchema } from "@/lib/validation";
+import { assetTargetUrl, createLead, getOrCreateLink, recommendBlockLabel, recommendState } from "@/lib/tracking";
+import { z } from "zod";
+import { rateLimit } from "@/lib/rate-limit";
+import { emailSchema, passwordSchema } from "@/lib/validation";
 
 export async function setProfessionAction(fd: FormData) {
   const { partner } = await requirePartner();
@@ -88,4 +90,36 @@ export async function changePasswordAction(_: FormState, fd: FormData): Promise<
   if (!next.success) return { error: next.error.issues[0].message };
   await db.update(users).set({ passwordHash: await hashPassword(next.data) }).where(eq(users.id, user.id));
   return { ok: "Hasło zostało zmienione." };
+}
+
+const handoffSchema = z.object({
+  name: z.string().trim().min(2, "Podaj imię i nazwisko klienta").max(120),
+  phone: z.string().trim().max(40).optional(),
+  email: z.union([z.literal(""), emailSchema]).optional(),
+  consent: z.literal("on", { message: "Potwierdź, że klient zgodził się na przekazanie danych" }),
+}).refine((v) => (v.phone && v.phone.replace(/\D/g, "").length >= 7) || v.email, { message: "Podaj telefon lub e-mail klienta" });
+
+/** Partner przekazuje kontakt klienta do konsultacji — lead od razu przypisany do partnera. */
+export async function submitClientAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { user, partner } = await requirePartner();
+  if (!(await rateLimit(`handoff:${partner.id}`, 20, 3600))) return { error: "Zbyt wiele zgłoszeń w krótkim czasie. Spróbuj ponownie za chwilę." };
+  const serviceId = String(fd.get("serviceId") ?? "");
+  const [service] = await db.select().from(services).where(eq(services.id, serviceId));
+  if (!service) return { error: "Nie znaleziono usługi." };
+  if (service.sensitive) return { error: "Przy tej usłudze klient zgłasza się sam — wyślij mu link." };
+  const [term] = await db.select().from(partnerServiceTerms).where(and(eq(partnerServiceTerms.partnerId, partner.id), eq(partnerServiceTerms.serviceId, serviceId)));
+  const state = recommendState(partner, service, term);
+  if (!state.can) return { error: recommendBlockLabel[state.reason] };
+  const parsed = handoffSchema.safeParse(Object.fromEntries(fd));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const { lead, duplicate } = await createLead({
+    serviceId, source: "partner", stage: "consultation", partnerId: partner.id,
+    contact: { name: parsed.data.name, email: parsed.data.email || null, phone: parsed.data.phone || null },
+    consent: true, actor: { userId: user.id, label: `partner ${user.email}` },
+  });
+  // Nie ujawniamy, kto zgłosił klienta wcześniej — tylko że kontakt już jest w systemie.
+  if (duplicate) return { error: "Ten klient jest już zgłoszony do tej usługi. Nie tworzymy drugiego zgłoszenia." };
+  revalidatePath("/app", "layout");
+  redirect(`/app/polecenia/${lead.id}?nowe=1`);
 }

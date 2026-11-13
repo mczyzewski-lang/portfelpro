@@ -189,7 +189,7 @@ export type CreateLeadInput = {
   ref?: string | null;
   visitorId?: string | null;
   stage?: Stage | null;
-  source: "form" | "webhook" | "csv" | "manual";
+  source: "form" | "webhook" | "csv" | "manual" | "partner";
   externalId?: string | null;
   contact?: { name?: string | null; email?: string | null; phone?: string | null };
   consent?: boolean;
@@ -228,7 +228,7 @@ export async function createLead(input: CreateLeadInput): Promise<{ lead: Lead; 
     }).returning();
     await tx.insert(leadEvents).values({
       leadId: lead.id, type: "created", toValue: "registered",
-      note: lead.partnerId ? (attr ? "Przypisano na podstawie linku polecającego" : "Przypisano ręcznie") : "Brak atrybucji partnera",
+      note: input.source === "partner" ? "Kontakt przekazany przez partnera" : lead.partnerId ? (attr ? "Przypisano na podstawie linku polecającego" : "Przypisano ręcznie") : "Brak atrybucji partnera",
       actorUserId: input.actor.userId, actorLabel: input.actor.label,
     });
     return { lead, duplicate: false };

@@ -77,7 +77,7 @@ export async function recordConversion(input: RecordConversionInput, outer?: Tx)
       const [existing] = await tx.select().from(conversions).where(and(eq(conversions.leadId, lead.id), eq(conversions.type, input.type)));
       return { conversion: existing, commission: null, duplicate: true as const, reason: "duplicate" };
     }
-    const newStatus: LeadStatus = input.type === "sale" ? "won" : lead.status === "registered" ? "qualified" : lead.status;
+    const newStatus: LeadStatus = input.type === "sale" ? "won" : lead.status === "registered" || lead.status === "contacted" ? "qualified" : lead.status;
     if (newStatus !== lead.status) {
       await tx.update(leads).set({ status: newStatus, updatedAt: new Date() }).where(eq(leads.id, lead.id));
       await event(tx, lead.id, input.actor, "status", lead.status, newStatus);

@@ -1,14 +1,4 @@
 import Link from "next/link";
-import { env } from "@/lib/env";
-
-export function DemoBanner() {
-  if (!env.demoMode) return null;
-  return (
-    <div className="bg-leather-dark px-4 py-1.5 text-center text-xs font-medium text-gold-light">
-      Wersja demonstracyjna — stawki oznaczone „DEMO” są przykładowe i nie stanowią oferty.
-    </div>
-  );
-}
 
 export function SiteFooter() {
   return (
