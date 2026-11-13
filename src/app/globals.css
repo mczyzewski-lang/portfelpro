@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --color-leather: #713b20;
+  --color-leather-600: #8a4a2a;
+  --color-leather-dark: #321b12;
+  --color-gold: #c99a3c;
+  --color-gold-light: #e1bd6a;
+  --color-gold-deep: #7d5a12; /* złoto o kontraście AA na jasnym tle */
+  --color-cream: #f8f5ef;
+  --color-sand: #efe8dc;
+  --color-line: #e4dccd;
+  --color-ink: #242321;
+  --color-muted: #6a635a;
+  --color-ok: #2a6a4b;
+  --color-ok-bg: #e6f1ea;
+  --color-warn: #8a5a00;
+  --color-warn-bg: #fbf0d6;
+  --color-danger: #a1321f;
+  --color-danger-bg: #fbe9e5;
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow-card: 0 1px 2px rgb(50 27 18 / 0.04), 0 8px 24px -12px rgb(50 27 18 / 0.12);
+  --shadow-wallet: 0 2px 4px rgb(50 27 18 / 0.2), 0 24px 48px -20px rgb(50 27 18 / 0.55);
+  --radius-card: 1.25rem;
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { background: var(--color-cream); color: var(--color-ink); font-family: var(--font-sans); }
+h1, h2, h3 { letter-spacing: -0.02em; text-wrap: balance; }
+p { text-wrap: pretty; }
+.tabular { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--color-leather); outline-offset: 2px; border-radius: 6px; }
+::selection { background: var(--color-gold-light); color: var(--color-leather-dark); }
+
+/* Karta „portfela” — skórzana faktura z gradientów, bez obrazków */
+.wallet {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(255 255 255 / 0.10), transparent 55%),
+    linear-gradient(160deg, #7d4325 0%, #5b2f1a 55%, #3d2015 100%);
+  color: #fff;
+  box-shadow: var(--shadow-wallet);
+  position: relative;
+}
+.wallet::after { /* przeszycie */
+  content: ""; position: absolute; inset: 7px; border-radius: inherit;
+  border: 1.5px dashed rgb(225 189 106 / 0.45); pointer-events: none;
+}
+
+/* Logo: subtelne wejście 3D + błysk na gwiazdce */
+.logo-3d { perspective: 800px; display: inline-block; }
+.logo-3d > .logo-inner { position: relative; transform-style: preserve-3d; animation: logo-in 1.6s cubic-bezier(.2,.7,.2,1) both; }
+.logo-3d .logo-glint {
+  position: absolute; left: 28%; top: 24%; width: 44%; height: 40%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 244 210 / 0.85), transparent 70%);
+  mix-blend-mode: soft-light; opacity: 0; animation: glint 1.8s ease-out 0.5s both; pointer-events: none;
+}
+@keyframes logo-in {
+  0% { transform: rotateY(-28deg) rotateX(10deg) translateY(10px); opacity: 0; }
+  60% { transform: rotateY(6deg) rotateX(-2deg); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes glint { 0% { opacity: 0; transform: translateX(-30%); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateX(30%); } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .5s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+dialog::backdrop { background: rgb(50 27 18 / 0.5); backdrop-filter: blur(2px); }
