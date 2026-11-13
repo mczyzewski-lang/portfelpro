@@ -52,9 +52,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <div className="mt-3.5">
           {share?.ok ? (
             <StagePaths assets={share.assets} serviceName={service.name}
-              consultationExtra={service.sensitive
-                ? <p className="rounded-3xl border border-line bg-white px-4 py-3 text-[13px] leading-snug text-muted">Przy tej usłudze klient zgłasza się sam — ze względu na poufność nie przyjmujemy danych przekazanych przez osoby trzecie.</p>
-                : <ClientHandoff serviceId={service.id} />} />
+              consultationExtra={<ClientHandoff serviceId={service.id} sensitive={service.sensitive} />}} />
           ) : (
             <div className="rounded-3xl border border-line bg-white p-5 shadow-(--shadow-card)">
               <p className="flex items-center gap-2 font-bold text-leather-dark"><Lock className="size-4" aria-hidden />{state.can ? "Linki chwilowo niedostępne" : recommendBlockLabel[state.reason]}</p>

@@ -7,7 +7,7 @@ import { SubmitButton } from "./client";
 import { Field, inputCls } from "./ui";
 
 /** Partner rozmawia z klientem i od razu przekazuje jego kontakt do konsultacji — bez wysyłania linku. */
-export function ClientHandoff({ serviceId }: { serviceId: string }) {
+export function ClientHandoff({ serviceId, sensitive = false }: { serviceId: string; sensitive?: boolean }) {
   const [state, action] = useActionState(submitClientAction, null);
   return (
     <details className="group rounded-3xl border border-gold/50 bg-white shadow-(--shadow-card)" data-testid="handoff" open={!!state?.error}>
@@ -27,9 +27,13 @@ export function ClientHandoff({ serviceId }: { serviceId: string }) {
           <Field label="E-mail"><input name="email" type="email" inputMode="email" autoComplete="off" className={inputCls} /></Field>
         </div>
         <p className="text-xs text-muted">Wystarczy telefon albo e-mail. Nie zapisujemy opisu sprawy — klient omówi ją ze specjalistą.</p>
+        {sensitive && <p className="rounded-xl bg-warn-bg px-3 py-2 text-xs font-medium text-warn">To usługa dotycząca spraw prywatnych. Przekaż kontakt tylko wtedy, gdy klient sam o to poprosił — nie pytaj go o szczegóły sytuacji.</p>}
         <label className="flex gap-3 text-sm">
           <input type="checkbox" name="consent" required className="mt-0.5 size-5 shrink-0 accent-leather" />
-          <span>Klient zgodził się, żebym przekazał(a) jego dane i żeby specjalista skontaktował się z nim w sprawie tej usługi.</span>
+          <span>
+            Klient zgodził się, żebym przekazał(a) jego dane i żeby specjalista skontaktował się z nim w sprawie tej usługi.
+            {sensitive && " Wie też, że zobaczę etap jego zgłoszenia (np. czy rozpoczął współpracę)."}
+          </span>
         </label>
         {state?.error && <p role="alert" className="rounded-xl bg-danger-bg px-3 py-2 text-sm font-medium text-danger">{state.error}</p>}
         <SubmitButton className="press w-full" data-testid="handoff-submit">Przekaż do konsultacji</SubmitButton>

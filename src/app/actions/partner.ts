@@ -106,7 +106,6 @@ export async function submitClientAction(_: FormState, fd: FormData): Promise<Fo
   const serviceId = String(fd.get("serviceId") ?? "");
   const [service] = await db.select().from(services).where(eq(services.id, serviceId));
   if (!service) return { error: "Nie znaleziono usługi." };
-  if (service.sensitive) return { error: "Przy tej usłudze klient zgłasza się sam — wyślij mu link." };
   const [term] = await db.select().from(partnerServiceTerms).where(and(eq(partnerServiceTerms.partnerId, partner.id), eq(partnerServiceTerms.serviceId, serviceId)));
   const state = recommendState(partner, service, term);
   if (!state.can) return { error: recommendBlockLabel[state.reason] };

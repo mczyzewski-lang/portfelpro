@@ -113,7 +113,7 @@ Content-Type: application/json
 
 ### Prywatność
 
-- Partner nie widzi danych klienta, który zgłosił się przez link — tylko numer polecenia, usługę, etap procesu i prowizję. Przy zgłoszeniach, które sam przekazał do konsultacji (za zgodą klienta), widzi wpisane przez siebie imię i nazwisko. Usługi wrażliwe nie przyjmują takich zgłoszeń.
+- Partner nie widzi danych klienta, który zgłosił się przez link — tylko numer polecenia, usługę, etap procesu i prowizję. Przy zgłoszeniach, które sam przekazał do konsultacji (za zgodą klienta), widzi wpisane przez siebie imię i nazwisko. Przy usługach wrażliwych formularz wymaga dodatkowego potwierdzenia, że klient wie, iż partner zobaczy etap zgłoszenia.
 - Partner widzi cały przebieg polecenia (Zgłoszenie → Kontakt → Kwalifikacja → Realizacja → Sprzedaż oraz kroki prowizji), ale bez notatek administratora.
 - Poziomy i osiągnięcia (`/app/poziomy`) są liczone z faktycznych danych i nie wpływają na stawki.
 - Formularze nie zbierają opisu sytuacji klienta (istotne dla usług zdrowotnych i rodzinnych).

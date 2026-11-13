@@ -23,7 +23,7 @@ export default function Terms() {
         <li>W razie zwrotu lub odstąpienia klienta prowizja jest anulowana, a jeśli została wypłacona — korygowana.</li>
         <li>Zmiana stawek nie wpływa na prowizje już naliczone.</li>
       </ul></section>
-      <section><h2>6. Poufność</h2><p>Partner nie otrzymuje danych osobowych klientów, którzy zgłosili się przez link, ani informacji o treści ich spraw. Widzi numer polecenia, etap procesu i prowizję. Jeśli partner sam przekazuje kontakt klienta do konsultacji, robi to wyłącznie za zgodą klienta i widzi przy tym poleceniu imię i nazwisko, które sam wpisał. Usługi dotyczące zdrowia i spraw rodzinnych nie przyjmują danych przekazanych przez partnera.</p></section>
+      <section><h2>6. Poufność</h2><p>Partner nie otrzymuje danych osobowych klientów, którzy zgłosili się przez link, ani informacji o treści ich spraw. Widzi numer polecenia, etap procesu i prowizję. Jeśli partner sam przekazuje kontakt klienta do konsultacji, robi to wyłącznie za zgodą klienta i widzi przy tym poleceniu imię i nazwisko, które sam wpisał. Przy usługach dotyczących zdrowia i spraw rodzinnych partner przekazuje kontakt wyłącznie na wyraźną prośbę klienta, który wie, że partner zobaczy etap zgłoszenia.</p></section>
     </LegalPage>
   );
 }

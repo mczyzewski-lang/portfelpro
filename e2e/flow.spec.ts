@@ -275,7 +275,6 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(p2.getByRole("heading", { name: "Nie znaleźliśmy tej strony" })).toBeVisible();
   await admin.goto("/admin/polecenia");
   await expect(admin.getByRole("row", { name: /Piotr Przekazany/ })).toContainText("Anna Testowa");
-  // usługa wrażliwa: brak formularza przekazania (klient zgłasza się sam)
   // Poziomy: liczone z faktycznych danych (2 potwierdzonych klientów → Brązowy)
   await page.goto("/app/poziomy");
   await expect(page.getByTestId("level-name")).toHaveText("Brązowy");
