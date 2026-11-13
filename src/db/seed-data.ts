@@ -35,14 +35,16 @@ export const PROFESSIONS = [
   { slug: "spolecznosc", name: "Twórcy z własną społecznością", label: "Mam własną społeczność", icon: "heart" },
 ];
 
+// Oceny Google: stan z wizytówek w Mapach Google z dnia 13.11.2026 (podane przez właściciela projektu).
+export const GOOGLE_CHECKED_AT = new Date("2026-11-13T18:55:00+01:00");
 export const COMPANIES = [
-  { slug: "pravna", name: "PRAVNA", tagline: "Usługi prawne i podatkowe dla firm i osób prywatnych", color: "#172B4D", logoUrl: null, iconUrl: "/brands/pravna-icon.png",
+  { slug: "pravna", googleRating: 47, googleReviews: 1290, name: "PRAVNA", tagline: "Usługi prawne i podatkowe dla firm i osób prywatnych", color: "#172B4D", logoUrl: null, iconUrl: "/brands/pravna-icon.png",
     description: "Zespół prawników i doradców obsługujący przedsiębiorców oraz konsumentów." },
-  { slug: "nowy-etap", name: "NOWY ETAP", tagline: "Spokojniejsza droga przez rozwód", color: "#2E5A4F", logoUrl: null, iconUrl: "/brands/nowy-etap-icon.png",
+  { slug: "nowy-etap", googleRating: 48, googleReviews: 964, name: "NOWY ETAP", tagline: "Spokojniejsza droga przez rozwód", color: "#2E5A4F", logoUrl: null, iconUrl: "/brands/nowy-etap-icon.png",
     description: "Wsparcie w rozwodzie za porozumieniem, przygotowaniu do rozwodu i mediacjach online." },
-  { slug: "risify", name: "RISIFY", tagline: "Psychoterapia online", color: "#64A286", logoUrl: "/brands/risify.svg", iconUrl: "/brands/risify-icon.png",
+  { slug: "risify", googleRating: 48, googleReviews: 141, name: "RISIFY", tagline: "Psychoterapia online", color: "#64A286", logoUrl: "/brands/risify.svg", iconUrl: "/brands/risify-icon.png",
     description: "Platforma łącząca z psychoterapeutami pracującymi online." },
-  { slug: "budaro", name: "BUDARO", tagline: "Domy modułowe i szkieletowe", color: "#0B162A", logoUrl: "/brands/budaro.svg", iconUrl: "/brands/budaro-icon.svg",
+  { slug: "budaro", googleRating: 50, googleReviews: 27, name: "BUDARO", tagline: "Domy modułowe i szkieletowe", color: "#0B162A", logoUrl: "/brands/budaro.svg", iconUrl: "/brands/budaro-icon.svg",
     description: "Producent i wykonawca domów modułowych oraz szkieletowych." },
 ];
 

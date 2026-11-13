@@ -74,6 +74,8 @@ export const partners = pgTable("partners", {
   termsVersion: text("terms_version").notNull(),
   marketingConsentAt: ts("marketing_consent_at"),
   adminNote: text("admin_note"),
+  avatar: text("avatar"),                     // wykadrowane zdjęcie 320×320 jako data URL (JPEG, ok. 20–40 kB)
+  avatarUpdatedAt: ts("avatar_updated_at"),
   createdAt: createdAt(),
 });
 

@@ -20,7 +20,7 @@ async function register(page: Page, email: string, first: string) {
   await page.waitForURL("**/app/onboarding");
   const pid = (await page.getByTestId("onboarding-partner-id").innerText()).trim();
   expect(pid).toMatch(/^PP-\d{6}$/);
-  await page.getByLabel("Agencje marketingowe").check();
+  await page.getByRole("radiogroup").getByText("Agencje marketingowe").click();
   await page.getByRole("button", { name: "Dalej" }).click();
   await page.waitForURL("**/app/onboarding?krok=2");
   await expect(page.getByRole("heading", { name: "Polecane dla Ciebie" })).toBeVisible();
@@ -73,6 +73,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.locator('img[src="/brands/risify.svg"]')).toHaveCount(1); // logotypy spółek
   await expect(page.getByTestId("google-trust")).toContainText(">4,7/5");
   await expect(page.getByTestId("google-trust").getByRole("img", { name: "Google" })).toBeVisible();
+  await expect(page.getByLabel("Ocena w Google: 4,8 na 5, 964 opinii").first()).toBeVisible(); // rzeczywiste oceny spółek
 
   // 3–4. Rejestracja i unikalny numer partnera
   const pid = await register(page, "anna@e2e.test", "Anna");
@@ -232,8 +233,9 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByTestId("sum-pending")).toHaveText("0 zł");
 
   await admin.goto("/admin/prowizje");
-  await admin.getByTestId("payout-row").locator("input[name=reference]").fill("E2E-1");
-  await admin.getByTestId("mark-paid").click();
+  const payRow = admin.getByTestId("payout-row").filter({ hasText: "Anna Testowa" });
+  await payRow.locator("input[name=reference]").fill("E2E-1");
+  await payRow.getByTestId("mark-paid").click();
   await expect(admin.getByText(/Oznaczono wypłatę 300,00 zł/)).toBeVisible();
   await page.goto("/app");
   await expect(page.getByTestId("sum-paid")).toHaveText("300 zł");
@@ -278,6 +280,20 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(p2.getByRole("heading", { name: "Nie znaleźliśmy tej strony" })).toBeVisible();
   await admin.goto("/admin/polecenia");
   await expect(admin.getByRole("row", { name: /Piotr Przekazany/ })).toContainText("Anna Testowa");
+  // Konto: zdjęcie z kadrowaniem, branża z ikonami nad statusem, zmiana hasła jako link
+  await page.goto("/app/konto");
+  await page.getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");
+  await expect(page.getByTestId("avatar-crop")).toBeVisible();
+  await page.getByLabel("Powiększ", { exact: true }).click();
+  await page.getByTestId("avatar-save").click();
+  await expect(page.locator('header img[src^="/app/avatar"]')).toBeVisible();
+  const avatar = await page.request.get("/app/avatar");
+  expect(avatar.headers()["content-type"]).toBe("image/jpeg");
+  expect((await request.get("/app/avatar")).status()).toBe(404); // bez sesji brak dostępu
+  await expect(page.getByRole("radiogroup", { name: "Czym się zajmujesz" }).locator("label").last()).toHaveText("Inne");
+  await page.getByTestId("change-password-link").click();
+  await expect(page.getByRole("heading", { name: "Zmiana hasła" })).toBeVisible();
+
   // Poziomy: liczone z faktycznych danych (2 potwierdzonych klientów → Brązowy)
   await page.goto("/app/poziomy");
   await expect(page.getByTestId("level-name")).toHaveText("Brązowy");
@@ -298,6 +314,10 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await demo.getByRole("button", { name: "Zaloguj na konto demo" }).click();
   await demo.waitForURL("**/app");
   await expect(demo.getByTestId("sum-paid")).toHaveText("0 zł"); // nie widzi danych innych partnerów
+  await expect(demo.getByTestId("stat-leads")).toHaveText("5"); // pięć przykładowych poleceń na różnych etapach
+  await demo.goto("/app/polecenia");
+  await expect(demo.getByTestId("referral-row")).toHaveCount(5);
+  await expect(demo.getByText("Marta Kowalczyk (demo)")).toBeVisible();
   await demo.goto("/admin");
   await expect(demo).toHaveURL(/\/app$/);
 

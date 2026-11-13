@@ -1,5 +1,5 @@
 import { setProfessionAction } from "@/app/actions/partner";
-import { ProfessionIcon } from "@/components/profession-icon";
+import { ProfessionPicker } from "@/components/profession-picker";
 import { Rate } from "@/components/rate";
 import { CompanyMark, LinkButton, btn } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
@@ -24,17 +24,7 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
         <h1 className="mt-6 text-2xl font-extrabold text-leather-dark">Czym się zajmujesz?</h1>
         <p className="mt-1 text-sm text-muted">Dobierzemy usługi, które mają najwięcej sensu dla Twoich klientów.</p>
         <form action={setProfessionAction} className="mt-4">
-          <div className="grid gap-2 sm:grid-cols-2">
-            {professions.map((p) => (
-              <label key={p.slug} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border border-line bg-white px-4 text-[15px] font-semibold has-checked:border-leather has-checked:ring-2 has-checked:ring-leather/15">
-                <input type="radio" name="profession" value={p.slug} className="accent-leather size-4" />
-                <ProfessionIcon name={p.icon} className="size-4 text-leather" />{p.name}
-              </label>
-            ))}
-            <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border border-line bg-white px-4 text-[15px] font-semibold has-checked:border-leather has-checked:ring-2 has-checked:ring-leather/15">
-              <input type="radio" name="profession" value="" defaultChecked className="accent-leather size-4" />Inne
-            </label>
-          </div>
+          <ProfessionPicker professions={professions} value={partner.professionSlug} />
           <button className={btn("primary", "mt-5 w-full")}>Dalej</button>
         </form>
       </div>

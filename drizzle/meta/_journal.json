@@ -29,6 +29,13 @@
       "when": 1794592418878,
       "tag": "0003_company_google_rating",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794592772385,
+      "tag": "0004_partner_avatar",
+      "breakpoints": true
     }
   ]
 }

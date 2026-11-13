@@ -122,3 +122,23 @@ export async function submitClientAction(_: FormState, fd: FormData): Promise<Fo
   revalidatePath("/app", "layout");
   redirect(`/app/polecenia/${lead.id}?nowe=1`);
 }
+
+/** Zapis wykadrowanego zdjęcia (kwadratowy JPEG z przeglądarki). Serwer sprawdza format, sygnaturę pliku i rozmiar. */
+export async function saveAvatarAction(dataUrl: string): Promise<FormState> {
+  const { partner } = await requirePartner();
+  if (!(await rateLimit(`avatar:${partner.id}`, 20, 3600))) return { error: "Zbyt wiele zmian zdjęcia. Spróbuj później." };
+  const m = typeof dataUrl === "string" ? /^data:image\/jpeg;base64,([A-Za-z0-9+/]+={0,2})$/.exec(dataUrl) : null;
+  if (!m) return { error: "Nieprawidłowy format zdjęcia." };
+  const bytes = Buffer.from(m[1], "base64");
+  if (bytes.length < 500 || bytes.length > 200_000) return { error: "Zdjęcie ma nieprawidłowy rozmiar." };
+  if (bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) return { error: "To nie jest plik JPEG." };
+  await db.update(partners).set({ avatar: dataUrl, avatarUpdatedAt: new Date() }).where(eq(partners.id, partner.id));
+  revalidatePath("/app", "layout");
+  return { ok: "Zdjęcie zapisane." };
+}
+
+export async function removeAvatarAction() {
+  const { partner } = await requirePartner();
+  await db.update(partners).set({ avatar: null, avatarUpdatedAt: null }).where(eq(partners.id, partner.id));
+  revalidatePath("/app", "layout");
+}
