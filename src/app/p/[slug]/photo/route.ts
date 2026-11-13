@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 /** Zdjęcie partnera — publiczne wyłącznie wtedy, gdy sam włączył Portfel Publiczny. */
 export async function GET(_: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (!/^[A-Za-z0-9]{6,16}$/.test(slug)) return new NextResponse(null, { status: 404 });
+  if (!/^[A-Za-z0-9-]{3,90}$/.test(slug)) return new NextResponse(null, { status: 404 });
   const [p] = await db.select({ avatar: partners.avatar }).from(partners)
     .where(and(eq(partners.publicSlug, slug), eq(partners.publicEnabled, true), eq(partners.status, "active")));
   const m = p?.avatar ? /^data:image\/jpeg;base64,(.+)$/.exec(p.avatar) : null;

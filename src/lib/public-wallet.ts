@@ -7,7 +7,7 @@ const CAMPAIGN = "portfel publiczny";
 
 /** Dane strony /p/<slug>: partner (tylko to, co sam upublicznia) i usługi, które może polecać, z jego linkami. */
 export async function getPublicWallet(slug: string) {
-  if (!/^[A-Za-z0-9]{6,16}$/.test(slug)) return null;
+  if (!/^[A-Za-z0-9-]{3,90}$/.test(slug)) return null;
   const [row] = await db.select({ p: partners, firstName: users.firstName, lastName: users.lastName })
     .from(partners).innerJoin(users, eq(users.id, partners.userId))
     .where(and(eq(partners.publicSlug, slug), eq(partners.publicEnabled, true), eq(partners.status, "active")));
@@ -27,10 +27,17 @@ export async function getPublicWallet(slug: string) {
     };
     const [learn, talk] = [await link("education"), await link("consultation")];
     if (!learn && !talk) continue;
-    items.push({ id: s.id, name: s.name, benefit: s.clientBenefit, company: c, learn, talk });
+    items.push({
+      id: s.id, slug: s.slug, name: s.name, benefit: s.clientBenefit, learn, talk,
+      // tylko treści dla klienta — bez wskazówek sprzedażowych i prowizji
+      description: s.description, problems: s.problems, audience: s.audience, faq: s.faq, provider: s.provider,
+      company: { name: c.name, color: c.color, iconUrl: c.iconUrl, googleRating: c.googleRating, googleReviews: c.googleReviews },
+    });
   }
   return {
     name: `${row.firstName} ${row.lastName}`, initials: `${row.firstName[0] ?? ""}${row.lastName[0] ?? ""}`.toUpperCase(),
     bio: row.p.publicBio, companyName: row.p.companyName, hasPhoto: !!row.p.avatar, photoVersion: row.p.avatarUpdatedAt?.getTime() ?? 1, items,
   };
 }
+
+export type PublicWalletData = NonNullable<Awaited<ReturnType<typeof getPublicWallet>>>;

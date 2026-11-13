@@ -101,6 +101,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.getByTestId("service-znak-towarowy").click();
   await page.waitForURL("**/app/uslugi/znak-towarowy");
   await expect(page.getByRole("heading", { name: "Wybierz link dla klienta" })).toBeVisible();
+  await expect(page.getByTestId("service-screen")).toBeVisible(); // usługa na cały ekran
   await expect(page.getByTestId("stage-transaction")).toHaveCount(0); // tylko Edukacja i Konsultacja
   await expect(page.getByTestId("offer-links").getByTestId("copy-transaction")).toHaveText("Kopiuj"); // link do oferty: widoczny adres + „Kopiuj”
   await page.getByTestId("stage-consultation").click();
@@ -336,7 +337,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.getByTestId("public-save").click();
   await expect(page.getByText("Portfel Publiczny jest aktywny.")).toBeVisible();
   const publicUrl = "http://" + (await page.getByTestId("public-url").innerText()).trim();
-  expect(publicUrl).toMatch(/\/p\/[A-Za-z0-9]{9}$/);
+  expect(publicUrl).toMatch(/\/p\/anna-testowa$/); // adres z imieniem i nazwiskiem
   const visitor = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
   await visitor.goto(publicUrl);
   await expect(visitor.getByRole("heading", { name: "Anna Testowa" })).toBeVisible();
@@ -346,7 +347,17 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   expect((await visitor.request.get(publicUrl + "/photo")).headers()["content-type"]).toBe("image/jpeg");
   const card = visitor.locator("li").filter({ hasText: SERVICE });
   await expect(card.getByRole("link", { name: "Dowiedz się więcej" })).toBeVisible();
-  await card.getByRole("link", { name: "Porozmawiaj" }).click();
+  // wejście w usługę: ten sam ekran, partner dalej w przypiętym pasku, szczegóły zamiast listy
+  await visitor.getByTestId("public-item-znak-towarowy").click();
+  await expect(visitor.getByTestId("public-detail")).toContainText("W czym pomaga");
+  await expect(visitor.getByTestId("public-list")).toHaveCount(0);
+  await expect(visitor.getByRole("heading", { name: "Anna Testowa" })).toBeInViewport();
+  await expect(visitor.getByText("Czego nie należy obiecywać")).toHaveCount(0); // bez treści dla partnera
+  expect(visitor.url()).toBe(publicUrl);
+  await visitor.getByTestId("public-back").click();
+  await expect(visitor.getByTestId("public-list")).toBeVisible();
+  await visitor.getByTestId("public-item-znak-towarowy").click();
+  await visitor.getByTestId("public-detail").getByRole("link", { name: "Porozmawiaj" }).click();
   await expect(visitor).toHaveURL(/ocena-mozliwosci-rejestracji\?pp_ref=/); // link polecający partnera
   await page.getByTestId("public-toggle").uncheck({ force: true });
   await page.getByTestId("public-save").click();

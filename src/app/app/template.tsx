@@ -8,7 +8,9 @@ import { usePathname } from "next/navigation";
  */
 export default function Template({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const deep = /^\/app\/(uslugi|polecenia|konto)\/.+/.test(path);
+  // karta usługi animuje się sama (jest pełnoekranową nakładką), więc tutaj jej nie ruszamy
+  if (/^\/app\/uslugi\/.+/.test(path)) return <>{children}</>;
+  const deep = /^\/app\/(polecenia|konto)\/.+/.test(path);
   const list = path === "/app/uslugi" || path === "/app/polecenia";
   return <div className={deep ? "slide-in-right" : list ? "slide-in-left" : "page-enter"}>{children}</div>;
 }

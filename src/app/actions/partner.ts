@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { partnerServiceTerms, partners, professions, services, users } from "@/db/schema";
 import { requirePartner } from "@/lib/auth";
 import { hashPassword, randomToken, safeEqual, verifyPassword } from "@/lib/crypto";
+import { slugify } from "@/lib/csv";
 import { DEMO_ACCOUNT } from "@/lib/demo";
 import type { Stage } from "@/lib/labels";
 import { postMessage } from "@/lib/messages";
@@ -172,10 +173,16 @@ export async function savePublicWalletAction(_: FormState, fd: FormData): Promis
   const enable = fd.get("enabled") === "on";
   if (enable && partner.status !== "active") return { error: "Portfel Publiczny włączysz po zatwierdzeniu konta." };
   const bio = String(fd.get("bio") ?? "").replace(/\s+/g, " ").trim().slice(0, 160);
-  await db.update(partners).set({
-    publicEnabled: enable, publicBio: bio || null,
-    publicSlug: partner.publicSlug ?? randomToken(9), // losowy adres — nie zdradza numeru partnera
-  }).where(eq(partners.id, partner.id));
+  // Adres w formacie /p/imie-nazwisko; przy powtórce nazwiska dopisujemy -2, -3…
+  const { user } = await requirePartner();
+  const base = slugify(`${user.firstName} ${user.lastName}`) || "partner";
+  let slug = partner.publicSlug && (partner.publicSlug === base || partner.publicSlug.startsWith(`${base}-`)) ? partner.publicSlug : null;
+  for (let n = 1; !slug && n < 200; n++) {
+    const candidate = n === 1 ? base : `${base}-${n}`;
+    const [taken] = await db.select({ id: partners.id }).from(partners).where(eq(partners.publicSlug, candidate));
+    if (!taken) slug = candidate;
+  }
+  await db.update(partners).set({ publicEnabled: enable, publicBio: bio || null, publicSlug: slug ?? `${base}-${randomToken(5)}` }).where(eq(partners.id, partner.id));
   revalidatePath("/app/konto");
   return { ok: enable ? "Portfel Publiczny jest aktywny." : "Portfel Publiczny jest wyłączony." };
 }

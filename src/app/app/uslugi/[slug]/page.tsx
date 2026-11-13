@@ -31,14 +31,18 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const lockedAssets = state.can ? [] : await getPublishedAssets(service.id);
 
   return (
-    <article className="mx-auto max-w-2xl">
-      <div className="flex items-center justify-between">
-        <Link href="/app/uslugi" className="press -ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel usług</Link>
-        <Link href="/app/uslugi" aria-label="Zamknij usługę" className="press grid size-10 place-items-center rounded-full border border-line bg-white text-leather-dark" data-testid="close-service"><X className="size-5" aria-hidden /></Link>
+    // Pełnoekranowy widok „focus”: zakrywa nagłówek i dolną nawigację, wsuwa się z prawej jak otwierany artykuł.
+    <div className="slide-in-right fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-cream" data-testid="service-screen">
+      <div className="sticky top-0 z-10 border-b border-line bg-cream/95 backdrop-blur">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-3 py-2">
+          <Link href="/app/uslugi" className="press inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel usług</Link>
+          <p className="min-w-0 flex-1 truncate text-center text-[13px] font-bold text-muted">{company.name}</p>
+          <Link href="/app/uslugi" aria-label="Zamknij usługę" className="press grid size-11 place-items-center rounded-full border border-line bg-white text-leather-dark" data-testid="close-service"><X className="size-5" aria-hidden /></Link>
+        </div>
       </div>
-
+    <article className="mx-auto max-w-2xl px-5 pb-16 pt-4">
       {/* Karta usługi: co polecam i ile zarobię */}
-      <header className="wallet wallet-sheen mt-1 rounded-[28px] p-5">
+      <header className="wallet wallet-sheen rounded-[28px] p-5">
         <div className="relative z-10 flex items-center gap-2.5">
           <CompanyIcon name={company.name} color={company.color} iconUrl={company.iconUrl} size={34} />
           <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/75">{company.name}</span>
@@ -96,5 +100,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <div className="mt-3"><ServiceDetails service={service} company={company} collapsible /></div>
       </section>
     </article>
+    </div>
   );
 }
