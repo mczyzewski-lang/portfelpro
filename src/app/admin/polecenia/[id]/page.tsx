@@ -14,6 +14,7 @@ import { displayRate, effectiveRate, formatPLN, triggerFor } from "@/lib/commiss
 import { env } from "@/lib/env";
 import { fmtDateTime, leadRef, leadStatusLabel, modelLabel, partnerId, stageLabel } from "@/lib/labels";
 
+const valueLabel: Record<string, string> = { ...leadStatusLabel, sale: "sprzedaż", qualified_lead: "zakwalifikowany lead", pending: "naliczona", approved: "zatwierdzona", paid: "wypłacona", confirmed: "potwierdzona", refunded: "zwrot" };
 const eventLabel: Record<string, string> = { created: "Utworzono", status: "Status klienta", assignment: "Przypisanie partnera", conversion: "Konwersja", commission: "Prowizja", refund: "Zwrot" };
 
 export default async function LeadDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -142,7 +143,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
             <li key={e.id} className="flex flex-wrap gap-x-3 border-b border-line pb-2 last:border-0">
               <span className="tabular w-36 shrink-0 text-muted">{fmtDateTime(e.createdAt)}</span>
               <span className="font-semibold">{eventLabel[e.type] ?? e.type}</span>
-              <span>{e.type === "assignment" ? "zmiana partnera" : [e.fromValue, e.toValue].filter(Boolean).map((v) => leadStatusLabel[v!] ?? v).join(" → ")}</span>
+              <span>{e.type === "assignment" ? "zmiana partnera" : [e.fromValue, e.toValue].filter(Boolean).map((v) => (e.type === "commission" || e.type === "conversion" || e.type === "refund" ? valueLabel[v!] : leadStatusLabel[v!]) ?? v).join(" → ")}</span>
               {e.note && <span className="text-muted">— {e.note}</span>}
               <span className="ml-auto text-xs text-muted">{e.actorLabel}</span>
             </li>

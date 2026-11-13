@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ExternalLink, Share2, X } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarCheck, Calculator, ExternalLink, FileText, ListChecks, PenLine, Presentation, Share2, Video, X, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { getShareData, type ShareAsset, type ShareData } from "@/app/actions/partner";
@@ -9,15 +9,19 @@ import { assetTypeLabel, stageCopyLabel, stageHint, stageLabel, STAGES, type Sta
 import { CopyButton, ShareRow } from "./client";
 import { Badge, btnSm } from "./ui";
 
+const typeIcon: Record<string, LucideIcon> = {
+  article: FileText, guide: BookOpen, webinar: Presentation, video: Video, quiz: ListChecks,
+  calculator: Calculator, landing: FileText, form: PenLine, booking: CalendarCheck,
+};
+
 /** Jeden materiał z osobistym linkiem: kopiowanie jednym kliknięciem, podgląd i udostępnianie. */
 export function AssetShareCard({ asset, serviceName }: { asset: ShareAsset; serviceName: string }) {
   const [open, setOpen] = useState(false);
+  const Icon = typeIcon[asset.type] ?? FileText;
   return (
     <div className="rounded-2xl border border-line bg-white p-4" data-testid={`asset-${asset.stage}`}>
       <div className="flex gap-3">
-        <div aria-hidden className="grid size-12 shrink-0 place-items-center rounded-xl bg-sand text-[10px] font-extrabold uppercase tracking-wide text-leather">
-          {assetTypeLabel[asset.type]?.slice(0, 4)}
-        </div>
+        <div aria-hidden className="grid size-12 shrink-0 place-items-center rounded-xl bg-sand text-leather"><Icon className="size-5" /></div>
         <div className="min-w-0">
           <Badge>{assetTypeLabel[asset.type] ?? asset.type}</Badge>
           <p className="mt-1 font-bold leading-snug text-leather-dark">{asset.title}</p>
@@ -26,7 +30,7 @@ export function AssetShareCard({ asset, serviceName }: { asset: ShareAsset; serv
       </div>
       <p className="tabular mt-3 truncate rounded-lg bg-cream px-3 py-2 text-[13px] font-semibold text-leather" data-testid="link-url">{asset.url.replace(/^https?:\/\//, "")}</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <CopyButton text={asset.url} label={stageCopyLabel[asset.stage]} copiedLabel="Link skopiowany" className="flex-1 sm:flex-none" testId={`copy-${asset.stage}`} />
+        <CopyButton text={asset.url} label={stageCopyLabel[asset.stage]} copiedLabel="Link skopiowany" className="w-full sm:w-auto" testId={`copy-${asset.stage}`} />
         <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className={btnSm("secondary", "min-h-11")}>
           <Share2 className="size-4" aria-hidden /> Wyślij
         </button>
