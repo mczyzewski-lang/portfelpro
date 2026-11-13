@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "deploy": {
+    "preDeployCommand": "npm run db:deploy",
+    "startCommand": "npm start",
+    "healthcheckPath": "/logowanie",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}

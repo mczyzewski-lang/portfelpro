@@ -143,6 +143,20 @@ Aplikacja nie jest wdrożona produkcyjnie. Do wdrożenia potrzebne są:
 3. Silne `APP_SECRET`, `WEBHOOK_SECRET`, `ADMIN_PASSWORD`; `APP_URL` z docelową domeną; `DEMO_MODE=false`.
 4. Reverse proxy musi ustawiać `X-Forwarded-For` (limity i hash IP).
 
+### Railway
+
+Repo zawiera `railway.json`: przed każdym wdrożeniem uruchamia się `npm run db:deploy` (migracje + seed brakujących danych), start to `npm start`. Build nie wymaga żadnych zmiennych. W usłudze aplikacji ustaw zmienne:
+
+| Zmienna | Wartość |
+|---|---|
+| `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (referencja do usługi Postgres) |
+| `APP_URL` | publiczny adres, np. `https://${{RAILWAY_PUBLIC_DOMAIN}}` lub własna domena |
+| `APP_SECRET`, `WEBHOOK_SECRET` | losowe ciągi (`openssl rand -hex 32`) |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | dane pierwszego administratora (hasło min. 10 znaków) |
+| `DEMO_MODE` | `true` na czas testów, `false` przy starcie produkcyjnym |
+
+Następnie w Settings → Networking wygeneruj domenę (usługa jest domyślnie niewystawiona). Aplikacja nie zapisuje nic na dysku — wolumen przy usłudze aplikacji nie jest potrzebny.
+
 ### Przed startem produkcyjnym
 
 - [ ] Potwierdzić, że każda spółka w katalogu faktycznie spełnia deklarowane na stronie głównej kryterium opinii Google (min. 100 opinii, średnia powyżej 4,7/5) — aplikacja tego nie weryfikuje automatycznie.

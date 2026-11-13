@@ -45,11 +45,15 @@ async function main() {
 
   const adminEmail = (process.env.ADMIN_EMAIL ?? "admin@portfel.pro").toLowerCase();
   const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword || adminPassword.length < 10) throw new Error("Ustaw ADMIN_PASSWORD (min. 10 znaków) w .env");
-  const [admin] = await db.insert(s.users).values({
-    email: adminEmail, passwordHash: await hashPassword(adminPassword), role: "admin", firstName: "Administrator", lastName: "Portfel.pro",
-  }).onConflictDoNothing().returning();
-  console.log(admin ? `✓ Utworzono administratora: ${adminEmail}` : `• Administrator ${adminEmail} już istnieje`);
+  if (!adminPassword || adminPassword.length < 10 || adminPassword.startsWith("change-me")) {
+    // Nie blokujemy wdrożenia — ale bez tej zmiennej nie powstanie konto administratora.
+    console.warn("! Pominięto tworzenie administratora: ustaw ADMIN_PASSWORD (min. 10 znaków) i uruchom seed ponownie.");
+  } else {
+    const [admin] = await db.insert(s.users).values({
+      email: adminEmail, passwordHash: await hashPassword(adminPassword), role: "admin", firstName: "Administrator", lastName: "Portfel.pro",
+    }).onConflictDoNothing().returning();
+    console.log(admin ? `✓ Utworzono administratora: ${adminEmail}` : `• Konto ${adminEmail} już istnieje`);
+  }
   console.log(`✓ Seed zakończony: ${COMPANIES.length} spółki, ${SERVICES.length} usług`);
   process.exit(0);
 }
