@@ -8,13 +8,14 @@ import { btn } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { levelFor } from "@/lib/gamification";
 import { partnerId } from "@/lib/labels";
-import { getActivity, getWalletSummary, hasFirstSuccess } from "@/lib/partner-data";
+import { getActivity, getServiceStats, getWalletSummary, hasFirstSuccess } from "@/lib/partner-data";
 
 /** Pulpit: liczby i dziennik zdarzeń. Usługi są w zakładce „Portfel”. */
 export default async function Dashboard() {
   const { user, partner } = await requirePartner();
   if (!partner.onboardedAt) redirect("/app/onboarding");
-  const [sum, feed, success] = await Promise.all([getWalletSummary(partner.id), getActivity(partner.id), hasFirstSuccess(partner.id)]);
+  const [sum, feed, success, perService] = await Promise.all([getWalletSummary(partner.id), getActivity(partner.id, 12), hasFirstSuccess(partner.id), getServiceStats(partner.id)]);
+  const maxActivity = Math.max(1, ...perService.map((s) => s.clicks + s.leads));
   const showSuccess = success && !partner.firstSuccessSeenAt;
   const level = levelFor(sum.clients);
   const stats = [
@@ -26,11 +27,11 @@ export default async function Dashboard() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       {showSuccess && (
-        <section className="wallet pop rounded-[28px] p-6 text-center" data-testid="first-success">
-          <Sparkles className="relative z-10 mx-auto size-8 text-gold-light" aria-hidden />
+        <section className="success-grad pop rounded-[28px] p-6 text-center" data-testid="first-success">
+          <Sparkles className="relative z-10 mx-auto size-8 text-white" aria-hidden />
           <h2 className="relative z-10 mt-2 text-2xl font-extrabold">Pierwsze potwierdzone polecenie!</h2>
           <p className="relative z-10 mx-auto mt-1.5 max-w-sm text-sm text-white/80">Twoje polecenie zostało potwierdzone, a prowizja naliczona. Jej status znajdziesz w zakładce Polecenia.</p>
-          <form action={dismissFirstSuccessAction} className="relative z-10 mt-4"><button className={btn("gold", "press")}>Świetnie, dalej</button></form>
+          <form action={dismissFirstSuccessAction} className="relative z-10 mt-4"><button className={btn("secondary", "press")}>Świetnie, dalej</button></form>
         </section>
       )}
 
@@ -48,7 +49,7 @@ export default async function Dashboard() {
           </div>
           <dl className="relative z-10 mt-5 grid grid-cols-2 gap-x-4 border-t border-white/15 pt-4">
             <div><dt className="text-xs text-white/65">Oczekujące</dt><dd><CountUp value={sum.pending} testId="sum-pending" className="tabular text-lg font-bold" /></dd></div>
-            <div><dt className="text-xs text-white/65">Już wypłacone</dt><dd><CountUp value={sum.paid} testId="sum-paid" className="tabular text-lg font-bold" /></dd></div>
+            <div><dt className="text-xs text-white/65">Już wypłacone</dt><dd><CountUp value={sum.paid} testId="sum-paid" className={sum.paid > 0 ? "tabular text-lg font-bold text-[#8fe0b6]" : "tabular text-lg font-bold"} /></dd></div>
           </dl>
         </Link>
 
@@ -85,6 +86,33 @@ export default async function Dashboard() {
           ) : <Feed items={feed} />}
         </div>
       </section>
+
+      {perService.length > 0 && (
+        <section aria-labelledby="per-service" data-testid="service-stats">
+          <h2 id="per-service" className="text-xl font-extrabold text-leather-dark">Twoje usługi w liczbach</h2>
+          <p className="mt-0.5 text-sm text-muted">Linki, otwarcia i polecenia dla każdej usługi, którą polecasz.</p>
+          <ul className="stagger mt-3 space-y-2.5">
+            {perService.map((s, n) => (
+              <li key={s.slug} style={{ "--i": Math.min(n, 8) } as React.CSSProperties}>
+                <Link href={`/app/uslugi/${s.slug}`} className="press block rounded-3xl border border-line bg-white p-4 shadow-(--shadow-card)">
+                  <p className="font-extrabold leading-snug text-leather-dark">{s.name}</p>
+                  <dl className="mt-2.5 grid grid-cols-4 gap-2 text-center">
+                    {[["Linki", s.links], ["Otwarcia", s.clicks], ["Polecenia", s.leads], ["Klienci", s.won]].map(([l, v]) => (
+                      <div key={l} className={l === "Klienci" && Number(v) > 0 ? "success-grad rounded-xl py-1.5" : "rounded-xl bg-cream py-1.5"}>
+                        <dd className="tabular text-lg font-extrabold leading-tight">{v}</dd>
+                        <dt className={l === "Klienci" && Number(v) > 0 ? "text-[11px] text-white/85" : "text-[11px] text-muted"}>{l}</dt>
+                      </div>
+                    ))}
+                  </dl>
+                  <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-sand" role="img" aria-label={`Otwarcia: ${s.clicks}, polecenia: ${s.leads}`}>
+                    <div className="h-full rounded-full bg-gold" style={{ width: `${Math.max(s.clicks || s.leads ? 6 : 0, ((s.clicks + s.leads) / maxActivity) * 100)}%` }} />
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

@@ -314,7 +314,14 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   const avatar = await page.request.get("/app/avatar");
   expect(avatar.headers()["content-type"]).toBe("image/jpeg");
   expect((await request.get("/app/avatar")).status()).toBe(404); // bez sesji brak dostępu
-  await expect(page.getByRole("radiogroup", { name: "Czym się zajmujesz" }).locator("label").last()).toHaveText("Inne");
+  const select = page.getByTestId("profession-select");
+  await expect(select.getByRole("button", { expanded: false })).toContainText("Agencje marketingowe"); // widać wybraną pozycję
+  await select.getByRole("button").first().click();
+  await expect(select.getByRole("option").last()).toHaveText("Inne");
+  await select.getByRole("option", { name: "Biura rachunkowe i księgowi" }).click(); // zapis od razu po wyborze
+  await expect(select.getByRole("button", { expanded: false })).toContainText("Biura rachunkowe");
+  await expect(page.getByTestId("logout")).toBeVisible(); // wylogowanie w kontenerze pod zmianą hasła
+  await expect(page.locator('nav[aria-label="Główna"] [aria-current="page"]')).toHaveCount(0); // w Koncie żadna zakładka nie jest podświetlona
   await page.getByTestId("change-password-link").click();
   await expect(page.getByRole("heading", { name: "Zmiana hasła" })).toBeVisible();
 
@@ -339,6 +346,12 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await demo.waitForURL("**/app");
   await expect(demo.getByTestId("sum-paid")).toHaveText("0 zł"); // nie widzi danych innych partnerów
   await expect(demo.getByTestId("stat-leads")).toHaveText("5"); // pięć przykładowych poleceń na różnych etapach
+  await expect(demo.getByTestId("service-stats")).toContainText("Zastrzeżenie znaku towarowego"); // statystyka per usługa
+  await demo.goto("/app/wiadomosci");
+  await expect(demo.getByTestId("manager-card")).toContainText("Karolina Wysocka");
+  await expect(demo.getByTestId("manager-card").getByRole("link", { name: "+48 600 000 000" })).toBeVisible();
+  await expect(demo.getByTestId("manager-photo")).toBeVisible();
+  expect((await demo.request.get(await demo.getByTestId("manager-photo").getAttribute("src") as string)).headers()["content-type"]).toBe("image/jpeg");
   await demo.goto("/app/polecenia");
   await expect(demo.getByTestId("referral-row")).toHaveCount(5);
   await expect(demo.getByText("Marta Kowalczyk (demo)")).toBeVisible();

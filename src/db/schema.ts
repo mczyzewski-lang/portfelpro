@@ -42,6 +42,8 @@ export const users = pgTable("users", {
   lastName: text("last_name").notNull(),
   phone: text("phone"),          // telefon opiekuna pokazywany partnerom
   jobTitle: text("job_title"),   // np. „Opiekun partnerów”
+  avatar: text("avatar"),        // zdjęcie opiekuna (data URL JPEG) pokazywane partnerom
+  avatarUpdatedAt: ts("avatar_updated_at"),
   createdAt: createdAt(),
 });
 

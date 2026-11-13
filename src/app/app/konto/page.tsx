@@ -1,12 +1,12 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
-import { setProfessionAction } from "@/app/actions/partner";
+import { removeAvatarAction, saveAvatarAction, setProfessionAction } from "@/app/actions/partner";
 import { AvatarEditor } from "@/components/avatar";
 import { CopyButton } from "@/components/client";
-import { ProfessionPicker } from "@/components/profession-picker";
+import { ProfessionSelect } from "@/components/profession-select";
 import { PartnerStatusBadge } from "@/components/status";
-import { Card, btn } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { avatarSrc, initialsOf } from "@/lib/avatar";
 import { activityLabel, fmtDate, partnerId } from "@/lib/labels";
@@ -28,7 +28,7 @@ export default async function AccountPage() {
       <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Konto</h1>
 
       <div className="wallet rounded-[28px] p-5">
-        <div className="relative z-10"><AvatarEditor src={avatarSrc(partner)} initials={initialsOf(user)} /></div>
+        <div className="relative z-10"><AvatarEditor src={avatarSrc(partner)} initials={initialsOf(user)} onSave={saveAvatarAction} onRemove={removeAvatarAction} /></div>
         <p className="relative z-10 mt-4 text-lg font-extrabold leading-tight">{user.firstName} {user.lastName}</p>
         {partner.companyName && <p className="relative z-10 text-sm text-white/75">{partner.companyName}</p>}
         <div className="relative z-10 mt-4 flex items-end justify-between gap-3 border-t border-white/15 pt-3.5">
@@ -45,8 +45,7 @@ export default async function AccountPage() {
         <p className="mt-1 text-sm text-muted">Na tej podstawie podpowiadamy usługi oznaczone „dla Ciebie”.</p>
         <form action={setProfessionAction} className="mt-3">
           <input type="hidden" name="next" value="konto" />
-          <ProfessionPicker professions={professions} value={partner.professionSlug} />
-          <button className={btn("secondary", "press mt-3 w-full sm:w-auto")}>Zapisz</button>
+          <ProfessionSelect professions={professions} value={partner.professionSlug} />
         </form>
       </Card>
 
@@ -57,9 +56,13 @@ export default async function AccountPage() {
         <Link href="/app/konto/haslo" className="press flex min-h-12 items-center justify-between gap-4 px-4 py-3 text-sm" data-testid="change-password-link">
           <span className="text-muted">Hasło</span><span className="inline-flex items-center gap-1 font-bold text-leather">Zmień hasło<ChevronRight className="size-4" aria-hidden /></span>
         </Link>
+        <form action={logoutAction}>
+          <button className="press flex min-h-12 w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm" data-testid="logout">
+            <span className="text-muted">Sesja</span><span className="inline-flex items-center gap-1.5 font-bold text-danger"><LogOut className="size-4" aria-hidden />Wyloguj się</span>
+          </button>
+        </form>
       </Card>
 
-      <form action={logoutAction}><button className={btn("ghost", "w-full")}>Wyloguj się</button></form>
     </div>
   );
 }

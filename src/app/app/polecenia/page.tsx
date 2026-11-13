@@ -23,12 +23,9 @@ export default async function ReferralsPage({ searchParams }: { searchParams: Pr
     <>
       <h1 className="text-[26px] font-extrabold leading-tight text-leather-dark">Polecenia i prowizje</h1>
       <dl className="mt-4 grid grid-cols-3 gap-2.5">
-        {[["Oczekujące", sum.pending, "text-warn"], ["Zatwierdzone", sum.approved, "text-gold-deep"], ["Wypłacone", sum.paid, "text-ok"]].map(([l, v, c]) => (
-          <div key={l} className="rounded-2xl border border-line bg-white px-3 py-3">
-            <dt className="text-xs text-muted">{l}</dt>
-            <dd className={cn("tabular text-[17px] font-extrabold", c as string)}>{formatPLN(v as number)}</dd>
-          </div>
-        ))}
+        <div className="rounded-2xl border border-line bg-white px-3 py-3"><dt className="text-xs text-muted">Oczekujące</dt><dd className="tabular text-[17px] font-extrabold text-warn">{formatPLN(sum.pending)}</dd></div>
+        <div className={cn("rounded-2xl border px-3 py-3", sum.approved > 0 ? "success-soft" : "border-line bg-white")}><dt className="text-xs text-muted">Zatwierdzone</dt><dd className="tabular text-[17px] font-extrabold text-ok">{formatPLN(sum.approved)}</dd></div>
+        <div className={cn("rounded-2xl px-3 py-3", sum.paid > 0 ? "success-grad" : "border border-line bg-white")} data-testid="tile-paid"><dt className={cn("text-xs", sum.paid > 0 ? "text-white/85" : "text-muted")}>Wypłacone</dt><dd className={cn("tabular text-[17px] font-extrabold", sum.paid > 0 ? "text-white" : "text-ok")}>{formatPLN(sum.paid)}</dd></div>
       </dl>
 
       <nav aria-label="Widok" className="mt-5 flex gap-1 rounded-full bg-sand p-1">
@@ -62,7 +59,7 @@ async function Referrals({ partnerId }: { partnerId: string }) {
           const closed = r.status === "rejected" || r.status === "cancelled";
           return (
             <li key={r.id} style={{ "--i": Math.min(n, 8) } as React.CSSProperties}>
-              <Link href={`/app/polecenia/${r.id}`} className="press block rounded-3xl border border-line bg-white p-4 shadow-(--shadow-card)" data-testid="referral-row">
+              <Link href={`/app/polecenia/${r.id}`} className={cn("press block rounded-3xl border p-4 shadow-(--shadow-card)", r.status === "won" ? "success-soft" : "border-line bg-white")} data-testid="referral-row">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-extrabold leading-snug text-leather-dark">{r.clientName ?? r.serviceName}</p>
@@ -93,13 +90,13 @@ async function Commissions({ partnerId }: { partnerId: string }) {
   return (
     <ul className="space-y-2.5">
       {rows.map((c) => (
-        <li key={c.id} className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white px-4 py-3">
+        <li key={c.id} className={cn("flex items-center justify-between gap-3 rounded-2xl border px-4 py-3", c.status === "paid" || c.status === "approved" ? "success-soft" : "border-line bg-white")}>
           <div className="min-w-0">
             <p className="truncate font-bold text-leather-dark">{c.serviceName}</p>
             <p className="text-xs text-muted">{leadRef(c.leadNumber)} · naliczono {fmtDate(c.createdAt)}{c.paidAt && ` · wypłacono ${fmtDate(c.paidAt)}`}{c.kind === "correction" && " · korekta"}</p>
           </div>
           <div className="shrink-0 text-right">
-            <p className={cn("tabular font-extrabold", c.amount < 0 ? "text-danger" : "text-leather-dark", c.status === "cancelled" && "line-through opacity-60")}>{formatPLN(c.amount)}</p>
+            <p className={cn("tabular font-extrabold", c.amount < 0 ? "text-danger" : c.status === "paid" || c.status === "approved" ? "text-ok" : "text-leather-dark", c.status === "cancelled" && "line-through opacity-60")}>{formatPLN(c.amount)}</p>
             <CommissionStatusBadge status={c.status} />
           </div>
         </li>

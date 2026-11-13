@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { eq } from "drizzle-orm";
+import { and, eq, like } from "drizzle-orm";
 
 async function main() {
   const { db } = await import("../src/db");
@@ -72,6 +72,13 @@ async function main() {
       console.log(`✓ Utworzono konto demo: ${DEMO_ACCOUNT.email}`);
     }
     await seedDemoLeads(DEMO_ACCOUNT.email);
+    // Opiekun demo: przypisany do konta demo (także wtedy, gdy konto powstało przed dodaniem opiekunów).
+    const manager = await demoManager();
+    const [dp] = await db.select({ p: s.partners }).from(s.partners).innerJoin(s.users, eq(s.users.id, s.partners.userId)).where(eq(s.users.email, DEMO_ACCOUNT.email));
+    if (manager && dp && !dp.p.managerUserId) {
+      await db.update(s.partners).set({ managerUserId: manager.id }).where(eq(s.partners.id, dp.p.id));
+      await db.update(s.messages).set({ senderUserId: manager.id }).where(and(eq(s.messages.partnerId, dp.p.id), eq(s.messages.fromPartner, false), like(s.messages.body, "%wiadomość przykładowa%")));
+    }
   }
   console.log(`✓ Seed zakończony: ${COMPANIES.length} spółki, ${SERVICES.length} usług`);
   process.exit(0);
@@ -123,7 +130,7 @@ async function seedDemoLeads(email: string) {
     await db.update(s.commissions).set({ createdAt: new Date(end) }).where(eq(s.commissions.leadId, lead.id));
   }
   await db.update(s.partners).set({ firstSuccessSeenAt: new Date() }).where(eq(s.partners.id, row.p.id)); // bez ekranu „pierwszy sukces” na koncie demo
-  const [firstAdmin] = await db.select().from(s.users).where(eq(s.users.role, "admin")).orderBy(asc(s.users.createdAt)).limit(1);
+  const firstAdmin = await demoManager();
   if (firstAdmin) {
     await db.insert(s.messages).values({
       partnerId: row.p.id, fromPartner: false, senderUserId: firstAdmin.id, createdAt: new Date(Date.now() - 3 * 3600_000),
@@ -131,4 +138,27 @@ async function seedDemoLeads(email: string) {
     });
   }
   console.log("✓ Dodano 5 przykładowych poleceń na koncie demo");
+}
+
+/**
+ * Fikcyjny opiekun konta demo: zdjęcie wygenerowane (nie przedstawia prawdziwej osoby), numer telefonu jest przykładowy.
+ * Konto ma losowe hasło — nie da się na nie zalogować.
+ */
+async function demoManager() {
+  const { eq } = await import("drizzle-orm");
+  const { readFileSync, existsSync } = await import("node:fs");
+  const { db } = await import("../src/db");
+  const s = await import("../src/db/schema");
+  const { hashPassword, randomSecret } = await import("../src/lib/crypto");
+  const email = "opiekun.demo@portfel.pro";
+  const [existing] = await db.select().from(s.users).where(eq(s.users.email, email));
+  if (existing) return existing;
+  const photo = "design/opiekun-demo.jpg";
+  const [created] = await db.insert(s.users).values({
+    email, passwordHash: await hashPassword(randomSecret()), role: "admin", firstName: "Karolina", lastName: "Wysocka",
+    jobTitle: "Opiekun partnerów (demo)", phone: "+48 600 000 000",
+    avatar: existsSync(photo) ? `data:image/jpeg;base64,${readFileSync(photo).toString("base64")}` : null, avatarUpdatedAt: new Date(),
+  }).returning();
+  console.log("✓ Dodano opiekuna demo");
+  return created;
 }

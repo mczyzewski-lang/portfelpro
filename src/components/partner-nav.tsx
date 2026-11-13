@@ -30,11 +30,11 @@ export function PartnerNav({ variant, unread = 0 }: { variant: "bottom" | "top";
       </nav>
     );
   }
-  const idx = Math.max(0, items.findIndex(active));
+  const idx = items.findIndex(active); // -1 = żadna zakładka (np. Konto) — wtedy nic nie podświetlamy
   return (
     <nav aria-label="Główna" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] lg:hidden">
       <ul className="relative mx-auto grid max-w-md grid-cols-5 rounded-[26px] border border-line bg-white/95 p-1.5 shadow-[0_10px_30px_-10px_rgba(50,27,18,0.35)] backdrop-blur">
-        <li aria-hidden className="stage-pill pointer-events-none absolute bottom-1.5 left-1.5 top-1.5 w-[calc((100%-0.75rem)/5)] rounded-[20px] bg-leather" style={{ transform: `translateX(${idx * 100}%)` }} />
+        <li aria-hidden className="stage-pill pointer-events-none absolute bottom-1.5 left-1.5 top-1.5 w-[calc((100%-0.75rem)/5)] rounded-[20px] bg-leather" style={{ transform: `translateX(${Math.max(0, idx) * 100}%)`, opacity: idx < 0 ? 0 : 1 }} />
         {items.map((i) => (
           <li key={i.href} className="relative z-10">
             <Link href={i.href} aria-current={active(i) ? "page" : undefined}

@@ -43,6 +43,13 @@
       "when": 1794594017370,
       "tag": "0005_messages_and_manager",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794594728815,
+      "tag": "0006_manager_photo",
+      "breakpoints": true
     }
   ]
 }

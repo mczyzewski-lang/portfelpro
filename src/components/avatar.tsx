@@ -2,7 +2,7 @@
 
 import { Camera, Minus, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { removeAvatarAction, saveAvatarAction } from "@/app/actions/partner";
+import type { FormState } from "./client";
 import { cn } from "@/lib/cn";
 import { toast } from "./client";
 import { btn } from "./ui";
@@ -18,7 +18,10 @@ export function Avatar({ src, initials, size = 40, className }: { src: string | 
 }
 
 /** Zdjęcie profilowe: wybór pliku → kadrowanie (przesuwanie i powiększanie) → zapis kwadratu 320×320. */
-export function AvatarEditor({ src, initials }: { src: string | null; initials: string }) {
+export function AvatarEditor({ src, initials, onSave, onRemove, light = false }: {
+  src: string | null; initials: string; light?: boolean;
+  onSave: (dataUrl: string) => Promise<FormState>; onRemove: () => Promise<void>;
+}) {
   const dialog = useRef<HTMLDialogElement>(null);
   const file = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -58,7 +61,7 @@ export function AvatarEditor({ src, initials }: { src: string | null; initials: 
     ctx.drawImage(img, OUT / 2 - w / 2 + pos.x * k, OUT / 2 - h / 2 + pos.y * k, w, h);
     const data = c.toDataURL("image/jpeg", 0.86);
     start(async () => {
-      const res = await saveAvatarAction(data);
+      const res = await onSave(data);
       if (res?.error) return toast(res.error, "error");
       toast("Zdjęcie zapisane."); dialog.current?.close();
     });
@@ -70,12 +73,12 @@ export function AvatarEditor({ src, initials }: { src: string | null; initials: 
       <div className="flex flex-wrap gap-2">
         <input ref={file} type="file" accept="image/*" className="sr-only" aria-label="Wybierz zdjęcie" data-testid="avatar-file"
           onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
-        <button type="button" onClick={() => file.current?.click()} className="press inline-flex min-h-10 items-center gap-2 rounded-full bg-white/15 px-4 text-sm font-bold text-white hover:bg-white/25">
+        <button type="button" onClick={() => file.current?.click()} className={cn("press inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-bold", light ? "border border-line bg-white text-leather-dark hover:bg-sand" : "bg-white/15 text-white hover:bg-white/25")}>
           <Camera className="size-4" aria-hidden />{src ? "Zmień zdjęcie" : "Dodaj zdjęcie"}
         </button>
         {src && (
-          <button type="button" disabled={pending} aria-label="Usuń zdjęcie" onClick={() => start(async () => { await removeAvatarAction(); toast("Zdjęcie usunięte."); })}
-            className="press grid size-10 place-items-center rounded-full bg-white/10 text-white/80 hover:bg-white/20"><Trash2 className="size-4" aria-hidden /></button>
+          <button type="button" disabled={pending} aria-label="Usuń zdjęcie" onClick={() => start(async () => { await onRemove(); toast("Zdjęcie usunięte."); })}
+            className={cn("press grid size-10 place-items-center rounded-full", light ? "border border-line bg-white text-muted hover:bg-sand" : "bg-white/10 text-white/80 hover:bg-white/20")}><Trash2 className="size-4" aria-hidden /></button>
         )}
       </div>
 

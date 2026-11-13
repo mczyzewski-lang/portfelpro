@@ -30,7 +30,7 @@ export default async function LevelsPage() {
         </div>
         <div className="relative z-10 mt-5">
           <div className="h-2.5 overflow-hidden rounded-full bg-white/15" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level.progress * 100)} aria-label="Postęp do kolejnego poziomu">
-            <div className="h-full rounded-full bg-gold-light transition-[width] duration-700" style={{ width: `${Math.max(4, level.progress * 100)}%` }} />
+            <div className="h-full rounded-full bg-linear-to-r from-[#3fb37e] to-[#a8e6c4] transition-[width] duration-700" style={{ width: `${Math.max(4, level.progress * 100)}%` }} />
           </div>
           <p className="mt-2 text-sm text-white/80">
             {level.next
@@ -40,7 +40,7 @@ export default async function LevelsPage() {
         </div>
         <ol className="relative z-10 mt-4 flex justify-between gap-1 border-t border-white/15 pt-3">
           {LEVELS.map((l, i) => (
-            <li key={l.name} className={cn("flex-1 text-center text-[11px] font-bold leading-tight", i <= level.index ? "text-gold-light" : "text-white/45")}>
+            <li key={l.name} className={cn("flex-1 text-center text-[11px] font-bold leading-tight", i <= level.index ? "text-[#a8e6c4]" : "text-white/45")}>
               {l.name}<span className="block font-medium opacity-80">{l.min}+</span>
             </li>
           ))}
@@ -61,17 +61,17 @@ export default async function LevelsPage() {
       <section aria-labelledby="osiagniecia">
         <div className="flex items-baseline justify-between">
           <h2 id="osiagniecia" className="text-xl font-extrabold text-leather-dark">Osiągnięcia</h2>
-          <p className="tabular text-sm font-bold text-gold-deep">{doneCount} / {list.length}</p>
+          <p className="tabular rounded-full px-2.5 py-0.5 text-sm font-bold success-grad">{doneCount} / {list.length}</p>
         </div>
         <ul className="stagger mt-3 grid gap-2.5 sm:grid-cols-2">
           {list.map((a, n) => (
             <li key={a.id} style={{ "--i": Math.min(n, 8) } as React.CSSProperties} data-done={a.done}
-              className={cn("flex gap-3 rounded-3xl border p-4", a.done ? "border-gold/50 bg-white shadow-(--shadow-card)" : "border-line bg-white/60")}>
-              <span className={cn("grid size-11 shrink-0 place-items-center rounded-2xl", a.done ? "bg-gold-light text-leather-dark" : "bg-sand text-muted")}>
+              className={cn("flex gap-3 rounded-3xl border p-4", a.done ? "success-soft shadow-(--shadow-card)" : "border-line bg-white/60")}>
+              <span className={cn("grid size-11 shrink-0 place-items-center rounded-2xl", a.done ? "success-grad" : "bg-sand text-muted")}>
                 {a.done ? <Check className="size-5" aria-hidden /> : <Lock className="size-4" aria-hidden />}
               </span>
               <div className="min-w-0 flex-1">
-                <p className={cn("font-extrabold leading-snug", a.done ? "text-leather-dark" : "text-ink/70")}>{a.title}</p>
+                <p className={cn("font-extrabold leading-snug", a.done ? "text-[#14553c]" : "text-ink/70")}>{a.title}</p>
                 <p className="text-[13px] leading-snug text-muted">{a.description}</p>
                 {!a.done && a.target > 1 && (
                   <div className="mt-2 flex items-center gap-2">

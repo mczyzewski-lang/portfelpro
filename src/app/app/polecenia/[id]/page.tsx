@@ -10,7 +10,7 @@ import { fmtDateTime, leadRef, leadSourceLabel, PROCESS_STEPS, stageLabel } from
 import { getReferralDetail } from "@/lib/partner-data";
 
 export const metadata = { title: "Przebieg polecenia" };
-const dot = { neutral: "bg-leather", gold: "bg-gold", ok: "bg-ok", danger: "bg-danger" };
+const dot = { neutral: "bg-leather", gold: "bg-gold", ok: "success-grad", danger: "bg-danger" };
 
 export default async function ReferralDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ nowe?: string }> }) {
   const { partner } = await requirePartner();
@@ -47,7 +47,7 @@ export default async function ReferralDetail({ params, searchParams }: { params:
         </p>
       </header>
 
-      <section className="mt-4 rounded-3xl border border-line bg-white p-5" aria-labelledby="prow">
+      <section className={cn("mt-4 rounded-3xl border p-5", main && (main.status === "paid" || main.status === "approved") ? "success-soft" : "border-line bg-white")} aria-labelledby="prow">
         <h2 id="prow" className="text-[17px] font-extrabold text-leather-dark">Prowizja</h2>
         {main ? (
           <div className="mt-2 flex items-center justify-between gap-3">

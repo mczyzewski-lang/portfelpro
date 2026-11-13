@@ -32,6 +32,7 @@ const badgeTones = {
   warn: "bg-warn-bg text-warn",
   danger: "bg-danger-bg text-danger",
   dark: "bg-leather-dark text-gold-light",
+  success: "success-grad",
 };
 export type Tone = keyof typeof badgeTones;
 export function Badge({ tone = "neutral", className, ...p }: ComponentProps<"span"> & { tone?: Tone }) {

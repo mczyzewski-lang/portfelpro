@@ -1,6 +1,7 @@
 import { asc } from "drizzle-orm";
-import { createManagerAction, saveFaqAction, saveMyProfileAction, saveProfessionAction, saveSettingsAction } from "@/app/actions/admin";
+import { createManagerAction, removeMyPhotoAction, saveFaqAction, saveMyPhotoAction, saveMyProfileAction, saveProfessionAction, saveSettingsAction } from "@/app/actions/admin";
 import { PageHeader, Panel, textareaCls } from "@/components/admin";
+import { AvatarEditor } from "@/components/avatar";
 import { ActionForm, SubmitButton } from "@/components/client";
 import { Field, Notice, inputCls } from "@/components/ui";
 import { db } from "@/db";
@@ -13,6 +14,7 @@ import { getSettings } from "@/lib/settings";
 export default async function SettingsPage() {
   const { user: me } = await requireAdmin();
   const managers = await listManagers();
+  const myPhoto = managers.find((m) => m.id === me.id)?.photoVersion ?? null;
   const [cfg, faqs, profs] = await Promise.all([getSettings(), db.select().from(landingFaqs).orderBy(asc(landingFaqs.sort)), db.select().from(professions).orderBy(asc(professions.sort))]);
   const webhookReady = !!env.webhookSecret && !env.webhookSecret.startsWith("change-me");
   return (
@@ -47,6 +49,7 @@ Idempotency-Key: <unikalny identyfikator zdarzenia>
           <div className="grid gap-5 lg:grid-cols-2">
             <ActionForm action={saveMyProfileAction} className="space-y-3">
               <p className="text-sm font-extrabold text-leather-dark">Mój profil opiekuna</p>
+              <AvatarEditor light src={myPhoto ? `/api/manager-photo/${me.id}?v=${myPhoto}` : null} initials={`${me.firstName[0] ?? ""}${me.lastName[0] ?? ""}`.toUpperCase()} onSave={saveMyPhotoAction} onRemove={removeMyPhotoAction} />
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Imię"><input name="firstName" defaultValue={me.firstName} required className={inputCls} /></Field>
                 <Field label="Nazwisko"><input name="lastName" defaultValue={me.lastName} required className={inputCls} /></Field>

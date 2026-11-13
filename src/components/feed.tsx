@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import type { FeedItem } from "@/lib/partner-data";
 
 const icon = { click: MousePointerClick, lead: UserPlus, status: Route, money: CircleDollarSign };
-const tone = { neutral: "bg-sand text-leather", gold: "bg-gold-light/50 text-leather-dark", ok: "bg-ok-bg text-ok", danger: "bg-danger-bg text-danger" };
+const tone = { neutral: "bg-sand text-leather", gold: "bg-gold-light/50 text-leather-dark", ok: "success-grad", danger: "bg-danger-bg text-danger" };
 const rel = new Intl.RelativeTimeFormat("pl", { numeric: "auto" });
 
 export function timeAgo(d: Date): string {

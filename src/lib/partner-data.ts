@@ -141,3 +141,19 @@ export async function getMonthlyRank(partnerId: string) {
   const mine = rows.find((r) => r.partnerId === partnerId)?.n ?? 0;
   return { mine, position: mine ? rows.filter((r) => r.n > mine).length + 1 : null, active: rows.length };
 }
+
+
+/** Statystyka per usługa: ile linków ma partner, ile razy je otwarto, ile poleceń i klientów z nich wyszło. */
+export async function getServiceStats(partnerId: string) {
+  const rows = await db.execute<{ slug: string; name: string; links: number; clicks: number; leads: number; won: number }>(sql`
+    select s.slug, s.name,
+      (select count(*)::int from referral_links rl where rl.partner_id = ${partnerId} and rl.service_id = s.id) as links,
+      (select count(*)::int from referral_clicks rc where rc.partner_id = ${partnerId} and rc.service_id = s.id) as clicks,
+      (select count(*)::int from leads l where l.partner_id = ${partnerId} and l.service_id = s.id) as leads,
+      (select count(*)::int from leads l where l.partner_id = ${partnerId} and l.service_id = s.id and l.status = 'won') as won
+    from services s
+    where exists (select 1 from referral_links rl where rl.partner_id = ${partnerId} and rl.service_id = s.id)
+       or exists (select 1 from leads l where l.partner_id = ${partnerId} and l.service_id = s.id)
+    order by 5 desc, 4 desc, s.name`);
+  return [...rows];
+}

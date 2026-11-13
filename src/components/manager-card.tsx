@@ -9,7 +9,10 @@ export function ManagerCard({ manager }: { manager: Manager }) {
     <section className="wallet rounded-[28px] p-5" aria-label="Twój opiekun" data-testid="manager-card">
       <p className="relative z-10 text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twój opiekun</p>
       <div className="relative z-10 mt-2.5 flex items-center gap-3.5">
-        <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-gold-light text-xl font-extrabold text-leather-dark">{initials}</span>
+        {manager.photoVersion
+          // eslint-disable-next-line @next/next/no-img-element -- zdjęcie opiekuna serwowane z trasy wymagającej zalogowania
+          ? <img src={`/api/manager-photo/${manager.id}?v=${manager.photoVersion}`} alt="" width={64} height={64} className="size-16 shrink-0 rounded-full object-cover ring-2 ring-gold-light" data-testid="manager-photo" />
+          : <span aria-hidden className="grid size-16 shrink-0 place-items-center rounded-full bg-gold-light text-xl font-extrabold text-leather-dark">{initials}</span>}
         <div className="min-w-0">
           <p className="text-xl font-extrabold leading-tight">{manager.firstName} {manager.lastName}</p>
           <p className="text-sm text-white/75">{manager.jobTitle || "Opiekun partnerów"}</p>

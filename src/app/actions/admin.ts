@@ -118,6 +118,21 @@ export async function replyMessageAction(_: FormState, fd: FormData): Promise<Fo
   return null;
 }
 
+export async function saveMyPhotoAction(dataUrl: string): Promise<FormState> {
+  const { user } = await requireAdmin();
+  const m = typeof dataUrl === "string" ? /^data:image\/jpeg;base64,([A-Za-z0-9+/]+={0,2})$/.exec(dataUrl) : null;
+  const bytes = m ? Buffer.from(m[1], "base64") : null;
+  if (!bytes || bytes.length < 500 || bytes.length > 200_000 || bytes[0] !== 0xff || bytes[1] !== 0xd8) return { error: "Nieprawidłowe zdjęcie." };
+  await db.update(users).set({ avatar: dataUrl, avatarUpdatedAt: new Date() }).where(eq(users.id, user.id));
+  revalidatePath("/", "layout");
+  return { ok: "Zdjęcie zapisane." };
+}
+export async function removeMyPhotoAction() {
+  const { user } = await requireAdmin();
+  await db.update(users).set({ avatar: null, avatarUpdatedAt: null }).where(eq(users.id, user.id));
+  revalidatePath("/", "layout");
+}
+
 const phoneSchema = z.string().max(30).regex(/^[+\d][\d\s-]{6,}$|^$/, "Telefon: cyfry, spacje i opcjonalnie + na początku");
 
 export const saveMyProfileAction = adminAction(async (fd) => {
