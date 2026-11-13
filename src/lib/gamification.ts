@@ -8,16 +8,14 @@ export type PartnerStats = {
   starterConfirmed: boolean; hasPhoto: boolean;
 };
 
-export type StarTier = "ice" | "glass" | "stone" | "steel" | "bronze" | "silver" | "gold";
+export type StarTier = "ice" | "glass" | "bronze" | "silver" | "gold";
 
-/** Gwiazdy partnera — kolejne materiały aż do złotej przy 50 potwierdzonych klientach. */
+/** Gwiazdy partnera — miły dodatek graficzny do poziomów; złota przy 50 potwierdzonych klientach. */
 export const LEVELS = [
   { tier: "ice", name: "Lodowa", min: 0 },
   { tier: "glass", name: "Szklana", min: 1 },
-  { tier: "stone", name: "Kamienna", min: 3 },
-  { tier: "steel", name: "Stalowa", min: 5 },
-  { tier: "bronze", name: "Brązowa", min: 10 },
-  { tier: "silver", name: "Srebrna", min: 25 },
+  { tier: "bronze", name: "Brązowa", min: 5 },
+  { tier: "silver", name: "Srebrna", min: 20 },
   { tier: "gold", name: "Złota", min: 50 },
 ] as const satisfies readonly { tier: StarTier; name: string; min: number }[];
 

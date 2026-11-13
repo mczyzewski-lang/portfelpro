@@ -11,7 +11,7 @@ import { cn } from "@/lib/cn";
 import { achievementsFor, levelFor, LEVELS, newSince } from "@/lib/gamification";
 import { getMonthlyRank, getPartnerStats } from "@/lib/partner-data";
 
-export const metadata = { title: "Gwiazdy i osiągnięcia" };
+export const metadata = { title: "Poziomy i osiągnięcia" };
 
 export default async function LevelsPage() {
   const { partner } = await requirePartner();
@@ -29,14 +29,14 @@ export default async function LevelsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <ConfettiBurst fire={fresh.any} />
-      <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Gwiazdy i osiągnięcia</h1>
+      <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Poziomy i osiągnięcia</h1>
 
-      <section className="wallet wallet-sheen rounded-[28px] p-5" aria-label="Twoja gwiazda">
+      <section className="wallet wallet-sheen rounded-[28px] p-5" aria-label="Twój poziom">
         <div className="relative z-10 flex items-center gap-4">
           <span className="pop grid size-[76px] shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-white/15"><StarMark tier={level.current.tier} size={58} /></span>
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twoja gwiazda</p>
-            <p className="text-3xl font-extrabold leading-tight" data-testid="level-name">{level.current.name}{fresh.levelUp && <span className="pop ml-2 rounded-full px-2 py-0.5 align-middle text-[11px] font-bold success-grad">Nowa gwiazda</span>}</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twój poziom</p>
+            <p className="text-3xl font-extrabold leading-tight" data-testid="level-name">{level.current.name}{fresh.levelUp && <span className="pop ml-2 rounded-full px-2 py-0.5 align-middle text-[11px] font-bold success-grad">Nowy poziom</span>}</p>
           </div>
         </div>
         <div className="relative z-10 mt-5">
@@ -49,25 +49,16 @@ export default async function LevelsPage() {
               : "Masz Złotą gwiazdę — najwyższą. Gratulacje!"}
           </p>
         </div>
-      </section>
-
-      {/* Droga gwiazd: każdy poziom jako mini kontener, od lodowej do złotej */}
-      <section aria-labelledby="droga">
-        <h2 id="droga" className="text-xl font-extrabold text-leather-dark">Droga gwiazd</h2>
-        <p className="mt-0.5 text-sm text-muted">Każdy potwierdzony klient przybliża Cię do kolejnej. Złota czeka przy 50.</p>
-        <ol className="no-scrollbar stagger -mx-5 mt-3 flex snap-x gap-2.5 overflow-x-auto px-5 pb-2" data-testid="star-path">
+        {/* wszystkie gwiazdy w jednym rzędzie: zdobyte w kolorze, aktualna podświetlona */}
+        <ol className="relative z-10 mt-4 grid grid-cols-5 gap-1.5 border-t border-white/15 pt-3.5" data-testid="star-path">
           {LEVELS.map((l, i) => {
             const reached = i <= level.index; const current = i === level.index;
             return (
-              <li key={l.tier} style={{ "--i": i } as React.CSSProperties} data-reached={reached} aria-current={current ? "step" : undefined}
-                className={cn("relative flex w-[104px] shrink-0 snap-start flex-col items-center rounded-3xl border px-2 pb-3 pt-3.5 text-center",
-                  current ? "border-gold bg-white shadow-[0_12px_28px_-14px_rgba(50,27,18,0.5)] ring-2 ring-gold-light" : reached ? "border-line bg-white" : "border-dashed border-line bg-white/50")}>
-                <span className="tabular absolute left-2.5 top-2 text-[10px] font-bold text-muted">{i + 1}</span>
-                <StarMark tier={l.tier} size={54} dimmed={!reached} className={current ? "pop" : undefined} />
-                <span className={cn("mt-1.5 text-[13px] font-extrabold leading-tight", reached ? "text-leather-dark" : "text-muted")}>{l.name}</span>
-                <span className="tabular text-[11px] text-muted">{l.min === 0 ? "na start" : `${l.min} ${l.min === 1 ? "klient" : "klientów"}`}</span>
-                {current && <span className="success-grad mt-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold">Tu jesteś</span>}
-                {!reached && <Lock className="mt-1.5 size-3.5 text-muted/70" aria-hidden />}
+              <li key={l.tier} data-reached={reached} aria-current={current ? "step" : undefined}
+                className={cn("flex flex-col items-center rounded-2xl px-0.5 pb-1.5 pt-2 text-center", current && "bg-white/12 ring-1 ring-gold-light/60")}>
+                <StarMark tier={l.tier} size={34} dimmed={!reached} />
+                <span className={cn("mt-1 text-[11px] font-extrabold leading-tight", reached ? "text-white" : "text-white/55")}>{l.name}</span>
+                <span className={cn("tabular text-[10px] leading-tight", current ? "text-gold-light" : "text-white/50")}>{l.min === 0 ? "start" : `${l.min}+`}</span>
               </li>
             );
           })}

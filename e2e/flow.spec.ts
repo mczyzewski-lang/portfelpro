@@ -385,7 +385,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.goto("/app/poziomy");
   await expect(page.getByTestId("confetti")).toBeVisible(); // nowe poziomy / osiągnięcia = confetti
   await expect(page.getByTestId("level-name")).toContainText("Szklana"); // 2 potwierdzonych klientów
-  await expect(page.getByTestId("star-path").locator("li")).toHaveCount(7); // droga gwiazd: od lodowej do złotej
+  await expect(page.getByTestId("star-path").locator("li")).toHaveCount(5); // gwiazdy w karcie poziomu: od lodowej do złotej
   await expect(page.getByTestId("star-path").locator('[aria-current="step"]')).toContainText("Szklana");
   await expect(page.locator('[data-done="true"]')).toHaveCount(7); // zdjęcie, link, polecenie, klient, wypłata, dwie drogi, przekazanie
   await expect(page.locator("[data-done]").first()).toHaveAttribute("data-done", "true"); // zdobyte zawsze na górze

@@ -73,7 +73,7 @@ export default async function Dashboard() {
             Poleć usługę<ArrowRight className="size-5" aria-hidden />
           </Link>
           <Link href="/app/poziomy" className="press flex min-h-14 flex-col justify-center rounded-2xl border border-line bg-white px-4" data-testid="dash-star">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Gwiazda</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Poziom</span>
             <span className="flex items-center gap-1.5 text-sm font-extrabold text-leather-dark"><StarMark tier={level.current.tier} size={20} />{level.current.name}</span>
           </Link>
         </div>
