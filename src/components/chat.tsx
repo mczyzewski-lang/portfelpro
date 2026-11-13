@@ -44,7 +44,7 @@ export function Chat({ items, action, hidden, emptyText, placeholder = "Napisz w
             {(i === 0 || items[i - 1].day !== m.day) && <p className="py-2 text-center text-[11px] font-semibold text-muted">{m.day}</p>}
             <div className={cn("flex", m.mine ? "justify-end" : "justify-start")}>
               <div className={cn("rise max-w-[82%] rounded-[20px] px-3.5 py-2 text-[15px] leading-snug",
-                m.mine ? "leather-grad rounded-br-md" : page ? "rounded-bl-md bg-white text-ink shadow-(--shadow-card)" : "rounded-bl-md bg-sand text-ink")}>
+                m.mine ? "rounded-br-md bg-leather text-white" : page ? "rounded-bl-md bg-white text-ink shadow-(--shadow-card)" : "rounded-bl-md bg-sand text-ink")}>
                 {!m.mine && m.author && <p className="text-[11px] font-bold text-gold-deep">{m.author}</p>}
                 <p className="whitespace-pre-wrap break-words">{m.body}</p>
                 <p className={cn("mt-0.5 flex items-center justify-end gap-1 text-[10px]", m.mine ? "text-white/70" : "text-muted")}>

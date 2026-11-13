@@ -116,6 +116,13 @@ Content-Type: application/json
 
 Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny w widoku partnera w panelu admina). Dopóki go nie wpisze, na pulpicie wisi okienko „Potwierdzenie odbioru pakietu startowego”. Kod konta demo: `F3F4F5`. Nowe osiągnięcia i poziomy sygnalizuje confetti przy ikonie Poziomy; po wejściu w zakładkę oznaczają się jako obejrzane.
 
+### Wideo (reels 9:16)
+
+- **Usługa:** pole „Wideo o usłudze” w edycji usługi — w karcie usługi pojawia się kafelek, który otwiera pionowe wideo na cały ekran.
+- **Opiekun:** pole „Wideo powitalne” w `/admin/ustawienia` — partner odtwarza je, dotykając zdjęcia opiekuna w Wiadomościach.
+
+Podaje się bezpośredni adres pliku mp4/webm (aplikacja nie przechowuje wideo). Pliki w `public/demo/` to krótkie plansze przykładowe bez dźwięku; są pokazywane tylko przy `DEMO_MODE=true`.
+
 ### Wiadomości i opiekun
 
 Zakładka „Wiadomości” w panelu partnera pokazuje kartę opiekuna (imię, stanowisko, telefon, e-mail) i czat z nim. Opiekunem jest konto administratora: domyślnie pierwszy administrator, innego przypisuje się w widoku partnera. Swój telefon i stanowisko opiekun ustawia w `/admin/ustawienia`, na rozmowy odpowiada w `/admin/wiadomosci`. Czat odświeża się co kilka sekund; powiadomień e-mail ani push nie ma.

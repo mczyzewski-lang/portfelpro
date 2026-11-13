@@ -57,6 +57,13 @@
       "when": 1794599035174,
       "tag": "0007_starter_pack_and_levels_seen",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794599970555,
+      "tag": "0008_videos",
+      "breakpoints": true
     }
   ]
 }

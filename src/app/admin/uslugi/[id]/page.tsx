@@ -90,6 +90,10 @@ export default async function EditService({ params }: { params: Promise<{ id: st
             </div>
             <TA name="pitch" label="Jak przedstawić w 15–30 sekund" value={s.pitch} />
             <TA name="faq" label="Pytania klientów (FAQ)" value={s.faq.map((f) => `${f.q} | ${f.a}`)} hint="Jeden wiersz = Pytanie | Odpowiedź" rows={5} />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Wideo o usłudze — reel 9:16 (https://… lub /…)" hint="Bezpośredni adres pliku mp4/webm. Puste = brak sekcji wideo."><input name="reelUrl" defaultValue={s.reelUrl ?? ""} placeholder="https://…/usluga.mp4" className={inputCls} /></Field>
+              <Field label="Okładka wideo (obraz, opcjonalnie)"><input name="reelPosterUrl" defaultValue={s.reelPosterUrl ?? ""} className={inputCls} /></Field>
+            </div>
             <Field label="Kto realizuje usługę"><input name="provider" defaultValue={s.provider} className={inputCls} /></Field>
           </div>
         </Panel>

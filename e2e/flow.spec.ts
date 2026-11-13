@@ -373,6 +373,19 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByTestId("manager-card").getByRole("link", { name: "+48 600 000 000", exact: true })).toBeVisible();
   await expect(demo.getByTestId("manager-photo")).toBeVisible();
   expect((await demo.request.get(await demo.getByTestId("manager-photo").getAttribute("src") as string)).headers()["content-type"]).toBe("image/jpeg");
+  // Przywitanie opiekuna: dotknięcie zdjęcia otwiera pionowe wideo na cały ekran
+  await demo.getByTestId("manager-video").click();
+  await expect(demo.getByTestId("reel-dialog")).toBeVisible();
+  await expect(demo.getByTestId("reel-video")).toHaveAttribute("src", "/demo/opiekun-powitanie.mp4");
+  expect((await demo.request.get("/demo/opiekun-powitanie.mp4")).headers()["content-type"]).toContain("video/mp4");
+  await demo.getByRole("button", { name: "Zamknij wideo" }).click();
+  await expect(demo.getByTestId("reel-dialog")).toBeHidden();
+  // Wideo (reel) w karcie usługi
+  await demo.goto("/app/uslugi/znak-towarowy");
+  await demo.getByTestId("service-reel").click();
+  await expect(demo.getByTestId("reel-dialog")).toBeVisible();
+  await expect(demo.getByTestId("reel-video")).toHaveAttribute("src", "/demo/usluga-reel.mp4");
+  await demo.getByRole("button", { name: "Zamknij wideo" }).click();
   await demo.goto("/app/polecenia");
   await expect(demo.getByTestId("referral-row")).toHaveCount(5);
   await expect(demo.getByText("Marta Kowalczyk (demo)")).toBeVisible();

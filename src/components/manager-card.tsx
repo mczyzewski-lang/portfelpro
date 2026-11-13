@@ -1,18 +1,27 @@
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, Play } from "lucide-react";
 import type { Manager } from "@/lib/messages";
+import { visibleVideo } from "@/lib/video";
+import { ReelPlayer } from "./reel";
 
 /** Nagłówek rozmowy: opiekun partnera ze zdjęciem, telefonem i szybkim kontaktem. Przypięty nad wiadomościami. */
 export function ManagerCard({ manager }: { manager: Manager }) {
   const initials = `${manager.firstName[0] ?? ""}${manager.lastName[0] ?? ""}`.toUpperCase();
   const tel = manager.phone?.replace(/[^\d+]/g, "");
+  const video = visibleVideo(manager.welcomeVideoUrl);
+  const photo = manager.photoVersion
+    // eslint-disable-next-line @next/next/no-img-element -- zdjęcie opiekuna serwowane z trasy wymagającej zalogowania
+    ? <img src={`/api/manager-photo/${manager.id}?v=${manager.photoVersion}`} alt="" width={52} height={52} className="size-[52px] shrink-0 rounded-full object-cover ring-2 ring-gold-light" data-testid="manager-photo" />
+    : <span aria-hidden className="gold-grad grid size-[52px] shrink-0 place-items-center rounded-full text-lg font-extrabold">{initials}</span>;
   return (
     <section className="sticky top-[60px] z-20 -mx-5 sm:mx-0" aria-label="Twój opiekun" data-testid="manager-card">
       <div className="wallet px-5 py-3.5 sm:rounded-[24px]">
       <div className="relative z-10 flex items-center gap-3">
-        {manager.photoVersion
-          // eslint-disable-next-line @next/next/no-img-element -- zdjęcie opiekuna serwowane z trasy wymagającej zalogowania
-          ? <img src={`/api/manager-photo/${manager.id}?v=${manager.photoVersion}`} alt="" width={52} height={52} className="size-[52px] shrink-0 rounded-full object-cover ring-2 ring-gold-light" data-testid="manager-photo" />
-          : <span aria-hidden className="gold-grad grid size-[52px] shrink-0 place-items-center rounded-full text-lg font-extrabold">{initials}</span>}
+        {video ? (
+          <ReelPlayer src={video} title={`${manager.firstName} — przywitanie`} testId="manager-video" className="relative shrink-0 rounded-full">
+            {photo}
+            <span className="gold-grad absolute -bottom-0.5 -right-0.5 grid size-[22px] place-items-center rounded-full ring-2 ring-[#40190c]"><Play className="size-3 translate-x-px fill-current" aria-hidden /></span>
+          </ReelPlayer>
+        ) : photo}
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-light">Twój opiekun</p>
           <p className="truncate text-[17px] font-extrabold leading-tight">{manager.firstName} {manager.lastName}</p>

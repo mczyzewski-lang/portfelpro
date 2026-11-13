@@ -56,6 +56,7 @@ Idempotency-Key: <unikalny identyfikator zdarzenia>
               </div>
               <Field label="Stanowisko"><input name="jobTitle" defaultValue={me.jobTitle ?? ""} placeholder="Opiekun partnerów" className={inputCls} /></Field>
               <Field label="Telefon dla partnerów"><input name="phone" type="tel" defaultValue={me.phone ?? ""} placeholder="+48 600 000 000" className={inputCls} data-testid="my-phone" /></Field>
+              <Field label="Wideo powitalne 9:16 (https://… lub /…)" hint="Partner odtworzy je, dotykając Twojego zdjęcia w Wiadomościach. Bezpośredni adres pliku mp4/webm."><input name="welcomeVideoUrl" defaultValue={me.welcomeVideoUrl ?? ""} placeholder="https://…/przywitanie.mp4" className={inputCls} /></Field>
               <SubmitButton small data-testid="my-profile-save">Zapisz profil</SubmitButton>
             </ActionForm>
             <div>

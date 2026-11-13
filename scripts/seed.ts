@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { and, eq, like } from "drizzle-orm";
+import { and, eq, isNull, like } from "drizzle-orm";
 
 async function main() {
   const { db } = await import("../src/db");
@@ -74,6 +74,8 @@ async function main() {
       });
       console.log(`✓ Utworzono konto demo: ${DEMO_ACCOUNT.email}`);
     }
+    // Przykładowe wideo o usłudze (plik z /demo/ — widoczny tylko w trybie demo) tam, gdzie nie ustawiono własnego.
+    await db.update(s.services).set({ reelUrl: "/demo/usluga-reel.mp4", reelPosterUrl: "/demo/usluga-reel.jpg" }).where(isNull(s.services.reelUrl));
     await seedDemoLeads(DEMO_ACCOUNT.email);
     // Opiekun demo: przypisany do konta demo (także wtedy, gdy konto powstało przed dodaniem opiekunów).
     const manager = await demoManager();
@@ -158,11 +160,14 @@ async function demoManager() {
   const { hashPassword, randomSecret } = await import("../src/lib/crypto");
   const email = "opiekun.demo@portfel.pro";
   const [existing] = await db.select().from(s.users).where(eq(s.users.email, email));
-  if (existing) return existing;
+  if (existing) {
+    if (!existing.welcomeVideoUrl) await db.update(s.users).set({ welcomeVideoUrl: "/demo/opiekun-powitanie.mp4" }).where(eq(s.users.id, existing.id));
+    return existing;
+  }
   const photo = "design/opiekun-demo.jpg";
   const [created] = await db.insert(s.users).values({
     email, passwordHash: await hashPassword(randomSecret()), role: "admin", firstName: "Karolina", lastName: "Wysocka",
-    jobTitle: "Opiekun partnerów (demo)", phone: "+48 600 000 000",
+    jobTitle: "Opiekun partnerów (demo)", phone: "+48 600 000 000", welcomeVideoUrl: "/demo/opiekun-powitanie.mp4",
     avatar: existsSync(photo) ? `data:image/jpeg;base64,${readFileSync(photo).toString("base64")}` : null, avatarUpdatedAt: new Date(),
   }).returning();
   console.log("✓ Dodano opiekuna demo");

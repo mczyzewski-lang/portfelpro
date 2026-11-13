@@ -5,6 +5,7 @@ import { getShareData, requestAccessAction } from "@/app/actions/partner";
 import { ActionForm, CopyButton, SubmitButton } from "@/components/client";
 import { GoogleRating, GoogleTrustCard } from "@/components/google";
 import { Rate } from "@/components/rate";
+import { ReelTile } from "@/components/reel";
 import { ServiceDetails } from "@/components/service-details";
 import { ClientHandoff } from "@/components/client-handoff";
 import { StagePaths } from "@/components/share";
@@ -14,6 +15,7 @@ import { displayRate } from "@/lib/commission";
 import { env } from "@/lib/env";
 import { getPartnerTerms, getPublishedAssets, getServiceBySlug } from "@/lib/queries";
 import { recommendBlockLabel, recommendState } from "@/lib/tracking";
+import { visibleVideo } from "@/lib/video";
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
   const { partner } = await requirePartner();
@@ -25,6 +27,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const state = recommendState(partner, service, term);
   const rate = displayRate(service, term, env.demoMode);
   const share = state.can ? await getShareData(service.id) : null;
+  const reel = visibleVideo(service.reelUrl);
   const lockedAssets = state.can ? [] : await getPublishedAssets(service.id);
 
   return (
@@ -49,6 +52,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           {service.commissionCondition && <p className="mt-1 text-[13px] text-white/75">{service.commissionCondition}</p>}
         </div>
       </header>
+
+      {reel && <div className="mt-4"><ReelTile src={reel} poster={service.reelPosterUrl} title={service.name} caption="Krótkie wideo, które wyjaśnia, komu i jak polecać tę usługę." /></div>}
 
       {/* Najważniejsza akcja: dobierz link do etapu klienta i wyślij */}
       <section className="mt-6" aria-labelledby="polecaj">

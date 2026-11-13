@@ -2,8 +2,8 @@ import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { messages, partners, users, type Partner } from "@/db/schema";
 
-export type Manager = { id: string; firstName: string; lastName: string; email: string; phone: string | null; jobTitle: string | null; photoVersion: number | null };
-const managerCols = { id: users.id, firstName: users.firstName, lastName: users.lastName, email: users.email, phone: users.phone, jobTitle: users.jobTitle,
+export type Manager = { id: string; firstName: string; lastName: string; email: string; phone: string | null; jobTitle: string | null; photoVersion: number | null; welcomeVideoUrl: string | null };
+const managerCols = { id: users.id, firstName: users.firstName, lastName: users.lastName, email: users.email, phone: users.phone, jobTitle: users.jobTitle, welcomeVideoUrl: users.welcomeVideoUrl,
   photoVersion: sql<number | null>`case when ${users.avatar} is not null then extract(epoch from coalesce(${users.avatarUpdatedAt}, ${users.createdAt}))::bigint end`.mapWith((v) => (v == null ? null : Number(v))) };
 
 export const listManagers = (): Promise<Manager[]> =>

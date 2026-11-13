@@ -42,6 +42,7 @@ export const users = pgTable("users", {
   lastName: text("last_name").notNull(),
   phone: text("phone"),          // telefon opiekuna pokazywany partnerom
   jobTitle: text("job_title"),   // np. „Opiekun partnerów”
+  welcomeVideoUrl: text("welcome_video_url"), // pionowe wideo 9:16 z przywitaniem opiekuna
   avatar: text("avatar"),        // zdjęcie opiekuna (data URL JPEG) pokazywane partnerom
   avatarUpdatedAt: ts("avatar_updated_at"),
   createdAt: createdAt(),
@@ -118,6 +119,8 @@ export const services = pgTable("services", {
   category: text("category").notNull().default("Inne"),
   status: publishStatus("status").notNull().default("draft"),
   access: serviceAccess("access").notNull().default("open"),
+  reelUrl: text("reel_url"),              // pionowe wideo 9:16 o usłudze (adres pliku mp4/webm)
+  reelPosterUrl: text("reel_poster_url"), // okładka wideo
   sensitive: boolean("sensitive").notNull().default(false), // zdrowie / sprawy rodzinne — dodatkowa minimalizacja danych
   sort: integer("sort").notNull().default(0),
   // treści

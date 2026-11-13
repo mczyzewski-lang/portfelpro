@@ -59,6 +59,11 @@ const percentBps = (fd: FormData, k: string): number | null => {
   if (!Number.isFinite(n) || n < 0 || n > 100) throw new DomainError("Procent musi być liczbą z zakresu 0–100");
   return Math.round(n * 100);
 };
+const videoUrl = (fd: FormData, k: string, label: string): string | null => {
+  const v = str(fd, k);
+  if (v && !/^(https:\/\/|\/(?!\/))\S+$/.test(v)) throw new DomainError(`${label}: podaj adres https:// lub ścieżkę zaczynającą się od /`);
+  return v || null;
+};
 const modelEnum = z.enum(["fixed", "percent", "qualified_lead", "custom"]);
 
 function rateFields(fd: FormData, prefix = "") {
@@ -149,6 +154,7 @@ export const saveMyProfileAction = adminAction(async (fd) => {
   await db.update(users).set({
     firstName: z.string().min(2, "Podaj imię").max(80).parse(str(fd, "firstName")), lastName: z.string().min(2, "Podaj nazwisko").max(80).parse(str(fd, "lastName")),
     jobTitle: str(fd, "jobTitle").slice(0, 80) || null, phone: phoneSchema.parse(str(fd, "phone")) || null,
+    welcomeVideoUrl: videoUrl(fd, "welcomeVideoUrl", "Wideo powitalne"),
   }).where(eq(users.id, user.id));
   return "Zapisano profil opiekuna.";
 });
@@ -249,6 +255,7 @@ export const saveServiceAction = adminAction(async (fd, actor) => {
     clientBenefit: str(fd, "clientBenefit"), audienceShort: str(fd, "audienceShort"), description: str(fd, "description"),
     problems: lines(fd, "problems"), audience: lines(fd, "audience"), whenToRecommend: lines(fd, "whenToRecommend"),
     signals: lines(fd, "signals"), arguments: lines(fd, "arguments"), pitch: str(fd, "pitch"), faq,
+    reelUrl: videoUrl(fd, "reelUrl", "Wideo o usłudze"), reelPosterUrl: videoUrl(fd, "reelPosterUrl", "Okładka wideo"),
     doNotPromise: lines(fd, "doNotPromise"), provider: str(fd, "provider"), commissionTerms: str(fd, "commissionTerms"),
     commissionModel: rate.model, commissionAmount: rate.amount, commissionBps: rate.bps,
     commissionCondition: str(fd, "commissionCondition"), commissionNote: str(fd, "commissionNote"), rateStatus,
