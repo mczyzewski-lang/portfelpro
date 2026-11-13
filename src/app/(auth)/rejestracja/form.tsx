@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { registerAction } from "@/app/actions/auth";
 import { SubmitButton } from "@/components/client";
+import { ProfessionSelect } from "@/components/profession-select";
 import { Field, inputCls } from "@/components/ui";
 import { cn } from "@/lib/cn";
 
@@ -13,7 +14,7 @@ const kinds = [
   { v: "company", l: "Spółka / firma" },
 ];
 
-export function RegisterForm() {
+export function RegisterForm({ professions }: { professions: { slug: string; name: string; icon: string }[] }) {
   const [state, action] = useActionState(registerAction, null);
   const [kind, setKind] = useState("sole_trader");
   const fe = state?.fieldErrors ?? {};
@@ -45,6 +46,12 @@ export function RegisterForm() {
           <Field label="NIP" error={fe.nip}><input name="nip" inputMode="numeric" className={inputCls} /></Field>
         </div>
       )}
+
+      <div>
+        <p className="mb-1.5 text-sm font-semibold">Czym się zajmujesz?</p>
+        <ProfessionSelect professions={professions} value={null} placeholder="Wybierz branżę" />
+        <p className="mt-1 text-xs text-muted">Dobierzemy usługi, które pasują do Twoich klientów.</p>
+      </div>
 
       <div className="space-y-2.5 pt-1 text-sm">
         <label className="flex gap-3">

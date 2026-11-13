@@ -5,6 +5,7 @@
 export type PartnerStats = {
   clicks: number; leads: number; clients: number; paid: number;
   servicesShared: number; stagesUsed: number; handoffs: number;
+  starterConfirmed: boolean; hasPhoto: boolean;
 };
 
 export const LEVELS = [
@@ -30,6 +31,8 @@ export function achievementsFor(s: PartnerStats): Achievement[] {
   const a = (id: string, title: string, description: string, current: number, target: number): Achievement =>
     ({ id, title, description, current: Math.min(current, target), target, done: current >= target });
   return [
+    a("starter-pack", "Pakiet startowy odebrany", "Potwierdziłeś odbiór pakietu startowego kodem z przesyłki.", s.starterConfirmed ? 1 : 0, 1),
+    a("photo", "Zdjęcie profilowe", "Dodałeś swoje zdjęcie — klienci i opiekun wiedzą, z kim rozmawiają.", s.hasPhoto ? 1 : 0, 1),
     a("first-click", "Pierwszy otwarty link", "Klient otworzył materiał z Twojego linku.", s.clicks, 1),
     a("first-lead", "Pierwsze polecenie", "Klient zostawił kontakt albo przekazałeś go do konsultacji.", s.leads, 1),
     a("first-client", "Pierwszy klient", "Pierwsza potwierdzona sprzedaż z Twojego polecenia.", s.clients, 1),
@@ -40,4 +43,15 @@ export function achievementsFor(s: PartnerStats): Achievement[] {
     a("ten-leads", "10 poleceń", "Dziesięć osób trafiło do specjalistów dzięki Tobie.", s.leads, 10),
     a("five-clients", "5 klientów", "Pięć potwierdzonych sprzedaży.", s.clients, 5),
   ];
+}
+
+export type Seen = { level: number; achievements: string[] } | null | undefined;
+
+/** Co jest nowe względem tego, co partner już widział w zakładce Poziomy. */
+export function newSince(seen: Seen, s: PartnerStats) {
+  const level = levelFor(s.clients).index;
+  const done = achievementsFor(s).filter((a) => a.done).map((a) => a.id);
+  const newAchievements = done.filter((id) => !seen?.achievements.includes(id));
+  const levelUp = level > (seen?.level ?? 0);
+  return { level, done, newAchievements, levelUp, any: levelUp || newAchievements.length > 0 };
 }

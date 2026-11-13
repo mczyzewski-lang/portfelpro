@@ -4,6 +4,7 @@ import { Home, ListChecks, MessageCircle, Trophy, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { MiniConfetti } from "./confetti";
 
 const items = [
   { href: "/app", label: "Pulpit", icon: Home, exact: true },
@@ -13,7 +14,7 @@ const items = [
   { href: "/app/wiadomosci", label: "Wiadomości", icon: MessageCircle },
 ];
 
-export function PartnerNav({ variant, unread = 0 }: { variant: "bottom" | "top"; unread?: number }) {
+export function PartnerNav({ variant, unread = 0, levelsNew = false }: { variant: "bottom" | "top"; unread?: number; levelsNew?: boolean }) {
   const dot = (href: string) => href === "/app/wiadomosci" && unread > 0
     ? <span className="absolute right-[22%] top-1.5 grid min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold leading-4 text-white" data-testid="unread-badge">{unread}</span> : null;
   const path = usePathname();
@@ -23,8 +24,8 @@ export function PartnerNav({ variant, unread = 0 }: { variant: "bottom" | "top";
       <nav aria-label="Główna" className="hidden items-center gap-1 lg:flex">
         {items.map((i) => (
           <Link key={i.href} href={i.href} aria-current={active(i) ? "page" : undefined}
-            className={cn("press inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-bold", active(i) ? "bg-leather text-white" : "text-leather-dark hover:bg-sand")}>
-            <i.icon className="size-4" aria-hidden />{i.label}{i.href === "/app/wiadomosci" && unread > 0 && <span className="rounded-full bg-danger px-1.5 text-[10px] font-bold text-white">{unread}</span>}
+            className={cn("press inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-bold", active(i) ? "leather-grad" : "text-leather-dark hover:bg-sand")}>
+            <span className="relative"><i.icon className="size-4" aria-hidden />{i.href === "/app/poziomy" && levelsNew && <MiniConfetti />}</span>{i.label}{i.href === "/app/wiadomosci" && unread > 0 && <span className="rounded-full bg-danger px-1.5 text-[10px] font-bold text-white">{unread}</span>}
           </Link>
         ))}
       </nav>
@@ -34,12 +35,12 @@ export function PartnerNav({ variant, unread = 0 }: { variant: "bottom" | "top";
   return (
     <nav aria-label="Główna" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] lg:hidden">
       <ul className="relative mx-auto grid max-w-md grid-cols-5 rounded-[26px] border border-line bg-white/95 p-1.5 shadow-[0_10px_30px_-10px_rgba(50,27,18,0.35)] backdrop-blur">
-        <li aria-hidden className="stage-pill pointer-events-none absolute bottom-1.5 left-1.5 top-1.5 w-[calc((100%-0.75rem)/5)] rounded-[20px] bg-leather" style={{ transform: `translateX(${Math.max(0, idx) * 100}%)`, opacity: idx < 0 ? 0 : 1 }} />
+        <li aria-hidden className="stage-pill pointer-events-none absolute bottom-1.5 left-1.5 top-1.5 w-[calc((100%-0.75rem)/5)] rounded-[20px] leather-grad" style={{ transform: `translateX(${Math.max(0, idx) * 100}%)`, opacity: idx < 0 ? 0 : 1 }} />
         {items.map((i) => (
           <li key={i.href} className="relative z-10">
             <Link href={i.href} aria-current={active(i) ? "page" : undefined}
               className={cn("press flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[20px] text-[10.5px] font-bold transition-colors", active(i) ? "text-white" : "text-muted")}>
-              <i.icon className={cn("size-[21px]", active(i) && "text-gold-light")} aria-hidden />{i.label}{dot(i.href)}
+              <span className="relative"><i.icon className={cn("size-[21px]", active(i) && "text-gold-light")} aria-hidden />{i.href === "/app/poziomy" && levelsNew && <MiniConfetti />}</span>{i.label}{dot(i.href)}
             </Link>
           </li>
         ))}

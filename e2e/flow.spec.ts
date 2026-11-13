@@ -16,15 +16,16 @@ async function register(page: Page, email: string, first: string) {
   await page.locator("input[name=password]").fill(PASSWORD);
   await page.getByLabel("Osoba fizyczna").check();
   await page.getByLabel(/Akceptuję/).check();
+  // Branża już przy rejestracji — onboarding od razu pokazuje dopasowane usługi
+  await page.getByTestId("profession-select").getByRole("button").first().click();
+  await page.getByRole("option", { name: "Agencja marketingowa" }).click();
   await page.getByRole("button", { name: "Załóż bezpłatny Portfel" }).click();
-  await page.waitForURL("**/app/onboarding");
-  const pid = (await page.getByTestId("onboarding-partner-id").innerText()).trim();
-  expect(pid).toMatch(/^PP-\d{6}$/);
-  await page.getByRole("radiogroup").getByText("Agencje marketingowe").click();
-  await page.getByRole("button", { name: "Dalej" }).click();
   await page.waitForURL("**/app/onboarding?krok=2");
   await expect(page.getByRole("heading", { name: "Polecane dla Ciebie" })).toBeVisible();
   await expect(page.getByText(SERVICE)).toBeVisible();
+  const pid = (await page.getByTestId("partner-id").innerText()).trim();
+  expect(pid).toMatch(/^PP-\d{6}$/);
+  await expect(page.getByTestId("partner-name")).toHaveText(`${first} Testowa`); // w nagłówku imię i nazwisko, pod nim ID
   return pid;
 }
 
@@ -59,6 +60,7 @@ async function educationLink(page: Page) {
 
 test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ browser, page, context, request }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  page.on("dialog", (d) => d.accept());
 
   // 1–2. Landing na telefonie: idea, usługi i stawki widoczne bez logowania
   await page.goto("/");
@@ -98,7 +100,9 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByTestId("google-trust")).toContainText("Tylko firmy sprawdzone przez klientów"); // także w panelu partnera
   await page.getByTestId("service-znak-towarowy").click();
   await page.waitForURL("**/app/uslugi/znak-towarowy");
-  await expect(page.getByRole("heading", { name: "Na jakim etapie jest Twój klient?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Wybierz link dla klienta" })).toBeVisible();
+  await expect(page.getByTestId("stage-transaction")).toHaveCount(0); // tylko Edukacja i Konsultacja
+  await expect(page.getByTestId("offer-links").getByTestId("copy-transaction")).toHaveText("Kopiuj"); // link do oferty: widoczny adres + „Kopiuj”
   await page.getByTestId("stage-consultation").click();
   await expect(page.getByTestId("copy-consultation")).toHaveCount(1);
   await expect(page.getByTestId("copy-education")).toHaveCount(0); // każdy etap to inne linki
@@ -106,7 +110,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByText("Za zakończoną i opłaconą usługę")).toBeVisible();
   const { url: link, copy } = await educationLink(page);
   await copy.click();
-  await expect(copy).toContainText("Link skopiowany");
+  await expect(copy).toContainText("Skopiowano");
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(link);
 
   // Usługa regulowana wymaga odrębnego zatwierdzenia
@@ -287,7 +291,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(admin.getByText("Zapisano profil opiekuna.")).toBeVisible();
   await page.goto("/app/wiadomosci");
   await expect(page.getByTestId("manager-card")).toContainText("Twój opiekun");
-  await expect(page.getByTestId("manager-card").getByRole("link", { name: "+48 600 100 200" })).toHaveAttribute("href", "tel:+48600100200");
+  await expect(page.getByTestId("manager-card").getByRole("link", { name: "+48 600 100 200", exact: true })).toHaveAttribute("href", "tel:+48600100200");
   await page.getByLabel("Treść wiadomości").fill("Dzień dobry, kiedy wypłata za L-01001?");
   await page.getByTestId("chat-send").click();
   await expect(page.getByTestId("chat-thread")).toContainText("kiedy wypłata");
@@ -315,20 +319,30 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   expect(avatar.headers()["content-type"]).toBe("image/jpeg");
   expect((await request.get("/app/avatar")).status()).toBe(404); // bez sesji brak dostępu
   const select = page.getByTestId("profession-select");
-  await expect(select.getByRole("button", { expanded: false })).toContainText("Agencje marketingowe"); // widać wybraną pozycję
+  await expect(select.getByRole("button", { expanded: false })).toContainText("Agencja marketingowa"); // widać wybraną pozycję
   await select.getByRole("button").first().click();
   await expect(select.getByRole("option").last()).toHaveText("Inne");
-  await select.getByRole("option", { name: "Biura rachunkowe i księgowi" }).click(); // zapis od razu po wyborze
-  await expect(select.getByRole("button", { expanded: false })).toContainText("Biura rachunkowe");
+  await select.getByRole("option", { name: "Agent nieruchomości" }).click(); // pyta o potwierdzenie (dialog), potem zapisuje
+  await expect(select.getByRole("button", { expanded: false })).toContainText("Agent nieruchomości");
   await expect(page.getByTestId("logout")).toBeVisible(); // wylogowanie w kontenerze pod zmianą hasła
   await expect(page.locator('nav[aria-label="Główna"] [aria-current="page"]')).toHaveCount(0); // w Koncie żadna zakładka nie jest podświetlona
   await page.getByTestId("change-password-link").click();
   await expect(page.getByRole("heading", { name: "Zmiana hasła" })).toBeVisible();
 
   // Poziomy: liczone z faktycznych danych (2 potwierdzonych klientów → Brązowy)
+  await page.goto("/app");
+  await expect(page.locator('nav[aria-label="Główna"] [data-testid="levels-new"]').last()).toBeVisible(); // confetti przy ikonie = coś nowego
+  await page.getByTestId("starter-card").locator("input[name=code]").fill("ZLYKOD");
+  await page.getByTestId("starter-submit").click();
+  await expect(page.getByTestId("starter-card")).toContainText("Kod jest nieprawidłowy");
   await page.goto("/app/poziomy");
-  await expect(page.getByTestId("level-name")).toHaveText("Brązowy");
-  await expect(page.locator('[data-done="true"]')).toHaveCount(5); // link, polecenie, klient, wypłata, przekazanie
+  await expect(page.getByTestId("confetti")).toBeVisible(); // nowe poziomy / osiągnięcia = confetti
+  await expect(page.getByTestId("level-name")).toContainText("Brązowy");
+  await expect(page.locator('[data-done="true"]')).toHaveCount(6); // zdjęcie, link, polecenie, klient, wypłata, przekazanie
+  await expect(page.getByTestId("new-badge").first()).toBeVisible();
+  await page.goto("/app/poziomy"); // po obejrzeniu nie ma już nowości
+  await expect(page.getByTestId("new-badge")).toHaveCount(0);
+  await expect(page.locator('[data-testid="levels-new"]')).toHaveCount(0);
 
   // Izolacja: partner nie wejdzie do panelu admina, anonim nie wejdzie do panelu partnera
   await page.goto("/admin");
@@ -347,9 +361,16 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByTestId("sum-paid")).toHaveText("0 zł"); // nie widzi danych innych partnerów
   await expect(demo.getByTestId("stat-leads")).toHaveText("5"); // pięć przykładowych poleceń na różnych etapach
   await expect(demo.getByTestId("service-stats")).toContainText("Zastrzeżenie znaku towarowego"); // statystyka per usługa
+  await demo.getByTestId("starter-card").locator("input[name=code]").fill("f3f4f5"); // kod pakietu startowego konta demo
+  await demo.getByTestId("starter-submit").click();
+  await expect(demo.getByText("Pakiet startowy potwierdzony!")).toBeVisible();
+  await expect(demo.getByTestId("starter-card")).toHaveCount(0);
+  await demo.goto("/app/uslugi");
+  await expect(demo.getByTestId("service-duo-terapia-dla-malzenstw")).toBeVisible(); // nowa usługa w portfelu
+  await expect(demo.getByPlaceholder("Szukaj usługi lub branży")).toHaveCount(0); // bez wyszukiwarki i kategorii
   await demo.goto("/app/wiadomosci");
   await expect(demo.getByTestId("manager-card")).toContainText("Karolina Wysocka");
-  await expect(demo.getByTestId("manager-card").getByRole("link", { name: "+48 600 000 000" })).toBeVisible();
+  await expect(demo.getByTestId("manager-card").getByRole("link", { name: "+48 600 000 000", exact: true })).toBeVisible();
   await expect(demo.getByTestId("manager-photo")).toBeVisible();
   expect((await demo.request.get(await demo.getByTestId("manager-photo").getAttribute("src") as string)).headers()["content-type"]).toBe("image/jpeg");
   await demo.goto("/app/polecenia");

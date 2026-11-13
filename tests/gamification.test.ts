@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { achievementsFor, levelFor } from "@/lib/gamification";
+import { achievementsFor, levelFor, newSince } from "@/lib/gamification";
 
-const zero = { clicks: 0, leads: 0, clients: 0, paid: 0, servicesShared: 0, stagesUsed: 0, handoffs: 0 };
+const zero = { clicks: 0, leads: 0, clients: 0, paid: 0, servicesShared: 0, stagesUsed: 0, handoffs: 0, starterConfirmed: false, hasPhoto: false };
 
 describe("poziomy", () => {
   it("startuje od poziomu Start i liczy brakujących klientów", () => {
@@ -26,5 +26,16 @@ describe("osiągnięcia", () => {
     const done = list.filter((a) => a.done).map((a) => a.id);
     expect(done).toEqual(["first-click", "first-lead", "first-client", "handoff"]);
     expect(list.find((a) => a.id === "ten-leads")).toMatchObject({ current: 2, target: 10, done: false });
+  });
+});
+
+describe("nowości w poziomach", () => {
+  it("brak nowości bez żadnych osiągnięć", () => expect(newSince(null, zero).any).toBe(false));
+  it("pakiet startowy i nowy poziom są nowością, dopóki partner ich nie zobaczy", () => {
+    const stats = { ...zero, starterConfirmed: true, clients: 1, leads: 1 };
+    const fresh = newSince({ level: 0, achievements: [] }, stats);
+    expect(fresh).toMatchObject({ any: true, levelUp: true });
+    expect(fresh.newAchievements).toContain("starter-pack");
+    expect(newSince({ level: fresh.level, achievements: fresh.done }, stats).any).toBe(false);
   });
 });

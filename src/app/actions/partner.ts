@@ -7,7 +7,7 @@ import type { FormState } from "@/components/client";
 import { db } from "@/db";
 import { partnerServiceTerms, partners, professions, services, users } from "@/db/schema";
 import { requirePartner } from "@/lib/auth";
-import { hashPassword, verifyPassword } from "@/lib/crypto";
+import { hashPassword, safeEqual, verifyPassword } from "@/lib/crypto";
 import { DEMO_ACCOUNT } from "@/lib/demo";
 import type { Stage } from "@/lib/labels";
 import { postMessage } from "@/lib/messages";
@@ -151,4 +151,16 @@ export async function sendMessageAction(_: FormState, fd: FormData): Promise<For
   if ("error" in res) return { error: res.error };
   revalidatePath("/app/wiadomosci");
   return null;
+}
+
+/** Potwierdzenie odbioru pakietu startowego kodem z przesyłki. */
+export async function confirmStarterAction(_: FormState, fd: FormData): Promise<FormState> {
+  const { partner } = await requirePartner();
+  if (partner.starterConfirmedAt) return { ok: "Pakiet jest już potwierdzony." };
+  if (!(await rateLimit(`starter:${partner.id}`, 8, 3600))) return { error: "Zbyt wiele prób. Spróbuj ponownie za godzinę albo napisz do opiekuna." };
+  const code = String(fd.get("code") ?? "").replace(/[\s-]/g, "").toUpperCase();
+  if (!partner.starterCode || !code || !safeEqual(code, partner.starterCode.toUpperCase())) return { error: "Kod jest nieprawidłowy. Sprawdź go na karcie w pakiecie." };
+  await db.update(partners).set({ starterConfirmedAt: new Date() }).where(eq(partners.id, partner.id));
+  revalidatePath("/app", "layout");
+  return { ok: "Pakiet startowy potwierdzony!" };
 }

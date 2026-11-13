@@ -1,30 +1,30 @@
 import { Mail, Phone } from "lucide-react";
 import type { Manager } from "@/lib/messages";
 
-/** „Twój opiekun” — osoba do bezpośredniego kontaktu, z telefonem. */
+/** Nagłówek rozmowy: opiekun partnera ze zdjęciem, telefonem i szybkim kontaktem. Przypięty nad wiadomościami. */
 export function ManagerCard({ manager }: { manager: Manager }) {
   const initials = `${manager.firstName[0] ?? ""}${manager.lastName[0] ?? ""}`.toUpperCase();
   const tel = manager.phone?.replace(/[^\d+]/g, "");
   return (
-    <section className="wallet rounded-[28px] p-5" aria-label="Twój opiekun" data-testid="manager-card">
-      <p className="relative z-10 text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twój opiekun</p>
-      <div className="relative z-10 mt-2.5 flex items-center gap-3.5">
+    <section className="sticky top-[60px] z-20 -mx-5 sm:mx-0" aria-label="Twój opiekun" data-testid="manager-card">
+      <div className="wallet px-5 py-3.5 sm:rounded-[24px]">
+      <div className="relative z-10 flex items-center gap-3">
         {manager.photoVersion
           // eslint-disable-next-line @next/next/no-img-element -- zdjęcie opiekuna serwowane z trasy wymagającej zalogowania
-          ? <img src={`/api/manager-photo/${manager.id}?v=${manager.photoVersion}`} alt="" width={64} height={64} className="size-16 shrink-0 rounded-full object-cover ring-2 ring-gold-light" data-testid="manager-photo" />
-          : <span aria-hidden className="grid size-16 shrink-0 place-items-center rounded-full bg-gold-light text-xl font-extrabold text-leather-dark">{initials}</span>}
-        <div className="min-w-0">
-          <p className="text-xl font-extrabold leading-tight">{manager.firstName} {manager.lastName}</p>
-          <p className="text-sm text-white/75">{manager.jobTitle || "Opiekun partnerów"}</p>
+          ? <img src={`/api/manager-photo/${manager.id}?v=${manager.photoVersion}`} alt="" width={52} height={52} className="size-[52px] shrink-0 rounded-full object-cover ring-2 ring-gold-light" data-testid="manager-photo" />
+          : <span aria-hidden className="gold-grad grid size-[52px] shrink-0 place-items-center rounded-full text-lg font-extrabold">{initials}</span>}
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold-light">Twój opiekun</p>
+          <p className="truncate text-[17px] font-extrabold leading-tight">{manager.firstName} {manager.lastName}</p>
+          <p className="truncate text-xs text-white/75">
+            {manager.jobTitle || "Opiekun partnerów"}
+            {tel && <> · <a href={`tel:${tel}`} className="tabular font-bold text-white underline-offset-2 hover:underline">{manager.phone}</a></>}
+          </p>
         </div>
+        {tel && <a href={`tel:${tel}`} aria-label={`Zadzwoń: ${manager.phone}`} className="gold-grad press grid size-11 shrink-0 place-items-center rounded-full"><Phone className="size-5" aria-hidden /></a>}
+        <a href={`mailto:${manager.email}`} aria-label={`Napisz e-mail: ${manager.email}`} className="press grid size-11 shrink-0 place-items-center rounded-full bg-white/15 text-white"><Mail className="size-5" aria-hidden /></a>
       </div>
-      <div className="relative z-10 mt-4 grid gap-2 sm:grid-cols-2">
-        {tel
-          ? <a href={`tel:${tel}`} className="press flex min-h-12 items-center justify-center gap-2 rounded-full bg-gold-light px-4 font-bold text-leather-dark"><Phone className="size-[18px]" aria-hidden /><span className="tabular">{manager.phone}</span></a>
-          : <p className="flex min-h-12 items-center justify-center rounded-full bg-white/10 px-4 text-sm text-white/70">Numer telefonu pojawi się wkrótce</p>}
-        <a href={`mailto:${manager.email}`} className="press flex min-h-12 items-center justify-center gap-2 rounded-full bg-white/15 px-4 text-sm font-bold text-white"><Mail className="size-[18px]" aria-hidden /><span className="truncate">{manager.email}</span></a>
       </div>
-      <p className="relative z-10 mt-3 text-xs text-white/65">Pytania o usługi, prowizje albo konkretnego klienta — napisz poniżej lub zadzwoń.</p>
     </section>
   );
 }

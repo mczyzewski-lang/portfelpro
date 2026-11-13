@@ -4,12 +4,15 @@ import { and, eq, like } from "drizzle-orm";
 async function main() {
   const { db } = await import("../src/db");
   const s = await import("../src/db/schema");
-  const { COMPANIES, GOOGLE_CHECKED_AT, LANDING_FAQ, PROFESSIONS, SERVICES } = await import("../src/db/seed-data");
+  const { COMPANIES, GOOGLE_CHECKED_AT, LANDING_FAQ, PROFESSION_RENAMES, PROFESSIONS, SERVICES } = await import("../src/db/seed-data");
   const { hashPassword } = await import("../src/lib/crypto");
   const { SETTING_DEFAULTS } = await import("../src/lib/settings");
 
   for (const [i, p] of PROFESSIONS.entries()) {
     await db.insert(s.professions).values({ ...p, sort: i }).onConflictDoNothing();
+  }
+  for (const [oldName, newName] of Object.entries(PROFESSION_RENAMES)) {
+    await db.update(s.professions).set({ name: newName }).where(eq(s.professions.name, oldName));
   }
   const companyIds: Record<string, string> = {};
   for (const [i, c] of COMPANIES.entries()) {
@@ -75,6 +78,9 @@ async function main() {
     // Opiekun demo: przypisany do konta demo (także wtedy, gdy konto powstało przed dodaniem opiekunów).
     const manager = await demoManager();
     const [dp] = await db.select({ p: s.partners }).from(s.partners).innerJoin(s.users, eq(s.users.id, s.partners.userId)).where(eq(s.users.email, DEMO_ACCOUNT.email));
+    if (dp && !dp.p.starterCode && !dp.p.starterConfirmedAt) {
+      await db.update(s.partners).set({ starterCode: DEMO_ACCOUNT.starterCode }).where(eq(s.partners.id, dp.p.id));
+    }
     if (manager && dp && !dp.p.managerUserId) {
       await db.update(s.partners).set({ managerUserId: manager.id }).where(eq(s.partners.id, dp.p.id));
       await db.update(s.messages).set({ senderUserId: manager.id }).where(and(eq(s.messages.partnerId, dp.p.id), eq(s.messages.fromPartner, false), like(s.messages.body, "%wiadomość przykładowa%")));

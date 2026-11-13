@@ -4,9 +4,9 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/client";
 import { db } from "@/db";
-import { partners, users } from "@/db/schema";
+import { partners, professions, users } from "@/db/schema";
 import { createSession, destroySession } from "@/lib/auth";
-import { hashPassword, verifyPassword } from "@/lib/crypto";
+import { hashPassword, randomToken, verifyPassword } from "@/lib/crypto";
 import { DEMO_ACCOUNT } from "@/lib/demo";
 import { env } from "@/lib/env";
 import { clientIpHash, rateLimit } from "@/lib/rate-limit";
@@ -24,6 +24,7 @@ export async function registerAction(_: FormState, fd: FormData): Promise<FormSt
   const [exists] = await db.select({ id: users.id }).from(users).where(eq(users.email, v.email));
   if (exists) return { error: "Popraw zaznaczone pola.", fieldErrors: { email: "Konto z tym adresem już istnieje. Zaloguj się." } };
 
+  const [profession] = v.profession ? await db.select().from(professions).where(eq(professions.slug, v.profession)) : [];
   const passwordHash = await hashPassword(v.password);
   const userId = await db.transaction(async (tx) => {
     const [u] = await tx.insert(users).values({ email: v.email, passwordHash, role: "partner", firstName: v.firstName, lastName: v.lastName }).returning();
@@ -33,13 +34,15 @@ export async function registerAction(_: FormState, fd: FormData): Promise<FormSt
       activityType: v.activityType,
       companyName: v.activityType === "individual" ? null : v.companyName ?? null,
       nip: v.activityType === "individual" ? null : v.nip?.replace(/[\s-]/g, "") ?? null,
+      professionSlug: profession?.slug ?? null, onboardedAt: profession ? new Date() : null,
+      starterCode: randomToken(6).toUpperCase(),
       termsAcceptedAt: new Date(), termsVersion: cfg.terms_version,
       marketingConsentAt: v.marketing === "on" ? new Date() : null,
     });
     return u.id;
   });
   await createSession(userId);
-  redirect("/app/onboarding");
+  redirect(profession ? "/app/onboarding?krok=2" : "/app/onboarding");
 }
 
 export async function loginAction(_: FormState, fd: FormData): Promise<FormState> {

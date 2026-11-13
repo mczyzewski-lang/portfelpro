@@ -1,4 +1,4 @@
-import { ArrowLeft, Lock, MessageSquareQuote } from "lucide-react";
+import { ArrowLeft, Lock, MessageSquareQuote, X } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShareData, requestAccessAction } from "@/app/actions/partner";
@@ -29,7 +29,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
   return (
     <article className="mx-auto max-w-2xl">
-      <Link href="/app/uslugi" className="press -ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel</Link>
+      <div className="flex items-center justify-between">
+        <Link href="/app/uslugi" className="press -ml-2 inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm font-bold text-leather"><ArrowLeft className="size-4" aria-hidden />Portfel usług</Link>
+        <Link href="/app/uslugi" aria-label="Zamknij usługę" className="press grid size-10 place-items-center rounded-full border border-line bg-white text-leather-dark" data-testid="close-service"><X className="size-5" aria-hidden /></Link>
+      </div>
 
       {/* Karta usługi: co polecam i ile zarobię */}
       <header className="wallet wallet-sheen mt-1 rounded-[28px] p-5">
@@ -49,8 +52,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
       {/* Najważniejsza akcja: dobierz link do etapu klienta i wyślij */}
       <section className="mt-6" aria-labelledby="polecaj">
-        <h2 id="polecaj" className="text-xl font-extrabold text-leather-dark">Na jakim etapie jest Twój klient?</h2>
-        <p className="mt-0.5 text-sm text-muted">Każdy etap to inny link. Wybierz ten, który pasuje do rozmowy.</p>
+        <h2 id="polecaj" className="text-xl font-extrabold text-leather-dark">Wybierz link dla klienta</h2>
+        <p className="mt-0.5 text-sm text-muted">Najpierw etap klienta, pod nim linki tylko dla tego etapu.</p>
         <div className="mt-3.5">
           {share?.ok ? (
             <StagePaths assets={share.assets} serviceName={service.name}

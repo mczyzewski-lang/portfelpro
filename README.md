@@ -112,6 +112,10 @@ Content-Type: application/json
 - Zwrot: prowizja niewypłacona jest anulowana; wypłacona dostaje ujemną **korektę**, która pomniejsza kolejną wypłatę.
 - Ręczna zmiana przypisania partnera wymaga powodu; wszystko trafia do historii leada i dziennika zmian (`/admin/dziennik`).
 
+### Pakiet startowy i poziomy
+
+Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny w widoku partnera w panelu admina). Dopóki go nie wpisze, na pulpicie wisi okienko „Potwierdzenie odbioru pakietu startowego”. Kod konta demo: `F3F4F5`. Nowe osiągnięcia i poziomy sygnalizuje confetti przy ikonie Poziomy; po wejściu w zakładkę oznaczają się jako obejrzane.
+
 ### Wiadomości i opiekun
 
 Zakładka „Wiadomości” w panelu partnera pokazuje kartę opiekuna (imię, stanowisko, telefon, e-mail) i czat z nim. Opiekunem jest konto administratora: domyślnie pierwszy administrator, innego przypisuje się w widoku partnera. Swój telefon i stanowisko opiekun ustawia w `/admin/ustawienia`, na rozmowy odpowiada w `/admin/wiadomosci`. Czat odświeża się co kilka sekund; powiadomień e-mail ani push nie ma.

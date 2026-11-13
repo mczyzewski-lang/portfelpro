@@ -1,17 +1,15 @@
 import Link from "next/link";
-import { CopyButton } from "@/components/client";
 import { CommissionStatusBadge, LeadStatusBadge } from "@/components/status";
 import { ProcessBar } from "@/components/process";
-import { Badge, EmptyState, LinkButton } from "@/components/ui";
+import { EmptyState, LinkButton } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 import { formatPLN } from "@/lib/commission";
-import { fmtDate, leadRef, PROCESS_STEPS, stageLabel } from "@/lib/labels";
-import { getPartnerCommissions, getPartnerLinks, getPartnerReferrals, getWalletSummary } from "@/lib/partner-data";
-import { linkUrl } from "@/lib/tracking";
+import { fmtDate, leadRef, PROCESS_STEPS } from "@/lib/labels";
+import { getPartnerCommissions, getPartnerReferrals, getWalletSummary } from "@/lib/partner-data";
 
 export const metadata = { title: "Polecenia" };
-const tabs = [["polecenia", "Polecenia"], ["prowizje", "Prowizje"], ["linki", "Linki"]] as const;
+const tabs = [["polecenia", "Polecenia"], ["prowizje", "Prowizje"]] as const;
 
 export default async function ReferralsPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const { partner } = await requirePartner();
@@ -31,14 +29,13 @@ export default async function ReferralsPage({ searchParams }: { searchParams: Pr
       <nav aria-label="Widok" className="mt-5 flex gap-1 rounded-full bg-sand p-1">
         {tabs.map(([t, l]) => (
           <Link key={t} href={`/app/polecenia?tab=${t}`} aria-current={tab === t ? "page" : undefined}
-            className={cn("flex min-h-10 flex-1 items-center justify-center rounded-full text-sm font-bold", tab === t ? "bg-white text-leather-dark shadow-sm" : "text-muted")}>{l}</Link>
+            className={cn("flex min-h-10 flex-1 items-center justify-center rounded-full text-sm font-bold", tab === t ? "leather-grad" : "text-muted")}>{l}</Link>
         ))}
       </nav>
 
       <div className="mt-4">
         {tab === "polecenia" && <Referrals partnerId={partner.id} />}
         {tab === "prowizje" && <Commissions partnerId={partner.id} />}
-        {tab === "linki" && <Links partnerId={partner.id} />}
       </div>
     </>
   );
@@ -98,29 +95,6 @@ async function Commissions({ partnerId }: { partnerId: string }) {
           <div className="shrink-0 text-right">
             <p className={cn("tabular font-extrabold", c.amount < 0 ? "text-danger" : c.status === "paid" || c.status === "approved" ? "text-ok" : "text-leather-dark", c.status === "cancelled" && "line-through opacity-60")}>{formatPLN(c.amount)}</p>
             <CommissionStatusBadge status={c.status} />
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-async function Links({ partnerId }: { partnerId: string }) {
-  const rows = await getPartnerLinks(partnerId);
-  if (!rows.length) return (
-    <EmptyState title="Nie masz jeszcze linków" action={<LinkButton href="/app/uslugi">Wybierz usługę</LinkButton>}>
-      Linki tworzą się automatycznie, gdy otworzysz kartę usługi. Tutaj zobaczysz ich wyniki.
-    </EmptyState>
-  );
-  return (
-    <ul className="space-y-2.5">
-      {rows.map((l) => (
-        <li key={l.id} className="rounded-2xl border border-line bg-white p-4">
-          <div className="flex flex-wrap items-center gap-2"><Badge>{stageLabel[l.stage]}</Badge>{l.campaign && <Badge tone="gold">{l.campaign}</Badge>}<span className="text-xs text-muted">{l.serviceName}</span></div>
-          <Link href={`/app/uslugi/${l.serviceSlug}`} className="mt-1 block font-bold leading-snug text-leather-dark hover:underline">{l.assetTitle}</Link>
-          <div className="mt-2 flex items-center justify-between gap-3">
-            <p className="tabular text-sm"><b>{l.clicks}</b> <span className="text-muted">klik.</span> · <b>{l.leads}</b> <span className="text-muted">polec.</span></p>
-            <CopyButton small variant="secondary" text={linkUrl(l.token)} label="Kopiuj link" />
           </div>
         </li>
       ))}

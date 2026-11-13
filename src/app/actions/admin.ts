@@ -82,6 +82,15 @@ export const setPartnerStatusAction = adminAction(async (fd, actor) => {
   return status === "active" ? "Konto partnera jest aktywne." : "Zmieniono status konta.";
 });
 
+export const setStarterCodeAction = adminAction(async (fd, actor) => {
+  const code = str(fd, "code").replace(/[\s-]/g, "").toUpperCase();
+  if (code && !/^[A-Z0-9]{4,12}$/.test(code)) throw new DomainError("Kod pakietu: 4–12 liter i cyfr");
+  const reset = str(fd, "reset") === "on";
+  await db.update(partners).set({ starterCode: code || null, ...(reset ? { starterConfirmedAt: null } : {}) }).where(eq(partners.id, str(fd, "partnerId")));
+  await logAudit(db, actor, "partner.starter_code", "partner", str(fd, "partnerId"), { after: { set: !!code, reset } });
+  return code ? "Zapisano kod pakietu startowego." : "Usunięto kod — okienko potwierdzenia nie będzie pokazywane.";
+});
+
 export const setPartnerNoteAction = adminAction(async (fd) => {
   await db.update(partners).set({ adminNote: str(fd, "note").slice(0, 2000) }).where(eq(partners.id, str(fd, "partnerId")));
 });

@@ -1,7 +1,7 @@
 import { asc, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { setPartnerManagerAction, setPartnerNoteAction, setPartnerStatusAction, setPartnerTermAction } from "@/app/actions/admin";
+import { setPartnerManagerAction, setPartnerNoteAction, setStarterCodeAction, setPartnerStatusAction, setPartnerTermAction } from "@/app/actions/admin";
 import { PageHeader, Panel, Stat, Table, textareaCls } from "@/components/admin";
 import { ActionForm, SubmitButton } from "@/components/client";
 import { Rate } from "@/components/rate";
@@ -73,6 +73,14 @@ export default async function PartnerDetail({ params }: { params: Promise<{ id: 
             </Field>
             <SubmitButton small variant="secondary">Zapisz</SubmitButton>
             <Link href={`/admin/wiadomosci/${p.id}`} className={btnSm("primary")}>Napisz do partnera</Link>
+          </ActionForm>
+          <ActionForm action={setStarterCodeAction} className="mt-4 flex flex-wrap items-end gap-2 border-t border-line pt-4">
+            <input type="hidden" name="partnerId" value={p.id} />
+            <Field label="Kod pakietu startowego" hint={p.starterConfirmedAt ? `Odbiór potwierdzony ${fmtDate(p.starterConfirmedAt)}` : p.starterCode ? "Partner jeszcze nie potwierdził odbioru" : "Brak kodu — okienko na pulpicie jest ukryte"}>
+              <input name="code" defaultValue={p.starterCode ?? ""} className={`${inputCls} tabular uppercase`} />
+            </Field>
+            {p.starterConfirmedAt && <label className="flex items-center gap-2 pb-3 text-sm"><input type="checkbox" name="reset" className="size-4 accent-leather" />cofnij potwierdzenie</label>}
+            <SubmitButton small variant="secondary">Zapisz kod</SubmitButton>
           </ActionForm>
           <ActionForm action={setPartnerNoteAction} className="mt-4 border-t border-line pt-4">
             <input type="hidden" name="partnerId" value={p.id} />

@@ -79,6 +79,9 @@ export const partners = pgTable("partners", {
   marketingConsentAt: ts("marketing_consent_at"),
   managerUserId: uuid("manager_user_id").references(() => users.id, { onDelete: "set null" }), // przypisany opiekun (null = domyślny)
   adminNote: text("admin_note"),
+  starterCode: text("starter_code"),          // kod z pakietu startowego (wpisywany przez partnera na pulpicie)
+  starterConfirmedAt: ts("starter_confirmed_at"),
+  gamificationSeen: jsonb("gamification_seen").$type<{ level: number; achievements: string[] }>(), // co partner już widział w „Poziomach”
   avatar: text("avatar"),                     // wykadrowane zdjęcie 320×320 jako data URL (JPEG, ok. 20–40 kB)
   avatarUpdatedAt: ts("avatar_updated_at"),
   createdAt: createdAt(),

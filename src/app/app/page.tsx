@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { dismissFirstSuccessAction } from "@/app/actions/partner";
 import { CountUp } from "@/components/client";
+import { StarterCard } from "@/components/starter-card";
 import { Feed } from "@/components/feed";
 import { btn } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
@@ -19,7 +20,7 @@ export default async function Dashboard() {
   const showSuccess = success && !partner.firstSuccessSeenAt;
   const level = levelFor(sum.clients);
   const stats = [
-    { label: "Kliknięcia", value: sum.clicks, icon: MousePointerClick, test: "stat-clicks", href: "/app/polecenia?tab=linki" },
+    { label: "Kliknięcia", value: sum.clicks, icon: MousePointerClick, test: "stat-clicks", href: "/app/polecenia" },
     { label: "Polecenia", value: sum.leads, icon: Users, test: "stat-leads", href: "/app/polecenia" },
     { label: "Klienci", value: sum.clients, icon: UserCheck, test: "stat-clients", href: "/app/polecenia" },
   ];
@@ -34,6 +35,8 @@ export default async function Dashboard() {
           <form action={dismissFirstSuccessAction} className="relative z-10 mt-4"><button className={btn("secondary", "press")}>Świetnie, dalej</button></form>
         </section>
       )}
+
+      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard />}
 
       <section aria-labelledby="pulpit">
         <p className="text-sm text-muted">Dzień dobry, {user.firstName}</p>
@@ -64,7 +67,7 @@ export default async function Dashboard() {
         </div>
 
         <div className="mt-3 grid grid-cols-[1fr_auto] gap-2.5">
-          <Link href="/app/uslugi" className="press flex min-h-14 items-center justify-between gap-3 rounded-2xl bg-leather px-5 font-bold text-white shadow-sm" data-testid="go-wallet">
+          <Link href="/app/uslugi" className="leather-grad press flex min-h-14 items-center justify-between gap-3 rounded-2xl px-5 font-bold" data-testid="go-wallet">
             Poleć usługę<ArrowRight className="size-5" aria-hidden />
           </Link>
           <Link href="/app/poziomy" className="press flex min-h-14 flex-col justify-center rounded-2xl border border-line bg-white px-4">

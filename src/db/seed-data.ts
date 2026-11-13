@@ -21,22 +21,38 @@ export type ServiceSeed = {
 };
 
 export const PROFESSIONS = [
-  { slug: "ksiegowosc", name: "Biura rachunkowe i księgowi", label: "Jestem księgowym", icon: "calculator" },
-  { slug: "doradztwo", name: "Doradcy podatkowi i biznesowi", label: "Doradzam firmom", icon: "compass" },
-  { slug: "sprzedaz", name: "Handlowcy B2B i przedstawiciele", label: "Sprzedaję w B2B", icon: "handshake" },
-  { slug: "finanse", name: "Doradcy finansowi i kredytowi", label: "Doradzam w finansach", icon: "landmark" },
-  { slug: "ubezpieczenia", name: "Agenci ubezpieczeniowi", label: "Jestem agentem ubezpieczeniowym", icon: "shield" },
-  { slug: "nieruchomosci", name: "Agenci nieruchomości i pośrednicy", label: "Pracuję w nieruchomościach", icon: "home" },
-  { slug: "architektura", name: "Architekci i obsługa inwestorów", label: "Projektuję i obsługuję inwestorów", icon: "ruler" },
-  { slug: "marketing", name: "Agencje marketingowe", label: "Prowadzę agencję marketingową", icon: "megaphone" },
-  { slug: "it", name: "Software house'y i konsultanci IT", label: "Działam w IT", icon: "code" },
-  { slug: "freelance", name: "Freelancerzy i małe firmy", label: "Jestem freelancerem", icon: "user" },
-  { slug: "organizacje", name: "Organizacje i partnerzy biznesowi", label: "Zrzeszam przedsiębiorców", icon: "users" },
-  { slug: "spolecznosc", name: "Twórcy z własną społecznością", label: "Mam własną społeczność", icon: "heart" },
+  { slug: "ksiegowosc", name: "Księgowy / biuro rachunkowe", label: "Jestem księgowym", icon: "calculator" },
+  { slug: "doradztwo", name: "Doradca podatkowy lub biznesowy", label: "Doradzam firmom", icon: "compass" },
+  { slug: "sprzedaz", name: "Handlowiec B2B / przedstawiciel", label: "Sprzedaję w B2B", icon: "handshake" },
+  { slug: "finanse", name: "Doradca finansowy lub kredytowy", label: "Doradzam w finansach", icon: "landmark" },
+  { slug: "ubezpieczenia", name: "Agent ubezpieczeniowy", label: "Jestem agentem ubezpieczeniowym", icon: "shield" },
+  { slug: "nieruchomosci", name: "Agent nieruchomości", label: "Pracuję w nieruchomościach", icon: "home" },
+  { slug: "architektura", name: "Architekt / obsługa inwestorów", label: "Projektuję i obsługuję inwestorów", icon: "ruler" },
+  { slug: "marketing", name: "Agencja marketingowa", label: "Prowadzę agencję marketingową", icon: "megaphone" },
+  { slug: "it", name: "Software house / konsultant IT", label: "Działam w IT", icon: "code" },
+  { slug: "freelance", name: "Freelancer / mała firma", label: "Jestem freelancerem", icon: "user" },
+  { slug: "organizacje", name: "Organizacja zrzeszająca przedsiębiorców", label: "Zrzeszam przedsiębiorców", icon: "users" },
+  { slug: "spolecznosc", name: "Twórca z własną społecznością", label: "Mam własną społeczność", icon: "heart" },
 ];
 
 // Oceny Google: stan z wizytówek w Mapach Google z dnia 13.11.2026 (podane przez właściciela projektu).
 export const GOOGLE_CHECKED_AT = new Date("2026-11-13T18:55:00+01:00");
+/** Dawne nazwy grup (liczba mnoga) → nowe (jak odpowiedź na „Czym się zajmujesz?”). Seed aktualizuje tylko nazwy niezmienione w panelu. */
+export const PROFESSION_RENAMES: Record<string, string> = {
+  "Biura rachunkowe i księgowi": "Księgowy / biuro rachunkowe",
+  "Doradcy podatkowi i biznesowi": "Doradca podatkowy lub biznesowy",
+  "Handlowcy B2B i przedstawiciele": "Handlowiec B2B / przedstawiciel",
+  "Doradcy finansowi i kredytowi": "Doradca finansowy lub kredytowy",
+  "Agenci ubezpieczeniowi": "Agent ubezpieczeniowy",
+  "Agenci nieruchomości i pośrednicy": "Agent nieruchomości",
+  "Architekci i obsługa inwestorów": "Architekt / obsługa inwestorów",
+  "Agencje marketingowe": "Agencja marketingowa",
+  "Software house'y i konsultanci IT": "Software house / konsultant IT",
+  "Freelancerzy i małe firmy": "Freelancer / mała firma",
+  "Organizacje i partnerzy biznesowi": "Organizacja zrzeszająca przedsiębiorców",
+  "Twórcy z własną społecznością": "Twórca z własną społecznością"
+};
+
 export const COMPANIES = [
   { slug: "pravna", googleRating: 47, googleReviews: 1290, name: "PRAVNA", tagline: "Usługi prawne i podatkowe dla firm i osób prywatnych", color: "#172B4D", logoUrl: null, iconUrl: "/brands/pravna-icon.png",
     description: "Zespół prawników i doradców obsługujący przedsiębiorców oraz konsumentów." },
@@ -313,6 +329,39 @@ export const SERVICES: ServiceSeed[] = [
       { slug: "umow-sesje", stage: "transaction", type: "booking", title: "Umów pierwszą sesję",
         description: "Bezpośrednie przejście do rezerwacji.",
         shareText: "Tu można umówić pierwszą sesję online:" },
+    ],
+  },
+  {
+    company: "risify", slug: "duo-terapia-dla-malzenstw", name: "Duo terapia dla małżeństw", category: "Zdrowie psychiczne", access: "approval_required", sensitive: true,
+    clientBenefit: "Wskaż parze, która chce popracować nad relacją, terapię prowadzoną online dla obojga partnerów.",
+    audienceShort: "Małżeństwa i pary, które chcą wspólnie pracować nad relacją",
+    description: "Terapia dla par prowadzona online: oboje partnerzy spotykają się z terapeutą na wspólnych sesjach. Platforma pomaga dobrać specjalistę pracującego z parami i umówić pierwsze spotkanie.",
+    problems: ["Trudność w rozmowie i narastające konflikty", "Kryzys w związku, o którym para chce porozmawiać z kimś z zewnątrz", "Brak czasu i możliwości dojazdu na wspólne wizyty"],
+    audience: ["Małżeństwa i pary w stałych związkach", "Pary przed ważną decyzją lub po trudnym wydarzeniu"],
+    whenToRecommend: ["Ktoś sam mówi, że szukają z partnerem terapii dla par", "Pyta, czy znasz sprawdzone miejsce", "Tworzysz treści o relacjach dla swojej społeczności"],
+    signals: ["Bezpośrednie pytanie o terapię małżeńską lub terapię par"],
+    arguments: ["Wspólne sesje online — z jednego lub dwóch miejsc", "Pomoc w doborze terapeuty pracującego z parami", "Pełna poufność"],
+    pitch: "Jeśli szukacie terapii dla par — znam platformę, na której można umówić wspólne sesje online i dobrać terapeutę pracującego z małżeństwami. Podeślę link, bez zobowiązań.",
+    faq: [
+      { q: "Czy dowiem się, czy polecona para skorzystała?", a: "Zobaczysz jedynie status polecenia. Nie masz dostępu do przebiegu terapii ani żadnych informacji o relacji i zdrowiu." },
+      { q: "Czy oboje partnerzy muszą być w jednym miejscu?", a: "O organizacji sesji decyduje terapeuta wspólnie z parą — wyjaśni to przy pierwszym kontakcie." },
+    ],
+    doNotPromise: ["Nie obiecuj uratowania związku ani efektów terapii.", "Nie sugeruj nikomu, że „potrzebuje terapii”, i nie dopytuj o szczegóły relacji.", "W sytuacji przemocy lub zagrożenia życia wskaż numer 112 lub 116 123, nie link."],
+    provider: "Usługę realizuje RISIFY — platforma psychoterapii online.",
+    commissionTerms: "Zasady wynagradzania za polecenia usług zdrowotnych wymagają odrębnych ustaleń i zatwierdzenia formy współpracy. Do tego czasu stawka nie jest publikowana.",
+    commissionModel: "custom", commissionCondition: "Warunki ustalane indywidualnie po zatwierdzeniu współpracy", rateStatus: "tbd",
+    professions: { spolecznosc: "Twoi odbiorcy pytają o sprawdzone miejsca.", organizacje: "Dbasz o dobrostan członków i ich rodzin.", ubezpieczenia: "Rozmawiasz z rodzinami o zdrowiu i ochronie." },
+    assets: [
+      { slug: "jak-wyglada-terapia-par-online", stage: "education", type: "article", title: "Jak wygląda terapia par online?",
+        description: "Materiał oswajający temat pierwszego wspólnego spotkania.",
+        body: "Terapia par to wspólne spotkania obojga partnerów z terapeutą. Pierwsza sesja służy poznaniu się i ustaleniu, nad czym chcecie pracować.\n\nSpotkania online odbywają się przez bezpieczne połączenie wideo. Terapeuta wyjaśni zasady: jak często się spotykacie i jak wygląda praca między sesjami.\n\nJeśli w związku dochodzi do przemocy albo ktoś jest w kryzysie zagrażającym życiu, zadzwoń pod 112 lub na telefon zaufania 116 123.",
+        shareText: "Podsyłam tekst o tym, jak wygląda terapia dla par online:" },
+      { slug: "dobor-terapeuty-par", stage: "consultation", type: "form", title: "Pomoc w doborze terapeuty dla par",
+        description: "Formularz kontaktowy — bez pytań o szczegóły relacji.",
+        shareText: "Tu można poprosić o pomoc w doborze terapeuty dla par:" },
+      { slug: "umow-sesje-par", stage: "transaction", type: "booking", title: "Umów pierwszą wspólną sesję",
+        description: "Bezpośrednie przejście do rezerwacji.",
+        shareText: "Tu można umówić pierwszą wspólną sesję online:" },
     ],
   },
   {

@@ -6,8 +6,8 @@ import { cn } from "@/lib/cn";
 const btnBase =
   "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors min-h-11 px-5 text-[15px] disabled:opacity-50 disabled:pointer-events-none select-none";
 const btnVariants = {
-  primary: "bg-leather text-white hover:bg-leather-600 active:bg-leather-dark shadow-sm",
-  gold: "bg-gold-light text-leather-dark hover:bg-gold",
+  primary: "leather-grad",
+  gold: "gold-grad",
   secondary: "bg-white text-leather-dark border border-line hover:bg-sand",
   ghost: "text-leather hover:bg-sand",
   danger: "bg-danger text-white hover:opacity-90",

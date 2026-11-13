@@ -20,6 +20,7 @@ export const registerSchema = z.object({
   activityType: z.enum(["individual", "sole_trader", "company"], { message: "Wybierz rodzaj działalności" }),
   companyName: z.string().trim().max(160).optional(),
   nip: z.string().trim().max(20).optional(),
+  profession: z.string().trim().max(80).optional(),
   terms: z.literal("on", { message: "Zaakceptuj regulamin, aby założyć konto" }),
   marketing: z.string().optional(),
 }).superRefine((v, ctx) => {

@@ -45,7 +45,7 @@ export default async function AccountPage() {
         <p className="mt-1 text-sm text-muted">Na tej podstawie podpowiadamy usługi oznaczone „dla Ciebie”.</p>
         <form action={setProfessionAction} className="mt-3">
           <input type="hidden" name="next" value="konto" />
-          <ProfessionSelect professions={professions} value={partner.professionSlug} />
+          <ProfessionSelect professions={professions} value={partner.professionSlug} autoSubmit />
         </form>
       </Card>
 

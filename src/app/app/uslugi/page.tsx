@@ -13,7 +13,7 @@ export default async function ServicesPage() {
     <>
       <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Portfel usług</h1>
       <p className="mt-1 text-sm text-muted">
-        {partner.status === "active" ? `Wybierz usługę — w środku dobierzesz link do etapu klienta. Dostępne: ${available} z ${items.length}.` : "Przeglądaj katalog — linki aktywujemy po zatwierdzeniu konta."}
+        {partner.status === "active" ? `Dotknij usługi, żeby ją otworzyć i wybrać link. Dostępne: ${available} z ${items.length}.` : "Przeglądaj katalog — linki aktywujemy po zatwierdzeniu konta."}
       </p>
       <div className="mt-4"><ServiceList items={items} /></div>
       <GoogleTrustCard compact className="mt-6" />

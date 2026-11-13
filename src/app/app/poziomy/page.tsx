@@ -1,16 +1,23 @@
 import { Check, Lock, Trophy } from "lucide-react";
 import Link from "next/link";
-import { btn } from "@/components/ui";
+import { eq } from "drizzle-orm";
+import { ConfettiBurst } from "@/components/confetti";
+import { btn, btnSm } from "@/components/ui";
+import { db } from "@/db";
+import { partners } from "@/db/schema";
 import { requirePartner } from "@/lib/auth";
 import { cn } from "@/lib/cn";
-import { achievementsFor, levelFor, LEVELS } from "@/lib/gamification";
+import { achievementsFor, levelFor, LEVELS, newSince } from "@/lib/gamification";
 import { getMonthlyRank, getPartnerStats } from "@/lib/partner-data";
 
 export const metadata = { title: "Poziomy i osiągnięcia" };
 
 export default async function LevelsPage() {
   const { partner } = await requirePartner();
-  const [stats, rank] = await Promise.all([getPartnerStats(partner.id), getMonthlyRank(partner.id)]);
+  const [stats, rank] = await Promise.all([getPartnerStats(partner), getMonthlyRank(partner.id)]);
+  // Nowości od ostatniej wizyty: confetti i oznaczenie „Nowe”, po czym zapisujemy, że partner je zobaczył.
+  const fresh = newSince(partner.gamificationSeen, stats);
+  if (fresh.any) await db.update(partners).set({ gamificationSeen: { level: fresh.level, achievements: fresh.done } }).where(eq(partners.id, partner.id));
   const level = levelFor(stats.clients);
   const list = achievementsFor(stats);
   const doneCount = list.filter((a) => a.done).length;
@@ -18,6 +25,7 @@ export default async function LevelsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <ConfettiBurst fire={fresh.any} />
       <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Poziomy i osiągnięcia</h1>
 
       <section className="wallet wallet-sheen rounded-[28px] p-5" aria-label="Twój poziom">
@@ -25,7 +33,7 @@ export default async function LevelsPage() {
           <span className="pop grid size-16 shrink-0 place-items-center rounded-full bg-gold-light text-leather-dark shadow-lg"><Trophy className="size-8" aria-hidden /></span>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twój poziom</p>
-            <p className="text-3xl font-extrabold leading-tight" data-testid="level-name">{level.current.name}</p>
+            <p className="text-3xl font-extrabold leading-tight" data-testid="level-name">{level.current.name}{fresh.levelUp && <span className="pop ml-2 rounded-full px-2 py-0.5 align-middle text-[11px] font-bold success-grad">Nowy poziom</span>}</p>
           </div>
         </div>
         <div className="relative z-10 mt-5">
@@ -71,8 +79,10 @@ export default async function LevelsPage() {
                 {a.done ? <Check className="size-5" aria-hidden /> : <Lock className="size-4" aria-hidden />}
               </span>
               <div className="min-w-0 flex-1">
-                <p className={cn("font-extrabold leading-snug", a.done ? "text-[#14553c]" : "text-ink/70")}>{a.title}</p>
+                <p className={cn("font-extrabold leading-snug", a.done ? "text-[#14553c]" : "text-ink/70")}>{a.title}{fresh.newAchievements.includes(a.id) && <span className="pop ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold success-grad" data-testid="new-badge">Nowe</span>}</p>
                 <p className="text-[13px] leading-snug text-muted">{a.description}</p>
+                {!a.done && a.id === "photo" && <Link href="/app/konto" className={btnSm("gold", "press mt-2")}>Dodaj zdjęcie</Link>}
+                {!a.done && a.id === "starter-pack" && <Link href="/app" className={btnSm("gold", "press mt-2")}>Wpisz kod z pakietu</Link>}
                 {!a.done && a.target > 1 && (
                   <div className="mt-2 flex items-center gap-2">
                     <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-sand"><div className="h-full rounded-full bg-gold" style={{ width: `${(a.current / a.target) * 100}%` }} /></div>
