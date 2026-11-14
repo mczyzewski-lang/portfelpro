@@ -312,6 +312,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
 
   // Konto: zdjęcie z kadrowaniem, branża z ikonami nad statusem, zmiana hasła jako link
   await page.goto("/app/konto");
+  await page.waitForLoadState("networkidle"); // strona musi być aktywna, zanim wstawimy plik
   await expect(page.getByTestId("avatar-take")).toHaveText("Zrób zdjęcie"); // główny przycisk: aparat
   await expect(page.getByTestId("avatar-camera")).toHaveAttribute("capture", "user");
   await expect(page.getByTestId("avatar-choose")).toHaveText("Wybierz"); // opcjonalnie: galeria
@@ -439,6 +440,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByTestId("starter-star").locator("svg")).toHaveAttribute("data-tier", "glass"); // gwiazda poziomu w okienku
   await expect(demo.getByTestId("avatar-star")).toHaveCount(0); // przed kodem awatar nie ma jeszcze gwiazdy
   await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeDisabled();
+  await demo.waitForLoadState("networkidle");
   await demo.getByTestId("starter-card").getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");
   await demo.getByTestId("avatar-save").click();
   await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeEnabled();
