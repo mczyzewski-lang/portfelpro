@@ -17,6 +17,8 @@ export type ServiceSeed = {
   companyFacts: string[];
   /** tabela „my vs inni” — wiersze PRZYKŁADOWE, do potwierdzenia przez firmę */
   comparison: { label: string; us: string; others: string }[];
+  /** pytanie klienta — tytuł karty usługi */
+  headline: string;
   /** co partner słyszy od klienta → skojarzenie z usługą */
   hook: string;
   /** ekspert DEMO: fikcyjna osoba z wygenerowanym portretem — do podmiany na prawdziwego eksperta w panelu */
@@ -87,6 +89,7 @@ const baseTerms = "Prowizja przysługuje za klienta przypisanego do Twojego link
 export const SERVICES: ServiceSeed[] = [
   {
     company: "pravna", slug: "znak-towarowy", name: "Zastrzeżenie znaku towarowego", category: "Ochrona marki",
+    headline: "Jak ochronić nazwę firmy?",
     hook: "nowa nazwa firmy", expertName: "Michał Borowski", expertTitle: "Ekspert ds. znaków towarowych (demo)", expertPhotoUrl: "/demo/eksperci/m1.jpg",
     serviceFacts: ["Ochrona znaku trwa 10 lat i można ją przedłużać na kolejne 10-letnie okresy.", "Znak zgłasza się w Polsce (Urząd Patentowy RP) albo od razu na całą Unię Europejską (EUIPO).", "Ochrona obejmuje tylko wskazane w zgłoszeniu klasy towarów i usług."],
     companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Przykład do potwierdzenia: „zastrzegamy 5× więcej znaków niż drugi pełnomocnik na liście UPRP”.", "Zastrzeżenie znaku towarowego to jedna z dwóch głównych specjalizacji wskazanych na stronie pravna.pl."],
@@ -146,6 +149,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "upadlosc-konsumencka", name: "Upadłość konsumencka", category: "Finanse osobiste",
+    headline: "Jak wyjść z długów osobistych?",
     hook: "długi osobiste", expertName: "Tomasz Lewandowski", expertTitle: "Ekspert ds. oddłużania (demo)", expertPhotoUrl: "/demo/eksperci/m2.jpg",
     serviceFacts: ["Postępowanie prowadzi sąd upadłościowy z udziałem syndyka.", "Sąd ustala plan spłaty wierzycieli — co do zasady na okres do 36 miesięcy.", "O umorzeniu pozostałych zobowiązań decyduje sąd po wykonaniu planu spłaty."],
     companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Sprawy prowadzone są zdalnie, bez konieczności wizyt w kancelarii."],
@@ -183,6 +187,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "sankcja-kredytu-darmowego", name: "Sankcja Kredytu Darmowego", category: "Finanse osobiste",
+    headline: "Jak sprawdzić umowę kredytu gotówkowego?",
     hook: "kredyt gotówkowy", expertName: "Agnieszka Sowa", expertTitle: "Ekspertka ds. kredytów konsumenckich (demo)", expertPhotoUrl: "/demo/eksperci/k1.jpg",
     serviceFacts: ["Dotyczy kredytów konsumenckich do 255 550 zł.", "Kredytobiorca składa kredytodawcy pisemne oświadczenie.", "Uprawnienie wygasa po roku od wykonania umowy — także przy kredytach już spłaconych."],
     companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Analiza umowy odbywa się zdalnie, na podstawie przesłanych dokumentów."],
@@ -220,6 +225,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "ip-box", name: "Ulga IP Box", category: "Podatki",
+    headline: "Jak skorzystać z ulgi dla programistów?",
     hook: "programista na B2B", expertName: "Marta Wilk", expertTitle: "Ekspertka ds. ulg podatkowych (demo)", expertPhotoUrl: "/demo/eksperci/k2.jpg",
     serviceFacts: ["Stawka podatku od kwalifikowanego dochodu wynosi 5%.", "Wymaga prowadzenia działalności badawczo-rozwojowej i odrębnej ewidencji.", "Ulgę rozlicza się w zeznaniu rocznym."],
     companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "IP Box to jedna z dwóch głównych specjalizacji wskazanych na stronie pravna.pl."],
@@ -264,6 +270,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "restrukturyzacja", name: "Restrukturyzacja przedsiębiorstwa", category: "Firma w kryzysie",
+    headline: "Jak dogadać się z wierzycielami firmy?",
     hook: "zaległości w ZUS", expertName: "Paweł Zając", expertTitle: "Ekspert ds. restrukturyzacji (demo)", expertPhotoUrl: "/demo/eksperci/m3.jpg",
     serviceFacts: ["Prawo przewiduje cztery tryby postępowania restrukturyzacyjnego.", "Celem jest zawarcie układu z wierzycielami i dalsze prowadzenie firmy.", "Układ przyjmują wierzyciele w głosowaniu, a zatwierdza go sąd."],
     companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Wstępna analiza sytuacji firmy odbywa się zdalnie."],
@@ -301,6 +308,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "nowy-etap", slug: "rozwod-za-porozumieniem", name: "Rozwód za porozumieniem i mediacje online", category: "Sprawy rodzinne",
+    headline: "Jak rozstać się bez wojny w sądzie?",
     hook: "rozstajemy się", expertName: "Joanna Krajewska", expertTitle: "Mediatorka rodzinna (demo)", expertPhotoUrl: "/demo/eksperci/k3.jpg",
     serviceFacts: ["Rozwód orzeka sąd okręgowy.", "Mediacja jest dobrowolna i poufna.", "Sąd nie orzeka o winie, gdy oboje małżonkowie zgodnie o to wnoszą."],
     companyFacts: ["Ocena w Google: 4,8/5 z 964 opinii (stan na 13.11.2026).", "Wg strony nowy-etap.pl: zaufało im ponad 5205 osób.", "Wg strony nowy-etap.pl: 98% skutecznych spraw."],
@@ -338,6 +346,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "risify", slug: "psychoterapia-online", name: "Psychoterapia online", category: "Zdrowie psychiczne",
+    headline: "Jak znaleźć dobrego terapeutę?",
     hook: "szukam terapeuty", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka doboru terapeutów (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg",
     serviceFacts: ["Sesja trwa zwykle około 50 minut.", "Spotkania odbywają się w stałym rytmie, najczęściej raz w tygodniu.", "Terapeutę obowiązuje tajemnica zawodowa."],
     companyFacts: ["Ocena w Google: 4,8/5 z 141 opinii (stan na 13.11.2026).", "Sesje odbywają się online — z dowolnego miejsca."],
@@ -375,6 +384,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "duo", slug: "duo-terapia-dla-malzenstw", name: "Duo terapia dla małżeństw", category: "Zdrowie psychiczne",
+    headline: "Jak przejść przez kryzys w związku?",
     hook: "kryzys w związku", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka terapii par (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg",
     serviceFacts: ["W sesjach uczestniczą oboje partnerzy.", "Terapeuta pozostaje bezstronny wobec obu stron.", "Treść spotkań jest poufna."],
     companyFacts: ["Wg strony duo.pl: praca zaczyna się od „Mapy Relacji” z psychologiem.", "Wg strony duo.pl: trzy możliwe kierunki — odbudowa relacji, wsparcie w decyzji albo świadome rozstanie."],
@@ -412,6 +422,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "budaro", slug: "domy-modulowe", name: "Domy modułowe i szkieletowe", category: "Budownictwo",
+    headline: "Jak szybciej zbudować dom?",
     hook: "kupiliśmy działkę", expertName: "Adam Górski", expertTitle: "Doradca techniczny (demo)", expertPhotoUrl: "/demo/eksperci/m4.jpg",
     serviceFacts: ["Elementy domu powstają w hali, a na działce odbywa się montaż.", "Technologia szkieletowa opiera się na konstrukcji drewnianej.", "Dom o powierzchni zabudowy do 70 m² można — po spełnieniu warunków ustawowych — budować na zgłoszenie."],
     companyFacts: ["Ocena w Google: 5,0/5 z 27 opinii (stan na 13.11.2026).", "Wg strony budaro.pl: firma ma na koncie realizację 200 domów.", "Wg strony budaro.pl: domy modułowe od 229 635 zł."],

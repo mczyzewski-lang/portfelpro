@@ -2,6 +2,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { companies, contentAssets, partnerServiceTerms, partners, services, users } from "@/db/schema";
 import { factsOf } from "@/components/service-facts";
+import { companyInfo } from "./company";
 import { expertOf } from "./expert";
 import { getOrCreateLink, recommendState } from "./tracking";
 
@@ -34,7 +35,7 @@ export async function getPublicWallet(slug: string) {
       // tylko treści dla klienta — bez wskazówek sprzedażowych i prowizji
       expert: expertOf(s), facts: factsOf(s),
       description: s.description, problems: s.problems, audience: s.audience, faq: s.faq, provider: s.provider,
-      company: { name: c.name, color: c.color, iconUrl: c.iconUrl, googleRating: c.googleRating, googleReviews: c.googleReviews },
+      company: { name: c.name, color: c.color, iconUrl: c.iconUrl, googleRating: c.googleRating, googleReviews: c.googleReviews, info: companyInfo(c) },
     });
   }
   return {

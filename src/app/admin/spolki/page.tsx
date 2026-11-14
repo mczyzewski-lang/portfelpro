@@ -26,6 +26,8 @@ function CompanyForm({ c }: { c?: Company }) {
         <Field label="Ocena w Google (1–5)" hint={`Kryterium katalogu: powyżej ${(GOOGLE_MIN_RATING / 10).toFixed(1).replace(".", ",")}`}><input name="googleRating" inputMode="decimal" defaultValue={c?.googleRating != null ? (c.googleRating / 10).toFixed(1).replace(".", ",") : ""} placeholder="np. 4,9" className={inputCls} /></Field>
         <Field label="Liczba opinii w Google" hint={`Kryterium katalogu: min. ${GOOGLE_MIN_REVIEWS}`}><input name="googleReviews" inputMode="numeric" defaultValue={c?.googleReviews ?? ""} className={inputCls} /></Field>
         <Field label="Link do opinii Google (https://…)" className="sm:col-span-2" hint={c?.googleCheckedAt ? `Dane z dnia ${fmtDate(c.googleCheckedAt)}` : "Brak danych — ocena nie jest nigdzie pokazywana"}><input name="googleUrl" defaultValue={c?.googleUrl ?? ""} className={inputCls} /></Field>
+        <Field label="Strona www (https://…)"><input name="website" defaultValue={c?.website ?? ""} className={inputCls} /></Field>
+        <Field label="Referencje wideo 9:16" hint="Jeden wiersz = Tytuł | adres pliku mp4" className="sm:col-span-2"><textarea name="referenceVideos" rows={2} defaultValue={(c?.referenceVideos ?? []).map((v) => `${v.title} | ${v.url}`).join("\n")} className={textareaCls} /></Field>
         <Field label="Opis" className="sm:col-span-2"><textarea name="description" rows={2} defaultValue={c?.description} className={textareaCls} /></Field>
       </div>
       <label className="mt-3 flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" name="published" defaultChecked={c?.published ?? true} className="size-4 accent-leather" />Widoczna w katalogu</label>

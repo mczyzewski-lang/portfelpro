@@ -25,6 +25,8 @@ export function StarterCard({ hasPhoto, avatarSrc, initials, tier, tierName, mel
   const [watched, setWatched] = useState(false);
   const [burst, setBurst] = useState(false);
   const codeReady = hasPhoto && !confirmed;
+  const active = !hasPhoto ? 1 : !confirmed ? 2 : 3; // krok do wykonania teraz — pulsuje i ma znacznik
+  const now = <span className="gold-grad now-badge ml-auto rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide">Teraz</span>;
   const router = useRouter();
   const star = useRef<HTMLSpanElement>(null);
   const [done, setDone] = useState(false);
@@ -86,12 +88,12 @@ export function StarterCard({ hasPhoto, avatarSrc, initials, tier, tierName, mel
       </div>
 
       <div className="mt-3.5 rounded-2xl bg-cream/70 p-3" data-testid="starter-photo-step">
-        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(1, hasPhoto)}Dodaj swoje zdjęcie</p>
+        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(1, hasPhoto)}<span className={active === 1 ? "step-now" : undefined} data-active={active === 1}>Dodaj swoje zdjęcie</span>{active === 1 && now}</p>
         <AvatarEditor light src={avatarSrc} initials={initials} onSave={saveAvatarAction} onRemove={removeAvatarAction} />
       </div>
 
       <form action={action} className="mt-2.5 rounded-2xl bg-cream/70 p-3">
-        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(2, confirmed)}Wpisz kod z karty w pakiecie</p>
+        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(2, confirmed)}<span className={active === 2 ? "step-now" : undefined} data-active={active === 2}>Wpisz kod z karty w pakiecie</span>{active === 2 && now}</p>
         <div className="flex gap-2">
           <input name="code" required disabled={!codeReady} autoComplete="off" autoCapitalize="characters" spellCheck={false} maxLength={14} placeholder="KOD" aria-label="Kod z pakietu startowego"
             className="tabular min-h-12 min-w-0 flex-1 rounded-2xl border border-line bg-white px-4 text-center text-lg font-extrabold uppercase tracking-[0.3em] text-leather-dark placeholder:tracking-[0.2em] placeholder:text-muted/50 focus:border-leather focus:outline-none focus:ring-2 focus:ring-leather/20 disabled:opacity-50" />
@@ -103,7 +105,7 @@ export function StarterCard({ hasPhoto, avatarSrc, initials, tier, tierName, mel
       </form>
       {videoUrl && confirmed && (
         <div className="mt-2.5 rounded-2xl bg-cream/70 p-3" data-testid="starter-video-step">
-          <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(3, watched)}Obejrzyj krótkie nagranie</p>
+          <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(3, watched)}<span className={active === 3 ? "step-now" : undefined} data-active={active === 3}>Obejrzyj krótkie nagranie</span>{active === 3 && now}</p>
           <ReelPlayer src={videoUrl} title="Pakiet startowy — co dalej" testId="starter-video" onOpen={() => { setWatched(true); void markStarterVideoSeenAction(); }} onClose={() => { setHidden(true); router.refresh(); }}
             className="flex min-h-12 w-full items-center gap-3 rounded-2xl border border-gold bg-white px-3 text-left ring-2 ring-gold-light/60">
             <span className="gold-grad grid size-9 shrink-0 place-items-center rounded-full"><Play className="size-4 translate-x-px fill-current" aria-hidden /></span>

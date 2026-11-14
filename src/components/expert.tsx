@@ -1,3 +1,4 @@
+import { Ear } from "lucide-react";
 import { cn } from "@/lib/cn";
 import type { Expert } from "@/lib/expert";
 
@@ -6,7 +7,7 @@ export function Hook({ text, onDark = false, className }: { text: string | null 
   if (!text) return null;
   return (
     <span className={cn("block text-[13px] font-semibold leading-snug", onDark ? "text-gold-light" : "text-gold-deep", className)} data-testid="service-hook">
-      Słyszysz: <span className="italic">„{text}”</span>?
+      <Ear className="mb-0.5 mr-1 inline size-4" aria-hidden />Słyszysz: <span className="italic">„{text}”</span>?
     </span>
   );
 }

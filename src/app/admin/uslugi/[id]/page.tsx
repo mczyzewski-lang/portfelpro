@@ -78,6 +78,7 @@ export default async function EditService({ params }: { params: Promise<{ id: st
         <Panel title="Treści dla partnera">
           <div className="grid gap-3">
             <TA name="clientBenefit" label="Krótki opis sprzedażowy (korzyść klienta)" value={s.clientBenefit} rows={2} />
+            <Field label="Pytanie klienta — tytuł karty usługi" hint="Np. Jak wyjść z długów osobistych? Nazwa usługi pojawi się pod spodem."><input name="headline" defaultValue={s.headline ?? ""} className={inputCls} /></Field>
             <Field label="Hasło skojarzeniowe — co słyszysz od klienta" hint="Pokazywane nad nazwą jako: Słyszysz: „…”? Np. długi osobiste"><input name="hook" defaultValue={s.hook ?? ""} className={inputCls} /></Field>
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label="Ekspert — imię i nazwisko"><input name="expertName" defaultValue={s.expertName ?? ""} className={inputCls} /></Field>

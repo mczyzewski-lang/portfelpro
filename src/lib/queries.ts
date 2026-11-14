@@ -3,9 +3,10 @@ import { db } from "@/db";
 import { companies, contentAssets, partnerServiceTerms, professions, serviceProfessions, services, type PartnerServiceTerm } from "@/db/schema";
 import { displayRate, type RateDisplay } from "./commission";
 import { env } from "./env";
+import { expertOf, type Expert } from "./expert";
 
 export type CatalogItem = {
-  id: string; slug: string; name: string; category: string; hook: string | null; clientBenefit: string; audienceShort: string;
+  id: string; slug: string; name: string; category: string; hook: string | null; headline: string | null; expert: Expert | null; clientBenefit: string; audienceShort: string;
   commissionCondition: string; access: "open" | "approval_required";
   company: { name: string; color: string; logoUrl: string | null; iconUrl: string | null; slug: string; googleRating: number | null; googleReviews: number | null };
   rate: RateDisplay;
@@ -21,7 +22,7 @@ export async function getCatalog(terms: PartnerServiceTerm[] = []): Promise<Cata
   const sp = await db.select().from(serviceProfessions);
   const termBy = new Map(terms.map((t) => [t.serviceId, t]));
   return rows.map(({ s, c }) => ({
-    id: s.id, slug: s.slug, name: s.name, category: s.category, hook: s.hook, clientBenefit: s.clientBenefit, audienceShort: s.audienceShort,
+    id: s.id, slug: s.slug, name: s.name, category: s.category, hook: s.hook, headline: s.headline, expert: expertOf(s), clientBenefit: s.clientBenefit, audienceShort: s.audienceShort,
     commissionCondition: s.commissionCondition, access: s.access,
     company: { name: c.name, color: c.color, logoUrl: c.logoUrl, iconUrl: c.iconUrl, slug: c.slug, googleRating: c.googleRating, googleReviews: c.googleReviews },
     rate: displayRate(s, termBy.get(s.id), env.demoMode),

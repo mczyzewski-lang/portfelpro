@@ -98,7 +98,8 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.getByTestId("go-wallet").click(); // Portfel = lista usług
   await page.waitForURL("**/app/uslugi");
   await expect(page.getByTestId("google-trust")).toContainText("Tylko firmy sprawdzone przez klientów"); // także w panelu partnera
-  await expect(page.getByTestId("service-upadlosc-konsumencka").getByTestId("service-hook")).toHaveText("Słyszysz: „długi osobiste”?");
+  await expect(page.getByTestId("service-upadlosc-konsumencka").getByTestId("service-headline")).toHaveText("Jak wyjść z długów osobistych?"); // pytanie klienta jako tytuł karty
+  await expect(page.getByTestId("service-upadlosc-konsumencka")).toContainText("Upadłość konsumencka");
   await page.getByTestId("service-znak-towarowy").click();
   await page.waitForURL("**/app/uslugi/znak-towarowy");
   await expect(page.getByRole("heading", { name: "Wybierz link dla klienta" })).toBeVisible();
@@ -108,6 +109,10 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByTestId("pitch-bubble")).toContainText("Budujesz markę"); // dymek nad wyborem linku
   await expect(page.getByTestId("service-screen").getByTestId("service-hook")).toHaveText("Słyszysz: „nowa nazwa firmy”?"); // hasło skojarzeniowe nad nazwą
   await expect(page.getByTestId("service-expert")).toContainText("Michał Borowski"); // ekspert usługi ze zdjęciem
+  await page.getByTestId("company-open").click(); // dotknięcie firmy: więcej informacji i referencje wideo
+  await expect(page.getByTestId("company-sheet")).toContainText("Referencje wideo");
+  await expect(page.getByTestId("company-sheet")).toContainText("pravna.pl");
+  await page.getByTestId("company-sheet").getByRole("button", { name: "Zamknij" }).click();
   await expect(page.getByTestId("service-facts")).toContainText("Ochrona znaku trwa 10 lat"); // najważniejsze o usłudze
   await expect(page.getByTestId("service-facts")).toContainText("PRAVNA przy tej usłudze"); // firma w kontekście usługi
   await expect(page.getByTestId("comparison-table").getByRole("columnheader", { name: "PRAVNA" })).toBeVisible(); // tabela my vs inni
@@ -450,6 +455,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByTestId("stat-leads")).toHaveText("5"); // pięć przykładowych poleceń na różnych etapach
   await expect(demo.getByTestId("service-stats")).toContainText("Zastrzeżenie znaku towarowego"); // statystyka per usługa
   // Pakiet startowy: najpierw zdjęcie (pole kodu jest zablokowane), potem kod — gwiazdka leci do awatara
+  await expect(demo.getByTestId("starter-card").locator('[data-active="true"]')).toHaveText("Dodaj swoje zdjęcie"); // krok „teraz” jest wyróżniony
   await expect(demo.getByTestId("starter-star").locator("svg")).toHaveAttribute("data-tier", "glass"); // gwiazda poziomu w okienku
   await expect(demo.getByTestId("avatar-star")).toHaveCount(0); // przed kodem awatar nie ma jeszcze gwiazdy
   await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeDisabled();
@@ -464,7 +470,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByText("Pakiet startowy potwierdzony!")).toBeVisible();
   // kod odblokował nagranie; po obejrzeniu okienko znika
   await demo.getByTestId("starter-video").click();
-  await expect(demo.getByTestId("reel-video").first()).toHaveAttribute("src", "/demo/pakiet-startowy.mp4");
+  await expect(demo.locator('dialog[open] [data-testid="reel-video"]').first()).toHaveAttribute("src", "/demo/pakiet-startowy.mp4");
   await demo.getByRole("button", { name: "Zamknij wideo" }).first().click();
   await expect(demo.getByTestId("avatar-star").locator("svg")).toHaveAttribute("data-tier", "glass"); // gwiazda poziomu przy awatarze
   await expect(demo.getByTestId("starter-card")).toHaveCount(0);
@@ -478,16 +484,16 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   expect((await demo.request.get(await demo.getByTestId("manager-photo").getAttribute("src") as string)).headers()["content-type"]).toBe("image/jpeg");
   // Przywitanie opiekuna: dotknięcie zdjęcia otwiera pionowe wideo na cały ekran
   await demo.getByTestId("manager-video").click();
-  await expect(demo.getByTestId("reel-dialog")).toBeVisible();
-  await expect(demo.getByTestId("reel-video")).toHaveAttribute("src", "/demo/opiekun-powitanie.mp4");
+  await expect(demo.locator('dialog[data-testid="reel-dialog"][open]')).toBeVisible();
+  await expect(demo.locator('dialog[open] [data-testid="reel-video"]')).toHaveAttribute("src", "/demo/opiekun-powitanie.mp4");
   expect((await demo.request.get("/demo/opiekun-powitanie.mp4")).headers()["content-type"]).toContain("video/mp4");
   await demo.getByRole("button", { name: "Zamknij wideo" }).click();
-  await expect(demo.getByTestId("reel-dialog")).toBeHidden();
+  await expect(demo.locator('dialog[data-testid="reel-dialog"][open]')).toHaveCount(0);
   // Wideo (reel) w karcie usługi
   await demo.goto("/app/uslugi/znak-towarowy");
   await demo.getByTestId("service-reel").click();
-  await expect(demo.getByTestId("reel-dialog")).toBeVisible();
-  await expect(demo.getByTestId("reel-video")).toHaveAttribute("src", "/demo/usluga-reel.mp4");
+  await expect(demo.locator('dialog[data-testid="reel-dialog"][open]')).toBeVisible();
+  await expect(demo.locator('dialog[open] [data-testid="reel-video"]')).toHaveAttribute("src", "/demo/usluga-reel.mp4");
   await demo.getByRole("button", { name: "Zamknij wideo" }).click();
   await demo.goto("/app/polecenia");
   await expect(demo.getByTestId("referral-row")).toHaveCount(5);

@@ -103,6 +103,8 @@ export const companies = pgTable("companies", {
   iconUrl: text("icon_url"),   // kwadratowa ikona — używana na kartach usług
   color: text("color").notNull().default("#713B20"),
   // Ocena w Google — wpisywana ręcznie lub pobierana z Google Places API; null = brak danych (nic nie pokazujemy)
+  website: text("website"),
+  referenceVideos: jsonb("reference_videos").$type<{ title: string; url: string }[]>().notNull().default([]), // referencje wideo (9:16)
   googleRating: integer("google_rating"),       // średnia × 10, np. 49 = 4,9
   googleReviews: integer("google_reviews"),     // liczba opinii
   googlePlaceId: text("google_place_id"),
@@ -127,6 +129,7 @@ export const services = pgTable("services", {
   companyFacts: jsonb("company_facts").$type<string[]>().notNull().default([]),   // fakty o firmie w kontekście tej usługi
   comparison: jsonb("comparison").$type<{ label: string; us: string; others: string }[]>().notNull().default([]), // my vs inni
   factsDemo: boolean("facts_demo").notNull().default(false),                      // treści startowe do potwierdzenia — widoczne tylko w trybie demo
+  headline: text("headline"),               // pytanie klienta jako tytuł karty, np. „Jak wyjść z długów osobistych?”
   hook: text("hook"),                       // hasło skojarzeniowe: co partner słyszy od klienta, np. „długi osobiste”
   expertName: text("expert_name"),          // ekspert-twarz usługi (marka osobista)
   expertTitle: text("expert_title"),

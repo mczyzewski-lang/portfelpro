@@ -203,7 +203,11 @@ export const saveCompanyAction = adminAction(async (fd, actor) => {
   const googleUrl = str(fd, "googleUrl");
   if (googleUrl && !/^https:\/\//.test(googleUrl)) throw new DomainError("Link do opinii Google musi zaczynać się od https://");
   const google = { googleRating: rating != null ? Math.round(rating * 10) : null, googleReviews: reviews, googleUrl: googleUrl || null };
-  const values = { ...data, ...google, logoUrl: data.logoUrl || null, iconUrl: data.iconUrl || null, published: str(fd, "published") === "on", sort: Number(str(fd, "sort")) || 0 };
+  const website = str(fd, "website");
+  if (website && !/^https:\/\/\S+$/.test(website)) throw new DomainError("Strona www musi zaczynać się od https://");
+  const referenceVideos = lines(fd, "referenceVideos").map((l) => { const [title = "", url = ""] = l.split("|").map((x) => x.trim()); return { title, url }; });
+  if (referenceVideos.some((v) => !v.title || !/^(https:\/\/|\/(?!\/))\S+$/.test(v.url))) throw new DomainError("Referencje wideo: każdy wiersz jako Tytuł | adres pliku (https://… lub /…)");
+  const values = { ...data, ...google, website: website || null, referenceVideos, logoUrl: data.logoUrl || null, iconUrl: data.iconUrl || null, published: str(fd, "published") === "on", sort: Number(str(fd, "sort")) || 0 };
   if (id) {
     const [prev] = await db.select().from(companies).where(eq(companies.id, id));
     const changed = prev && (prev.googleRating !== google.googleRating || prev.googleReviews !== google.googleReviews);
@@ -258,6 +262,7 @@ export const saveServiceAction = adminAction(async (fd, actor) => {
     serviceFacts: lines(fd, "serviceFacts"), companyFacts: lines(fd, "companyFacts"),
     comparison: lines(fd, "comparison").map((l) => { const [label = "", us = "", others = ""] = l.split("|").map((x) => x.trim()); return { label, us, others }; }).filter((r) => r.label && r.us),
     factsDemo: false, // zapis w panelu = treści potwierdzone przez administratora
+    headline: str(fd, "headline").slice(0, 120) || null,
     hook: str(fd, "hook").slice(0, 80) || null, expertName: str(fd, "expertName").slice(0, 120) || null, expertTitle: str(fd, "expertTitle").slice(0, 120) || null,
     expertPhotoUrl: videoUrl(fd, "expertPhotoUrl", "Zdjęcie eksperta"),
     reelUrl: videoUrl(fd, "reelUrl", "Wideo o usłudze"), reelPosterUrl: videoUrl(fd, "reelPosterUrl", "Okładka wideo"),

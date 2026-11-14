@@ -7,6 +7,7 @@ import { submitPublicLeadAction } from "@/app/actions/public";
 import { cn } from "@/lib/cn";
 import type { PublicWalletData } from "@/lib/public-wallet";
 import { SubmitButton } from "./client";
+import { CompanySheet } from "./company-sheet";
 import { ExpertCard } from "./expert";
 import { GoogleRating } from "./google";
 import { ServiceFacts } from "./service-facts";
@@ -160,8 +161,10 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
           <article key={item.id} className={cn("bg-white pb-10", singleId ? "fade-in" : "slide-in-right")} data-testid="public-detail">
             <div className="px-5 pt-5">
               <div className="flex items-center gap-2.5">
-                <CompanyIcon name={item.company.name} color={item.company.color} iconUrl={item.company.iconUrl} size={36} />
-                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted">{item.company.name}</span>
+                <CompanySheet company={item.company.info} className="flex items-center gap-2.5">
+                  <CompanyIcon name={item.company.name} color={item.company.color} iconUrl={item.company.iconUrl} size={36} />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4">{item.company.name}</span>
+                </CompanySheet>
                 <GoogleRating rating={item.company.googleRating} reviews={item.company.googleReviews} className="ml-auto" />
                 {!singleId && <a href={`/p/${slug}/${item.slug}`} target="_blank" rel="noopener" aria-label="Otwórz tę usługę w nowym oknie" title="Otwórz samą usługę w nowym oknie"
                   className="grid size-10 shrink-0 place-items-center rounded-full border border-line bg-white text-leather-dark active:bg-cream"><ExternalLink className="size-4" aria-hidden /></a>}

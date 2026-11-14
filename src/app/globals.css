@@ -145,3 +145,15 @@ dialog::backdrop { background: rgb(50 27 18 / 0.5); backdrop-filter: blur(2px); 
     radial-gradient(120% 90% at 0% 0%, rgb(255 190 140 / 0.10), transparent 55%),
     linear-gradient(170deg, #47200f 0%, #2f1209 55%, #1f0b05 100%);
 }
+
+/* Pakiet startowy: krok do wykonania teraz — tytuł delikatnie pulsuje, a po literach przesuwa się złoty błysk */
+@keyframes step-glare { from { background-position: 130% 0; } to { background-position: -130% 0; } }
+@keyframes step-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+@keyframes now-ping { 0%, 100% { box-shadow: 0 0 0 0 rgb(201 154 60 / 0.55); } 60% { box-shadow: 0 0 0 7px rgb(201 154 60 / 0); } }
+.step-now {
+  display: inline-block; transform-origin: left center;
+  background: linear-gradient(100deg, #321b12 0%, #321b12 40%, #d9a93f 50%, #321b12 60%, #321b12 100%);
+  background-size: 230% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: step-glare 2.4s linear infinite, step-pulse 1.7s ease-in-out infinite;
+}
+.now-badge { animation: now-ping 1.7s ease-out infinite; }

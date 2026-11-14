@@ -20,6 +20,11 @@ async function main() {
     await db.insert(s.companies).values({ ...c, sort: i, googleCheckedAt: GOOGLE_CHECKED_AT }).onConflictDoNothing();
     const [row] = await db.select().from(s.companies).where(eq(s.companies.slug, c.slug));
     companyIds[c.slug] = row.id;
+    // Strona www i przykładowa referencja wideo (plik z /demo/ — widoczny tylko w trybie demo), jeśli nic nie ustawiono.
+    const SITES: Record<string, string> = { pravna: "https://pravna.pl", "nowy-etap": "https://nowy-etap.pl", risify: "https://risify.pl", budaro: "https://budaro.pl", duo: "https://duo.pl" };
+    if (!row.website && !row.referenceVideos.length) {
+      await db.update(s.companies).set({ website: SITES[c.slug] ?? null, referenceVideos: [{ title: "Opinia klienta (materiał przykładowy)", url: "/demo/referencja.mp4" }] }).where(eq(s.companies.id, row.id));
+    }
     // Ocenę Google uzupełniamy tylko, gdy spółka nie ma jeszcze żadnych danych (nie nadpisujemy zmian z panelu).
     if (row.googleRating == null && row.googleReviews == null) {
       await db.update(s.companies).set({ googleRating: c.googleRating, googleReviews: c.googleReviews, googleCheckedAt: GOOGLE_CHECKED_AT }).where(eq(s.companies.id, row.id));
@@ -35,6 +40,7 @@ async function main() {
     if (!row) continue;
     const patch: Partial<typeof s.services.$inferInsert> = {};
     if (!row.hook) patch.hook = sv.hook;
+    if (!row.headline) patch.headline = sv.headline;
     if (!row.expertName && !row.expertPhotoUrl) Object.assign(patch, { expertName: sv.expertName, expertTitle: sv.expertTitle, expertPhotoUrl: sv.expertPhotoUrl });
     if (!row.serviceFacts.length && !row.companyFacts.length && !row.comparison.length) {
       Object.assign(patch, { serviceFacts: sv.serviceFacts, companyFacts: sv.companyFacts, comparison: sv.comparison, factsDemo: true });
