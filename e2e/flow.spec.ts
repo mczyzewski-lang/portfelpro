@@ -385,9 +385,13 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await visitor.getByTestId("public-item-znak-towarowy").click();
   await visitor.getByTestId("public-detail").getByRole("link", { name: "Porozmawiaj" }).click();
   await expect(visitor).toHaveURL(/ocena-mozliwosci-rejestracji\?pp_ref=/); // link polecający partnera
+  await page.reload();
+  await expect(page.getByTestId("open-public")).toHaveAttribute("href", "/p/anna-testowa"); // ikona w nagłówku, gdy profil jest aktywny
   await page.getByTestId("public-toggle").uncheck({ force: true });
   await page.getByTestId("public-save").click();
   await expect(page.getByText("Portfel Publiczny jest wyłączony.")).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId("open-public")).toHaveCount(0); // po wyłączeniu ikona znika
   expect((await visitor.request.get(publicUrl)).status()).toBe(404);
   expect((await visitor.request.get(publicUrl + "/photo")).status()).toBe(404);
 
@@ -400,6 +404,10 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.goto("/app/poziomy");
   await expect(page.getByTestId("confetti")).toBeVisible(); // nowe poziomy / osiągnięcia = confetti
   await expect(page.getByTestId("level-name")).toContainText("Szklana"); // 2 potwierdzonych klientów
+  await page.getByTestId("star-gold").click(); // dotknięcie gwiazdy: co trzeba zrobić, żeby ją zdobyć
+  await expect(page.getByTestId("star-tip")).toContainText("50 potwierdzonych klientów");
+  await page.getByTestId("star-glass").click();
+  await expect(page.getByTestId("star-tip")).toContainText("to Twoja obecna gwiazda");
   await expect(page.getByTestId("star-path").locator("li")).toHaveCount(5); // gwiazdy w karcie poziomu: od lodowej do złotej
   await expect(page.getByTestId("star-path").locator('[aria-current="step"]')).toContainText("Szklana");
   await expect(page.locator('[data-done="true"]')).toHaveCount(7); // zdjęcie, link, polecenie, klient, wypłata, dwie drogi, przekazanie

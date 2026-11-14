@@ -11,6 +11,7 @@ async function main() {
   for (const [i, p] of PROFESSIONS.entries()) {
     await db.insert(s.professions).values({ ...p, sort: i }).onConflictDoNothing();
   }
+  for (const [i, p] of PROFESSIONS.entries()) await db.update(s.professions).set({ sort: i }).where(eq(s.professions.slug, p.slug));
   for (const [oldName, newName] of Object.entries(PROFESSION_RENAMES)) {
     await db.update(s.professions).set({ name: newName }).where(eq(s.professions.name, oldName));
   }
@@ -26,6 +27,14 @@ async function main() {
     // Logotypy uzupełniamy tylko tam, gdzie administrator nie ustawił własnych.
     if (!row.logoUrl && !row.iconUrl && (c.logoUrl || c.iconUrl)) {
       await db.update(s.companies).set({ logoUrl: c.logoUrl, iconUrl: c.iconUrl, color: c.color }).where(eq(s.companies.id, row.id));
+    }
+  }
+  // Dopasowania dodane po pierwszym seedzie (np. nowa grupa „Barber / fryzjer”) — tylko brakujące wpisy.
+  for (const sv of SERVICES) {
+    const [row] = await db.select({ id: s.services.id }).from(s.services).where(eq(s.services.slug, sv.slug));
+    if (!row) continue;
+    for (const [slug, reason] of Object.entries(sv.professions)) {
+      await db.insert(s.serviceProfessions).values({ serviceId: row.id, professionSlug: slug, reason }).onConflictDoNothing();
     }
   }
   // Duo terapia była początkowo przypisana do RISIFY — przenosimy ją do marki DUO, jeśli nikt nie zmienił tego w panelu.

@@ -1,3 +1,4 @@
+import { Globe } from "lucide-react";
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
 import { avatarSrc, initialsOf } from "@/lib/avatar";
@@ -26,9 +27,10 @@ export default async function PartnerLayout({ children }: { children: React.Reac
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-5 py-2.5">
           <Wordmark href="/app" size={30} />
           <PartnerNav variant="top" unread={unread} levelsNew={levelsNew} />
+          <div className="flex min-w-0 items-center gap-1.5">
           <Link href="/app/konto" aria-label="Konto" className="press flex min-w-0 items-center gap-2.5 rounded-full bg-white py-1 pl-3.5 pr-2 ring-1 ring-line">
             <span className="min-w-0 text-right leading-tight">
-              <span className="block max-w-[150px] truncate text-[13px] font-extrabold text-leather-dark" data-testid="partner-name">{user.firstName} {user.lastName}</span>
+              <span className="block max-w-[120px] truncate text-[13px] font-extrabold text-leather-dark" data-testid="partner-name">{user.firstName} {user.lastName}</span>
               <span className="tabular block text-[10px] font-semibold text-muted" data-testid="partner-id">{partnerId(partner.number)}</span>
             </span>
             <span data-avatar-target className="relative block rounded-full">
@@ -37,6 +39,11 @@ export default async function PartnerLayout({ children }: { children: React.Reac
               {starShown && <span className="absolute -bottom-1.5 -right-1.5 grid size-[20px] place-items-center rounded-full bg-white shadow ring-1 ring-line" data-testid="avatar-star"><StarMark tier={level.tier} size={15} melt={melt} /></span>}
             </span>
           </Link>
+          {partner.publicEnabled && partner.publicSlug && partner.status === "active" && (
+            <a href={`/p/${partner.publicSlug}`} target="_blank" rel="noopener" aria-label="Otwórz mój Portfel Publiczny" title="Mój Portfel Publiczny"
+              className="press grid size-10 shrink-0 place-items-center rounded-full bg-white text-leather-dark ring-1 ring-line" data-testid="open-public"><Globe className="size-[18px]" aria-hidden /></a>
+          )}
+          </div>
         </div>
       </header>
       <main id="tresc" className="mx-auto w-full max-w-5xl flex-1 px-5 pb-32 pt-4 lg:pb-12">

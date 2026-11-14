@@ -77,18 +77,18 @@ export function AvatarEditor({ src, initials, onSave, onRemove, light = false }:
             className="press absolute -right-1.5 -top-1.5 grid size-7 place-items-center rounded-full bg-white text-danger shadow ring-1 ring-line"><Trash2 className="size-3.5" aria-hidden /></button>
         )}
       </span>
-      <div className="flex min-w-0 flex-nowrap gap-2">
+      <div className="flex min-w-0 flex-nowrap gap-1.5">
         {/* aparat (przedni) — na telefonie otwiera od razu kamerę; na komputerze zwykły wybór pliku */}
         <input ref={camera} type="file" accept="image/*" capture="user" className="sr-only" aria-label="Zrób zdjęcie aparatem" data-testid="avatar-camera"
           onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
         <input ref={file} type="file" accept="image/*" className="sr-only" aria-label="Wybierz zdjęcie z galerii" data-testid="avatar-file"
           onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
         <button type="button" onClick={() => camera.current?.click()} data-testid="avatar-take"
-          className={cn("press inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-sm font-bold", light ? "leather-grad" : "gold-grad")}>
+          className={cn("press inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm font-bold", light ? "leather-grad" : "gold-grad")}>
           <Camera className="size-4" aria-hidden />Zrób zdjęcie
         </button>
         <button type="button" onClick={() => file.current?.click()} data-testid="avatar-choose"
-          className={cn("press inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full px-3.5 text-sm font-semibold", light ? "border border-line bg-white text-leather-dark hover:bg-sand" : "bg-white/15 text-white hover:bg-white/25")}>
+          className={cn("press inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full px-3 text-sm font-semibold", light ? "border border-line bg-white text-leather-dark hover:bg-sand" : "bg-white/15 text-white hover:bg-white/25")}>
           Wybierz
         </button>
       </div>

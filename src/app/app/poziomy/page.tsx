@@ -4,12 +4,13 @@ import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { ConfettiBurst } from "@/components/confetti";
 import { StarMark } from "@/components/star";
+import { StarPath } from "@/components/star-path";
 import { btn, btnSm } from "@/components/ui";
 import { db } from "@/db";
 import { partners } from "@/db/schema";
 import { requirePartner } from "@/lib/auth";
 import { cn } from "@/lib/cn";
-import { achievementsFor, GLASS_LEADS, iceMelt, levelFor, LEVELS, newSince } from "@/lib/gamification";
+import { achievementsFor, GLASS_LEADS, ICE_MELT_WEEKS, iceMelt, levelFor, LEVELS, newSince } from "@/lib/gamification";
 import { getMonthlyRank, getPartnerStats } from "@/lib/partner-data";
 
 export const metadata = { title: "Poziomy i osiągnięcia" };
@@ -61,20 +62,15 @@ export default async function LevelsPage() {
             </p>
           )}
         </div>
-        {/* wszystkie gwiazdy w jednym rzędzie: zdobyte w kolorze, aktualna podświetlona */}
-        <ol className="relative z-10 mt-4 grid grid-cols-5 gap-1.5 border-t border-white/15 pt-3.5" data-testid="star-path">
-          {LEVELS.map((l, i) => {
-            const reached = i <= level.index; const current = i === level.index;
-            return (
-              <li key={l.tier} data-reached={reached} aria-current={current ? "step" : undefined}
-                className={cn("flex flex-col items-center rounded-2xl px-0.5 pb-1.5 pt-2 text-center", current && "bg-white/12 ring-1 ring-gold-light/60")}>
-                <StarMark tier={l.tier} size={34} dimmed={!reached} melt={l.tier === "ice" && current ? ice?.melt ?? 0 : 0} />
-                <span className={cn("mt-1 text-[11px] font-extrabold leading-tight", reached ? "text-white" : "text-white/55")}>{l.name}</span>
-                <span className={cn("tabular text-[10px] leading-tight", current ? "text-gold-light" : "text-white/50")}>{l.min === 0 ? "start" : l.tier === "glass" ? "1 kl. / 3 pol." : `${l.min}+`}</span>
-              </li>
-            );
-          })}
-        </ol>
+        {/* wszystkie gwiazdy w jednym rzędzie: dotknięcie pokazuje, co trzeba zrobić, żeby zdobyć daną gwiazdę */}
+        <StarPath steps={LEVELS.map((l, i) => ({
+          tier: l.tier, name: l.name, reached: i <= level.index, current: i === level.index,
+          melt: l.tier === "ice" && i === level.index ? ice?.melt ?? 0 : 0,
+          short: l.min === 0 ? "start" : l.tier === "glass" ? "1 kl. / 3 pol." : `${l.min}+`,
+          requirement: l.tier === "ice" ? `Dostajesz ją na start. Topnieje przez ${ICE_MELT_WEEKS} tygodni, więc warto szybko zdobyć Szklaną.`
+            : l.tier === "glass" ? `Wystarczy 1 klient, który zapłacił, albo ${GLASS_LEADS} polecenia (klienci, którzy zostawili kontakt).`
+            : `Potrzebujesz ${l.min} potwierdzonych klientów — czyli sprzedaży z Twoich poleceń.${l.tier === "gold" ? " To najwyższa gwiazda." : ""}`,
+        }))} />
       </section>
 
       <section className="grid grid-cols-2 gap-2.5" aria-label="Ten miesiąc">

@@ -32,6 +32,7 @@ export const PROFESSIONS = [
   { slug: "it", name: "Software house / konsultant IT", label: "Działam w IT", icon: "code" },
   { slug: "freelance", name: "Freelancer / mała firma", label: "Jestem freelancerem", icon: "user" },
   { slug: "organizacje", name: "Organizacja zrzeszająca przedsiębiorców", label: "Zrzeszam przedsiębiorców", icon: "users" },
+  { slug: "fryzjer", name: "Barber / fryzjer", label: "Prowadzę salon fryzjerski lub barber shop", icon: "scissors" },
   { slug: "spolecznosc", name: "Twórca z własną społecznością", label: "Mam własną społeczność", icon: "heart" },
 ];
 
@@ -106,6 +107,7 @@ export const SERVICES: ServiceSeed[] = [
       sprzedaz: "Rozmawiasz z właścicielami firm o ich planach.",
       freelance: "Tworzysz logo, strony i nazwy dla klientów.",
       organizacje: "Twoi członkowie inwestują we własne marki.",
+      fryzjer: "Twoi klienci prowadzą firmy, a Ty sam budujesz markę salonu.",
     },
     assets: [
       { slug: "ryzyko-niezarejestrowanej-marki", stage: "education", type: "article", title: "Co ryzykujesz, gdy nazwa firmy nie jest zastrzeżona?",
@@ -286,7 +288,7 @@ export const SERVICES: ServiceSeed[] = [
     provider: "Usługę realizuje NOWY ETAP — mediatorzy i prawnicy rodzinni.",
     commissionTerms: baseTerms + " Ze względu na charakter spraw rodzinnych nie otrzymujesz żadnych informacji o kliencie poza statusem polecenia.",
     commissionModel: "fixed", commissionAmount: 20000, commissionCondition: "Za opłacony pakiet usług", rateStatus: "demo",
-    professions: { nieruchomosci: "Sprzedajesz wspólne mieszkania rozstających się par.", finanse: "Pomagasz dzielić kredyty i majątek.", ubezpieczenia: "Aktualizujesz polisy przy zmianach życiowych.", spolecznosc: "Twoja społeczność szuka rzetelnych informacji." },
+    professions: { fryzjer: "Klienci często zwierzają się w fotelu — możesz podać sprawdzony kontakt.", nieruchomosci: "Sprzedajesz wspólne mieszkania rozstających się par.", finanse: "Pomagasz dzielić kredyty i majątek.", ubezpieczenia: "Aktualizujesz polisy przy zmianach życiowych.", spolecznosc: "Twoja społeczność szuka rzetelnych informacji." },
     assets: [
       { slug: "rozwod-bez-wojny", stage: "education", type: "guide", title: "Rozwód za porozumieniem — od czego zacząć?",
         description: "Poradnik porządkujący pierwsze kroki.",
@@ -386,7 +388,7 @@ export const SERVICES: ServiceSeed[] = [
     commissionTerms: baseTerms + " Lead uznaje się za zakwalifikowany po rozmowie doradcy z klientem potwierdzającej realny zamiar budowy.",
     commissionModel: "qualified_lead", commissionAmount: 15000, commissionCondition: "Za lead zakwalifikowany po rozmowie z doradcą", rateStatus: "demo",
     professions: {
-      nieruchomosci: "Sprzedajesz działki i rozmawiasz z przyszłymi inwestorami.", architektura: "Projektujesz dla inwestorów szukających wykonawcy.",
+      nieruchomosci: "Sprzedajesz działki i rozmawiasz z przyszłymi inwestorami.", fryzjer: "Klienci opowiadają Ci o planach budowy domu.", architektura: "Projektujesz dla inwestorów szukających wykonawcy.",
       finanse: "Finansujesz zakup działek i budowę.", ubezpieczenia: "Ubezpieczasz domy i budowy.", sprzedaz: "Masz klientów z branży budowlanej i turystycznej.",
     },
     assets: [
