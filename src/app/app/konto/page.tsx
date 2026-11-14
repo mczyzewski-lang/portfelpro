@@ -1,3 +1,4 @@
+import { Stitch } from "@/components/stitch";
 import { ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
@@ -30,6 +31,7 @@ export default async function AccountPage() {
       <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Konto</h1>
 
       <div className="wallet rounded-[28px] p-5">
+<Stitch radius={19} />
         <div className="relative z-10"><AvatarEditor src={avatarSrc(partner)} initials={initialsOf(user)} onSave={saveAvatarAction} onRemove={removeAvatarAction} /></div>
         <p className="relative z-10 mt-4 text-lg font-extrabold leading-tight">{user.firstName} {user.lastName}</p>
         {partner.companyName && <p className="relative z-10 text-sm text-white/75">{partner.companyName}</p>}

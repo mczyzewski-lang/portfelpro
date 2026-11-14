@@ -1,3 +1,4 @@
+import { Stitch } from "@/components/stitch";
 import { ArrowLeft, Lock, MessageSquareQuote, X } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,6 +44,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     <article className="mx-auto max-w-2xl px-5 pb-16 pt-4">
       {/* Karta usługi: co polecam i ile zarobię */}
       <header className="wallet wallet-sheen rounded-[28px] p-5">
+<Stitch radius={19} />
         <div className="relative z-10 flex items-center gap-2.5">
           <CompanyIcon name={company.name} color={company.color} iconUrl={company.iconUrl} size={34} />
           <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/75">{company.name}</span>
@@ -58,6 +60,22 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       </header>
 
       {reel && <div className="mt-4"><ReelTile src={reel} poster={service.reelPosterUrl} title={service.name} caption="Krótkie wideo, które wyjaśnia, komu i jak polecać tę usługę." /></div>}
+
+      {/* Dymek: gotowe zdanie, którym partner zaczyna rozmowę */}
+      {service.pitch && (
+        <section className="mt-6" aria-labelledby="pitch" data-testid="pitch-bubble">
+          <h2 id="pitch" className="flex items-center gap-2 text-[13px] font-extrabold uppercase tracking-[0.1em] text-gold-deep"><MessageSquareQuote className="size-[18px]" aria-hidden />Jak to powiedzieć w 20 sekund</h2>
+          <div className="relative mt-2.5">
+            <div className="relative rounded-[26px] rounded-bl-md bg-linear-to-br from-[#fbedc0] to-[#ecd08a] px-5 pb-4 pt-5 shadow-[0_14px_30px_-16px_rgba(120,80,10,0.6)] ring-1 ring-gold/40">
+              <span aria-hidden className="absolute -top-1 left-4 font-serif text-[64px] font-black leading-none text-leather-dark/20">“</span>
+              <p className="relative text-[16px] font-semibold leading-relaxed text-[#3a2208]">{service.pitch}</p>
+              <div className="mt-3 flex justify-end"><CopyButton small variant="primary" text={service.pitch} label="Kopiuj tekst" /></div>
+            </div>
+            {/* ogonek dymka */}
+            <span aria-hidden className="absolute -bottom-2 left-6 size-5 rotate-45 rounded-[4px] bg-[#f0d898] ring-1 ring-gold/40 [clip-path:polygon(100%_0,100%_100%,0_100%)]" />
+          </div>
+        </section>
+      )}
 
       {/* Najważniejsza akcja: dobierz link do etapu klienta i wyślij */}
       <section className="mt-6" aria-labelledby="polecaj">
@@ -86,14 +104,6 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           )}
         </div>
       </section>
-
-      {service.pitch && (
-        <section className="mt-6 rounded-3xl border border-gold/40 bg-white p-5" aria-labelledby="pitch">
-          <h2 id="pitch" className="flex items-center gap-2 text-[17px] font-extrabold text-leather-dark"><MessageSquareQuote className="size-5 text-gold-deep" aria-hidden />Jak to powiedzieć w 20 sekund</h2>
-          <p className="mt-2 text-[15px] italic leading-relaxed text-ink/85">„{service.pitch}”</p>
-          <div className="mt-3"><CopyButton small variant="secondary" text={service.pitch} label="Kopiuj tekst" /></div>
-        </section>
-      )}
 
       <section className="mt-6" aria-labelledby="poznaj">
         <h2 id="poznaj" className="text-xl font-extrabold text-leather-dark">Poznaj usługę</h2>

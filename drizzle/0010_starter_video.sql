@@ -1,0 +1,1 @@
+ALTER TABLE "partners" ADD COLUMN "starter_video_seen_at" timestamp with time zone;

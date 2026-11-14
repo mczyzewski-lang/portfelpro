@@ -4,12 +4,15 @@ import { redirect } from "next/navigation";
 import { dismissFirstSuccessAction } from "@/app/actions/partner";
 import { CountUp } from "@/components/client";
 import { StarMark } from "@/components/star";
+import { Stitch } from "@/components/stitch";
 import { StarterCard } from "@/components/starter-card";
 import { Feed } from "@/components/feed";
 import { btn } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { avatarSrc, initialsOf } from "@/lib/avatar";
-import { levelFor } from "@/lib/gamification";
+import { iceMelt, levelFor } from "@/lib/gamification";
+import { getSettings } from "@/lib/settings";
+import { visibleVideo } from "@/lib/video";
 import { partnerId } from "@/lib/labels";
 import { getActivity, getServiceStats, getWalletSummary, hasFirstSuccess } from "@/lib/partner-data";
 
@@ -20,7 +23,9 @@ export default async function Dashboard() {
   const [sum, feed, success, perService] = await Promise.all([getWalletSummary(partner.id), getActivity(partner.id, 12), hasFirstSuccess(partner.id), getServiceStats(partner.id)]);
   const maxActivity = Math.max(1, ...perService.map((s) => s.clicks + s.leads));
   const showSuccess = success && !partner.firstSuccessSeenAt;
-  const level = levelFor(sum.clients);
+  const level = levelFor(sum.clients, sum.leads);
+  const melt = level.current.tier === "ice" ? iceMelt(partner.createdAt).melt : 0;
+  const starterVideo = visibleVideo((await getSettings()).starter_video_url);
   const stats = [
     { label: "Kliknięcia", value: sum.clicks, icon: MousePointerClick, test: "stat-clicks", href: "/app/polecenia" },
     { label: "Polecenia", value: sum.leads, icon: Users, test: "stat-leads", href: "/app/polecenia" },
@@ -38,13 +43,14 @@ export default async function Dashboard() {
         </section>
       )}
 
-      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard hasPhoto={!!partner.avatar} avatarSrc={avatarSrc(partner)} initials={initialsOf(user)} tier={level.current.tier} tierName={level.current.name} />}
+      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard hasPhoto={!!partner.avatar} avatarSrc={avatarSrc(partner)} initials={initialsOf(user)} tier={level.current.tier} tierName={level.current.name} melt={melt} videoUrl={starterVideo} videoSeen={!!partner.starterVideoSeenAt} />}
 
       <section aria-labelledby="pulpit">
         <p className="text-sm text-muted">Dzień dobry, {user.firstName}</p>
         <h1 id="pulpit" className="text-[24px] font-extrabold leading-tight text-leather-dark">Pulpit</h1>
 
         <Link href="/app/polecenia?tab=prowizje" aria-label="Zobacz prowizje" className="wallet wallet-sheen press mt-4 block rounded-[28px] p-5 sm:p-6">
+<Stitch radius={19} />
           <div className="relative z-10 flex items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Zatwierdzone do wypłaty</p>
@@ -74,7 +80,7 @@ export default async function Dashboard() {
           </Link>
           <Link href="/app/poziomy" className="press flex min-h-14 flex-col justify-center rounded-2xl border border-line bg-white px-4" data-testid="dash-star">
             <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Poziom</span>
-            <span className="flex items-center gap-1.5 text-sm font-extrabold text-leather-dark"><StarMark tier={level.current.tier} size={20} />{level.current.name}</span>
+            <span className="flex items-center gap-1.5 text-sm font-extrabold text-leather-dark"><StarMark tier={level.current.tier} size={20} melt={melt} />{level.current.name}</span>
           </Link>
         </div>
       </section>

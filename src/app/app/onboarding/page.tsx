@@ -1,3 +1,4 @@
+import { Stitch } from "@/components/stitch";
 import { setProfessionAction } from "@/app/actions/partner";
 import { ProfessionPicker } from "@/components/profession-picker";
 import { Rate } from "@/components/rate";
@@ -18,6 +19,7 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
     return (
       <div className="mx-auto max-w-xl">
         <div className="wallet rounded-[24px] p-5">
+<Stitch radius={16} />
           <p className="relative z-10 text-sm text-white/80">Witaj, {user.firstName}! Twój numer partnera:</p>
           <p className="tabular relative z-10 mt-1 text-3xl font-extrabold tracking-wide" data-testid="onboarding-partner-id">{partnerId(partner.number)}</p>
         </div>

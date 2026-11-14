@@ -19,13 +19,24 @@ export const LEVELS = [
   { tier: "gold", name: "Złota", min: 50 },
 ] as const satisfies readonly { tier: StarTier; name: string; min: number }[];
 
-export function levelFor(clients: number) {
+export const GLASS_LEADS = 3;       // Szklana: 1 klient, który zapłacił, albo 3 polecenia
+export const ICE_MELT_WEEKS = 12;   // Lodowa topnieje — po 12 tygodniach zostaje po niej woda
+
+export function levelFor(clients: number, leads = 0) {
   let index = 0;
   LEVELS.forEach((l, i) => { if (clients >= l.min) index = i; });
+  if (index === 0 && leads >= GLASS_LEADS) index = 1;
   const current = LEVELS[index];
   const next = LEVELS[index + 1] ?? null;
-  const progress = next ? Math.min(1, (clients - current.min) / (next.min - current.min)) : 1;
-  return { index, current, next, progress, missing: next ? next.min - clients : 0 };
+  let progress = next ? Math.min(1, Math.max(0, (clients - current.min) / (next.min - current.min))) : 1;
+  if (index === 0) progress = Math.max(clients / 1, leads / GLASS_LEADS); // do Szklanej liczy się szybsza z dwóch dróg
+  return { index, current, next, progress: Math.min(1, progress), missing: next ? Math.max(0, next.min - clients) : 0, missingLeads: index === 0 ? Math.max(0, GLASS_LEADS - leads) : 0 };
+}
+
+/** Stopień roztopienia gwiazdy Lodowej: 0 = świeżo zamrożona, 1 = sama woda (po 12 tygodniach od dołączenia). */
+export function iceMelt(joinedAt: Date, now = new Date()): { weeks: number; melt: number; weeksLeft: number } {
+  const weeks = Math.max(0, Math.floor((now.getTime() - joinedAt.getTime()) / (7 * 86400_000)));
+  return { weeks, melt: Math.min(1, weeks / ICE_MELT_WEEKS), weeksLeft: Math.max(0, ICE_MELT_WEEKS - weeks) };
 }
 
 export type Achievement = {
@@ -60,7 +71,7 @@ export type Seen = { level: number; achievements: string[] } | null | undefined;
 
 /** Co jest nowe względem tego, co partner już widział w zakładce Poziomy. */
 export function newSince(seen: Seen, s: PartnerStats) {
-  const level = levelFor(s.clients).index;
+  const level = levelFor(s.clients, s.leads).index;
   const done = achievementsFor(s).filter((a) => a.done).map((a) => a.id);
   const newAchievements = done.filter((id) => !seen?.achievements.includes(id));
   const levelUp = level > (seen?.level ?? 0);

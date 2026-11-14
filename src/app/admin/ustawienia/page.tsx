@@ -26,6 +26,7 @@ export default async function SettingsPage() {
             <Field label="Okno atrybucji (dni)" hint="Jak długo po kliknięciu klient pozostaje przypisany do partnera."><input name="attribution_window_days" type="number" min={1} max={365} defaultValue={cfg.attribution_window_days} className={inputCls} /></Field>
             <Field label="Reguła atrybucji"><input disabled value="Pierwszy partner w oknie atrybucji (first touch), osobno dla każdej usługi" className={`${inputCls} bg-sand text-muted`} /></Field>
             <Field label="Wersja regulaminu" hint="Zapisywana przy rejestracji partnera."><input name="terms_version" defaultValue={cfg.terms_version} className={inputCls} /></Field>
+            <Field label="Nagranie w pakiecie startowym (9:16, https://… lub /…)" hint="Krok „Obejrzyj krótkie nagranie” przed wpisaniem kodu. Puste = krok pominięty."><input name="starter_video_url" defaultValue={cfg.starter_video_url} className={inputCls} /></Field>
             <label className="flex items-center gap-2.5 text-sm font-semibold"><input type="checkbox" name="auto_approve_partners" defaultChecked={cfg.auto_approve_partners} className="size-4 accent-leather" />Automatycznie aktywuj nowe konta partnerów</label>
             <SubmitButton small>Zapisz ustawienia</SubmitButton>
           </ActionForm>

@@ -12,6 +12,8 @@ import { slugify } from "@/lib/csv";
 import { DEMO_ACCOUNT } from "@/lib/demo";
 import type { Stage } from "@/lib/labels";
 import { postMessage } from "@/lib/messages";
+import { getSettings } from "@/lib/settings";
+import { visibleVideo } from "@/lib/video";
 import { getPublishedAssets } from "@/lib/queries";
 import { assetTargetUrl, createLead, getOrCreateLink, recommendBlockLabel, recommendState } from "@/lib/tracking";
 import { z } from "zod";
@@ -159,6 +161,7 @@ export async function confirmStarterAction(_: FormState, fd: FormData): Promise<
   const { partner } = await requirePartner();
   if (partner.starterConfirmedAt) return { ok: "Pakiet jest już potwierdzony." };
   if (!partner.avatar) return { error: "Najpierw dodaj swoje zdjęcie." };
+  if (visibleVideo((await getSettings()).starter_video_url) && !partner.starterVideoSeenAt) return { error: "Najpierw obejrzyj krótkie nagranie." };
   if (!(await rateLimit(`starter:${partner.id}`, 8, 3600))) return { error: "Zbyt wiele prób. Spróbuj ponownie za godzinę albo napisz do opiekuna." };
   const code = String(fd.get("code") ?? "").replace(/[\s-]/g, "").toUpperCase();
   if (!partner.starterCode || !code || !safeEqual(code, partner.starterCode.toUpperCase())) return { error: "Kod jest nieprawidłowy. Sprawdź go na karcie w pakiecie." };
@@ -185,4 +188,11 @@ export async function savePublicWalletAction(_: FormState, fd: FormData): Promis
   await db.update(partners).set({ publicEnabled: enable, publicBio: bio || null, publicSlug: slug ?? `${base}-${randomToken(5)}` }).where(eq(partners.id, partner.id));
   revalidatePath("/app/konto");
   return { ok: enable ? "Portfel Publiczny jest aktywny." : "Portfel Publiczny jest wyłączony." };
+}
+
+/** Krok „obejrzyj nagranie” w pakiecie startowym — zapisujemy, że partner otworzył wideo. */
+export async function markStarterVideoSeenAction() {
+  const { partner } = await requirePartner();
+  if (!partner.starterVideoSeenAt) await db.update(partners).set({ starterVideoSeenAt: new Date() }).where(eq(partners.id, partner.id));
+  revalidatePath("/app");
 }

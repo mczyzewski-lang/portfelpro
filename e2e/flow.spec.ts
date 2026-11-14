@@ -103,7 +103,8 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByRole("heading", { name: "Wybierz link dla klienta" })).toBeVisible();
   await expect(page.getByTestId("service-screen")).toBeVisible(); // usługa na cały ekran
   await expect(page.getByTestId("stage-transaction")).toHaveCount(0); // tylko Edukacja i Konsultacja
-  await expect(page.getByTestId("offer-links").getByTestId("copy-transaction")).toHaveText("Kopiuj"); // link do oferty: widoczny adres + „Kopiuj”
+  await expect(page.getByTestId("offer-links").getByTestId("copy-transaction")).toHaveText("Kopiuj");
+  await expect(page.getByTestId("pitch-bubble")).toContainText("Budujesz markę"); // dymek nad wyborem linku // link do oferty: widoczny adres + „Kopiuj”
   await page.getByTestId("stage-consultation").click();
   await expect(page.getByTestId("copy-consultation")).toHaveCount(1);
   await expect(page.getByTestId("copy-education")).toHaveCount(0); // każdy etap to inne linki
@@ -379,6 +380,8 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   // Poziomy: liczone z faktycznych danych (2 potwierdzonych klientów → Brązowy)
   await page.goto("/app");
   await expect(page.locator('nav[aria-label="Główna"] [data-testid="levels-new"]').last()).toBeVisible(); // confetti przy ikonie = coś nowego
+  await page.getByTestId("starter-video").click(); // krok „obejrzyj nagranie” odblokowuje pole kodu
+  await page.getByRole("button", { name: "Zamknij wideo" }).click();
   await page.getByTestId("starter-card").locator("input[name=code]").fill("ZLYKOD");
   await page.getByTestId("starter-submit").click();
   await expect(page.getByTestId("starter-card")).toContainText("Kod jest nieprawidłowy");
@@ -418,6 +421,10 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeDisabled();
   await demo.getByTestId("starter-card").getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");
   await demo.getByTestId("avatar-save").click();
+  await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeDisabled(); // jeszcze krok z nagraniem
+  await demo.getByTestId("starter-video").click();
+  await expect(demo.getByTestId("reel-video").first()).toHaveAttribute("src", "/demo/pakiet-startowy.mp4");
+  await demo.getByRole("button", { name: "Zamknij wideo" }).first().click();
   await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeEnabled();
   await demo.getByTestId("starter-card").locator("input[name=code]").fill("f3f4f5"); // kod pakietu startowego konta demo
   await demo.getByTestId("starter-submit").click();

@@ -92,7 +92,7 @@ async function main() {
       // Konto demo: przy każdym wdrożeniu pakiet startowy wraca do stanu „niepotwierdzony”, żeby dało się go pokazać ponownie.
       const seen = dp.p.gamificationSeen;
       await db.update(s.partners).set({
-        starterCode: DEMO_ACCOUNT.starterCode, starterConfirmedAt: null,
+        starterCode: DEMO_ACCOUNT.starterCode, starterConfirmedAt: null, starterVideoSeenAt: null,
         gamificationSeen: seen ? { ...seen, achievements: seen.achievements.filter((a) => a !== "starter-pack") } : null,
       }).where(eq(s.partners.id, dp.p.id));
     }

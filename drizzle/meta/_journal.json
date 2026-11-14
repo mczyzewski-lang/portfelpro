@@ -71,6 +71,13 @@
       "when": 1794600819511,
       "tag": "0009_public_wallet",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794639606912,
+      "tag": "0010_starter_video",
+      "breakpoints": true
     }
   ]
 }

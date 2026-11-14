@@ -3,7 +3,7 @@
 import { Home, ListChecks, MessageCircle, Trophy, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { MiniConfetti } from "./confetti";
 
@@ -32,12 +32,16 @@ export function PartnerNav({ variant, unread = 0, levelsNew = false }: { variant
     window.visualViewport?.addEventListener("resize", later);
     return () => { document.removeEventListener("focusout", later); window.visualViewport?.removeEventListener("resize", later); };
   }, [variant]);
-  const active = (i: (typeof items)[number]) => (i.exact ? path === i.href : path.startsWith(i.href));
+  // Podświetlenie przeskakuje od razu po dotknięciu, nie dopiero po odpowiedzi serwera.
+  const [tapped, setTapped] = useState<{ href: string; from: string } | null>(null);
+  const shown = tapped && tapped.from === path ? tapped.href : path;
+  const active = (i: (typeof items)[number]) => (i.exact ? shown === i.href : shown.startsWith(i.href));
+  const tap = (href: string) => () => setTapped({ href, from: path });
   if (variant === "top") {
     return (
       <nav aria-label="Główna" className="hidden items-center gap-1 lg:flex">
         {items.map((i) => (
-          <Link key={i.href} href={i.href} aria-current={active(i) ? "page" : undefined}
+          <Link key={i.href} href={i.href} onClick={tap(i.href)} aria-current={active(i) ? "page" : undefined}
             className={cn("press inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-bold", active(i) ? "leather-grad" : "text-leather-dark hover:bg-sand")}>
             <span className="relative"><i.icon className="size-4" aria-hidden />{i.href === "/app/poziomy" && levelsNew && <MiniConfetti />}</span>{i.label}{i.href === "/app/wiadomosci" && unread > 0 && <span className="rounded-full bg-danger px-1.5 text-[10px] font-bold text-white">{unread}</span>}
           </Link>
@@ -52,7 +56,7 @@ export function PartnerNav({ variant, unread = 0, levelsNew = false }: { variant
         <li aria-hidden className="stage-pill pointer-events-none absolute bottom-1.5 left-1.5 top-1.5 w-[calc((100%-0.75rem)/5)] rounded-[20px] leather-grad" style={{ transform: `translateX(${Math.max(0, idx) * 100}%)`, opacity: idx < 0 ? 0 : 1 }} />
         {items.map((i) => (
           <li key={i.href} className="relative z-10">
-            <Link href={i.href} aria-current={active(i) ? "page" : undefined}
+            <Link href={i.href} onClick={tap(i.href)} aria-current={active(i) ? "page" : undefined}
               className={cn("press flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[20px] text-[10.5px] font-bold transition-colors", active(i) ? "text-white" : "text-muted")}>
               <span className="relative"><i.icon className={cn("size-[21px]", active(i) && "text-gold-light")} aria-hidden />{i.href === "/app/poziomy" && levelsNew && <MiniConfetti />}</span>{i.label}{dot(i.href)}
             </Link>

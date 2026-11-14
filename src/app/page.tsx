@@ -1,3 +1,4 @@
+import { Stitch } from "@/components/stitch";
 import { ChevronDown, Link2, Search, Wallet } from "lucide-react";
 import Link from "next/link";
 import { asc, eq } from "drizzle-orm";
@@ -60,6 +61,7 @@ export default async function Landing() {
 
           {/* Podgląd usług i stawek — widoczny bez wchodzenia głębiej */}
           <div aria-label="Usługi i prowizje" className="wallet rounded-[28px] p-5 pb-4 sm:p-6">
+<Stitch radius={19} stitches={170} />
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Usługi i Twoja prowizja</p>
               <span className="text-xs text-white/60">{items.length} w katalogu</span>
@@ -173,6 +175,7 @@ export default async function Landing() {
         {/* CTA */}
         <section className="px-5 py-12 lg:py-16">
           <div className="wallet mx-auto max-w-3xl rounded-[28px] px-6 py-10 text-center">
+<Stitch radius={19} />
             <h2 className="relative z-10 text-2xl font-extrabold sm:text-3xl">Twoi klienci już pytają o te usługi.</h2>
             <p className="relative z-10 mx-auto mt-2 max-w-md text-[15px] text-white/80">Załóż konto, odbierz numer partnera i zobacz, co możesz polecić już dziś.</p>
             <LinkButton href="/rejestracja" variant="gold" className="relative z-10 mt-6 min-h-12 px-7">Załóż bezpłatny Portfel</LinkButton>

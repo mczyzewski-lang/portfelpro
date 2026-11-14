@@ -380,6 +380,7 @@ export const saveSettingsAction = adminAction(async (fd, actor) => {
   await setSetting("attribution_window_days", days);
   await setSetting("auto_approve_partners", str(fd, "auto_approve_partners") === "on");
   await setSetting("terms_version", str(fd, "terms_version") || "v1");
+  await setSetting("starter_video_url", videoUrl(fd, "starter_video_url", "Nagranie pakietu startowego") ?? "");
   await logAudit(db, actor, "settings.update", "settings", null, { after: { attribution_window_days: days, auto_approve_partners: str(fd, "auto_approve_partners") === "on" } });
   return "Zapisano. Nowe okno atrybucji dotyczy kolejnych kliknięć.";
 });

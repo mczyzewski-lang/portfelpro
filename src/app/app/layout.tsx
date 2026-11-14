@@ -5,7 +5,7 @@ import { StarMark } from "@/components/star";
 import { PartnerNav } from "@/components/partner-nav";
 import { Notice, Wordmark } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
-import { levelFor, newSince } from "@/lib/gamification";
+import { iceMelt, levelFor, newSince } from "@/lib/gamification";
 import { partnerId } from "@/lib/labels";
 import { getPartnerStats } from "@/lib/partner-data";
 import { unreadForPartner } from "@/lib/messages";
@@ -17,7 +17,8 @@ export default async function PartnerLayout({ children }: { children: React.Reac
   const { user, partner } = await requirePartner();
   const [unread, stats] = await Promise.all([unreadForPartner(partner.id), getPartnerStats(partner)]);
   const levelsNew = newSince(partner.gamificationSeen, stats).any;
-  const level = levelFor(stats.clients).current;
+  const level = levelFor(stats.clients, stats.leads).current;
+  const melt = level.tier === "ice" ? iceMelt(partner.createdAt).melt : 0;
   const starShown = !!partner.starterConfirmedAt || !partner.starterCode;
   return (
     <>
@@ -33,7 +34,7 @@ export default async function PartnerLayout({ children }: { children: React.Reac
             <span data-avatar-target className="relative block rounded-full">
               <Avatar src={avatarSrc(partner)} initials={initialsOf(user)} size={32} className="ring-1" />
               {/* gwiazda poziomu przy awatarze — pojawia się po potwierdzeniu pakietu startowego */}
-              {starShown && <span className="absolute -bottom-1.5 -right-1.5 grid size-[20px] place-items-center rounded-full bg-white shadow ring-1 ring-line" data-testid="avatar-star"><StarMark tier={level.tier} size={15} /></span>}
+              {starShown && <span className="absolute -bottom-1.5 -right-1.5 grid size-[20px] place-items-center rounded-full bg-white shadow ring-1 ring-line" data-testid="avatar-star"><StarMark tier={level.tier} size={15} melt={melt} /></span>}
             </span>
           </Link>
         </div>

@@ -8,12 +8,12 @@ import { cn } from "@/lib/cn";
  * Pionowe wideo 9:16 na cały ekran (jak reels). `children` to element, który je otwiera.
  * Odtwarzanie startuje po otwarciu i zatrzymuje się po zamknięciu.
  */
-export function ReelPlayer({ src, poster, title, children, className, testId }: {
-  src: string; poster?: string | null; title: string; children: ReactNode; className?: string; testId?: string;
+export function ReelPlayer({ src, poster, title, children, className, testId, onOpen }: {
+  src: string; poster?: string | null; title: string; children: ReactNode; className?: string; testId?: string; onOpen?: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const video = useRef<HTMLVideoElement>(null);
-  const open = () => { dialog.current?.showModal(); video.current?.play().catch(() => {}); };
+  const open = () => { dialog.current?.showModal(); video.current?.play().catch(() => {}); onOpen?.(); };
   const close = () => { video.current?.pause(); dialog.current?.close(); };
   return (
     <>
@@ -36,7 +36,7 @@ export function ReelPlayer({ src, poster, title, children, className, testId }: 
 export function ReelTile({ src, poster, title, caption }: { src: string; poster?: string | null; title: string; caption: string }) {
   return (
     <ReelPlayer src={src} poster={poster} title={title} testId="service-reel" className="group flex w-full items-center gap-4 rounded-3xl border border-line bg-white p-3 text-left shadow-(--shadow-card)">
-      <span className="wallet relative block aspect-[9/16] w-[84px] shrink-0 overflow-hidden rounded-2xl">
+      <span className="wallet relative block aspect-[9/16] w-[84px] shrink-0 overflow-hidden rounded-2xl !shadow-none">
         {/* eslint-disable-next-line @next/next/no-img-element -- okładka wideo ustawiana w panelu */}
         {poster && <img src={poster} alt="" className="absolute inset-0 size-full object-cover" />}
         <span className="absolute inset-0 grid place-items-center bg-black/20"><span className="gold-grad grid size-10 place-items-center rounded-full"><Play className="size-5 translate-x-px fill-current" aria-hidden /></span></span>

@@ -1,3 +1,4 @@
+import { Stitch } from "@/components/stitch";
 import { Check, Gift, Lock } from "lucide-react";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
@@ -8,7 +9,7 @@ import { db } from "@/db";
 import { partners } from "@/db/schema";
 import { requirePartner } from "@/lib/auth";
 import { cn } from "@/lib/cn";
-import { achievementsFor, levelFor, LEVELS, newSince } from "@/lib/gamification";
+import { achievementsFor, GLASS_LEADS, iceMelt, levelFor, LEVELS, newSince } from "@/lib/gamification";
 import { getMonthlyRank, getPartnerStats } from "@/lib/partner-data";
 
 export const metadata = { title: "Poziomy i osiągnięcia" };
@@ -19,7 +20,8 @@ export default async function LevelsPage() {
   // Nowości od ostatniej wizyty: confetti i oznaczenie „Nowe”, po czym zapisujemy, że partner je zobaczył.
   const fresh = newSince(partner.gamificationSeen, stats);
   if (fresh.any) await db.update(partners).set({ gamificationSeen: { level: fresh.level, achievements: fresh.done } }).where(eq(partners.id, partner.id));
-  const level = levelFor(stats.clients);
+  const level = levelFor(stats.clients, stats.leads);
+  const ice = level.index === 0 ? iceMelt(partner.createdAt) : null;
   // Zdobyte (zielone) zawsze na górze; w obrębie grup zachowujemy stałą kolejność.
   const all = achievementsFor(stats);
   const list = [...all.filter((a) => a.done), ...all.filter((a) => !a.done && !a.teaser)];
@@ -32,8 +34,9 @@ export default async function LevelsPage() {
       <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Poziomy i osiągnięcia</h1>
 
       <section className="wallet wallet-sheen rounded-[28px] p-5" aria-label="Twój poziom">
+<Stitch radius={19} />
         <div className="relative z-10 flex items-center gap-4">
-          <span className="pop grid size-[76px] shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-white/15"><StarMark tier={level.current.tier} size={58} /></span>
+          <span className="pop grid size-[76px] shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-white/15"><StarMark tier={level.current.tier} size={58} melt={ice?.melt ?? 0} /></span>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twój poziom</p>
             <p className="text-3xl font-extrabold leading-tight" data-testid="level-name">{level.current.name}{fresh.levelUp && <span className="pop ml-2 rounded-full px-2 py-0.5 align-middle text-[11px] font-bold success-grad">Nowy poziom</span>}</p>
@@ -44,10 +47,19 @@ export default async function LevelsPage() {
             <div className="h-full rounded-full bg-linear-to-r from-[#3fb37e] to-[#a8e6c4] transition-[width] duration-700" style={{ width: `${Math.max(4, level.progress * 100)}%` }} />
           </div>
           <p className="mt-2 text-sm text-white/80">
-            {level.next
-              ? <>Następna gwiazda: <b className="text-white">{level.next.name}</b> — brakuje {level.missing} {level.missing === 1 ? "potwierdzonego klienta" : "potwierdzonych klientów"}.</>
-              : "Masz Złotą gwiazdę — najwyższą. Gratulacje!"}
+            {ice
+              ? <>Następna gwiazda: <b className="text-white">Szklana</b> — wystarczy 1 klient, który zapłacił, albo {GLASS_LEADS} polecenia{level.missingLeads < GLASS_LEADS && <> (brakuje {level.missingLeads})</>}.</>
+              : level.next
+                ? <>Następna gwiazda: <b className="text-white">{level.next.name}</b> — brakuje {level.missing} {level.missing === 1 ? "potwierdzonego klienta" : "potwierdzonych klientów"}.</>
+                : "Masz Złotą gwiazdę — najwyższą. Gratulacje!"}
           </p>
+          {ice && (
+            <p className="mt-2 rounded-2xl bg-white/10 px-3 py-2 text-[13px] leading-snug text-white/85" data-testid="ice-melt">
+              {ice.melt >= 1
+                ? "Lodowa gwiazda już się roztopiła — została po niej woda. Zdobądź Szklaną, żeby mieć gwiazdę z powrotem."
+                : <>Lodowa gwiazda topnieje. Za <b className="text-white">{ice.weeksLeft} {ice.weeksLeft === 1 ? "tydzień" : ice.weeksLeft < 5 ? "tygodnie" : "tygodni"}</b> zostanie po niej tylko woda — zdobądź Szklaną wcześniej.</>}
+            </p>
+          )}
         </div>
         {/* wszystkie gwiazdy w jednym rzędzie: zdobyte w kolorze, aktualna podświetlona */}
         <ol className="relative z-10 mt-4 grid grid-cols-5 gap-1.5 border-t border-white/15 pt-3.5" data-testid="star-path">
@@ -56,9 +68,9 @@ export default async function LevelsPage() {
             return (
               <li key={l.tier} data-reached={reached} aria-current={current ? "step" : undefined}
                 className={cn("flex flex-col items-center rounded-2xl px-0.5 pb-1.5 pt-2 text-center", current && "bg-white/12 ring-1 ring-gold-light/60")}>
-                <StarMark tier={l.tier} size={34} dimmed={!reached} />
+                <StarMark tier={l.tier} size={34} dimmed={!reached} melt={l.tier === "ice" && current ? ice?.melt ?? 0 : 0} />
                 <span className={cn("mt-1 text-[11px] font-extrabold leading-tight", reached ? "text-white" : "text-white/55")}>{l.name}</span>
-                <span className={cn("tabular text-[10px] leading-tight", current ? "text-gold-light" : "text-white/50")}>{l.min === 0 ? "start" : `${l.min}+`}</span>
+                <span className={cn("tabular text-[10px] leading-tight", current ? "text-gold-light" : "text-white/50")}>{l.min === 0 ? "start" : l.tier === "glass" ? "1 kl. / 3 pol." : `${l.min}+`}</span>
               </li>
             );
           })}

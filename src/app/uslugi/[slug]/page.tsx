@@ -1,3 +1,4 @@
+import { Stitch } from "@/components/stitch";
 import { notFound } from "next/navigation";
 import { GoogleRating } from "@/components/google";
 import { Rate } from "@/components/rate";
@@ -30,6 +31,7 @@ export default async function PublicService({ params }: { params: Promise<{ slug
         <h1 className="mt-1 text-[30px] font-extrabold leading-tight text-leather-dark">{service.name}</h1>
         <p className="mt-2 text-[15px] text-ink/85">{service.clientBenefit}</p>
         <div className="wallet mt-5 rounded-[24px] p-5">
+<Stitch radius={16} />
           <p className="relative z-10 text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Prowizja partnera</p>
           <div className="relative z-10 mt-1"><Rate rate={displayRate(service, null, env.demoMode)} size="lg" onDark /></div>
           {service.commissionCondition && <p className="relative z-10 mt-1.5 text-sm text-white/80"><span className="font-semibold text-white">Warunek:</span> {service.commissionCondition}</p>}

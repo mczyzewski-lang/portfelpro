@@ -7,6 +7,8 @@ export const SETTING_DEFAULTS = {
   attribution_rule: "first_touch" as const,
   auto_approve_partners: false,
   terms_version: "2026-11-demo",
+  /** krótkie nagranie 9:16 w okienku pakietu startowego; puste = krok pominięty */
+  starter_video_url: "/demo/pakiet-startowy.mp4",
 };
 export type SettingKey = keyof typeof SETTING_DEFAULTS;
 

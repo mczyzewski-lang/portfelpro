@@ -84,6 +84,7 @@ export const partners = pgTable("partners", {
   publicSlug: text("public_slug").unique(),                          // losowy adres /p/<slug>
   publicBio: text("public_bio"),                                     // podpis pod nazwiskiem
   starterCode: text("starter_code"),          // kod z pakietu startowego (wpisywany przez partnera na pulpicie)
+  starterVideoSeenAt: ts("starter_video_seen_at"), // partner obejrzał nagranie z pakietu startowego
   starterConfirmedAt: ts("starter_confirmed_at"),
   gamificationSeen: jsonb("gamification_seen").$type<{ level: number; achievements: string[] }>(), // co partner już widział w „Poziomach”
   avatar: text("avatar"),                     // wykadrowane zdjęcie 320×320 jako data URL (JPEG, ok. 20–40 kB)

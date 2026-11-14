@@ -1,3 +1,4 @@
+import { Stitch } from "./stitch";
 import { Mail, Phone, Play } from "lucide-react";
 import type { Manager } from "@/lib/messages";
 import { visibleVideo } from "@/lib/video";
@@ -15,6 +16,7 @@ export function ManagerCard({ manager }: { manager: Manager }) {
   return (
     <section className="sticky top-[60px] z-20 -mx-5 sm:mx-0" aria-label="Twój opiekun" data-testid="manager-card">
       <div className="wallet px-5 py-3.5 sm:rounded-[24px]">
+<Stitch radius={0} inset={7} stitches={150} />
       <div className="relative z-10 flex items-center gap-3">
         {video ? (
           <ReelPlayer src={video} title={`${manager.firstName} — przywitanie`} testId="manager-video" className="relative shrink-0 rounded-full">
