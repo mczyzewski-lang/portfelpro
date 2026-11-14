@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ChevronDown, ChevronRight, MessageCircle, PhoneCall } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronRight, ExternalLink, MessageCircle, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { submitPublicLeadAction } from "@/app/actions/public";
@@ -60,8 +60,12 @@ function ContactForm({ slug, item, partnerFirstName }: { slug: string; item: Ite
  * Na górze duże, wycentrowane zdjęcie partnera; przy przewijaniu (i w szczegółach usługi) zwija się do białego paska u góry.
  * Po wybraniu usługi lista odjeżdża w lewo, a w jej miejsce wsuwają się szczegóły z formularzem kontaktowym.
  */
-export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; photoUrl: string | null; slug: string }) {
-  const [openId, setOpenId] = useState<string | null>(null);
+export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
+  wallet: Wallet; photoUrl: string | null; slug: string;
+  /** strona pojedynczej usługi (do wysłania klientowi bez całego katalogu) — bez listy i bez powrotu */
+  singleId?: string | null;
+}) {
+  const [openId, setOpenId] = useState<string | null>(singleId);
   const [dir, setDir] = useState<"in" | "back">("in");
   const [scrolled, setScrolled] = useState(false);
   const hero = useRef<HTMLElement>(null);
@@ -108,8 +112,8 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
       <div className={cn("fixed inset-x-0 top-0 z-30 border-b border-line bg-white shadow-[0_6px_18px_-12px_rgba(50,27,18,0.35)] transition-transform duration-300", compact ? "translate-y-0" : "-translate-y-full")}
         aria-hidden={!compact} data-testid="public-bar">
         <div className="mx-auto flex h-16 max-w-xl items-center gap-2.5 px-3">
-          {item && <button type="button" onClick={back} aria-label="Wszystkie usługi" className="press grid size-11 shrink-0 place-items-center rounded-full text-leather" data-testid="public-back"><ArrowLeft className="size-5" aria-hidden /></button>}
-          {photo(40, cn("ring-2 ring-gold-light", !item && "ml-2"))}
+          {item && !singleId && <button type="button" onClick={back} aria-label="Wszystkie usługi" className="press grid size-11 shrink-0 place-items-center rounded-full text-leather" data-testid="public-back"><ArrowLeft className="size-5" aria-hidden /></button>}
+          {photo(40, cn("ring-2 ring-gold-light", (!item || singleId) && "ml-2"))}
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-extrabold leading-tight text-leather-dark">{wallet.name}</p>
             {(wallet.bio || wallet.companyName) && <p className="truncate text-xs text-muted">{wallet.bio || wallet.companyName}</p>}
@@ -139,7 +143,11 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
                     </span>
                     <ChevronRight className="mt-3 size-5 shrink-0 text-muted" aria-hidden />
                   </button>
-                  <div className="px-5 pb-4"><Buttons item={i} /></div>
+                  <div className="flex items-center gap-2 px-5 pb-4">
+                    <div className="min-w-0 flex-1"><Buttons item={i} /></div>
+                    <a href={`/p/${slug}/${i.slug}`} target="_blank" rel="noopener" aria-label={`Otwórz w nowym oknie: ${i.name}`} title="Otwórz samą usługę w nowym oknie"
+                      className="grid size-11 shrink-0 place-items-center rounded-full border border-line bg-white text-leather-dark active:bg-cream" data-testid={`public-single-${i.slug}`}><ExternalLink className="size-[18px]" aria-hidden /></a>
+                  </div>
                 </li>
               ))}
               {wallet.items.length === 0 && <li className="px-5 py-12 text-center text-sm text-muted">Lista polecanych usług jest w przygotowaniu.</li>}
@@ -152,6 +160,8 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
                 <CompanyIcon name={item.company.name} color={item.company.color} iconUrl={item.company.iconUrl} size={36} />
                 <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted">{item.company.name}</span>
                 <GoogleRating rating={item.company.googleRating} reviews={item.company.googleReviews} className="ml-auto" />
+                {!singleId && <a href={`/p/${slug}/${item.slug}`} target="_blank" rel="noopener" aria-label="Otwórz tę usługę w nowym oknie" title="Otwórz samą usługę w nowym oknie"
+                  className="grid size-10 shrink-0 place-items-center rounded-full border border-line bg-white text-leather-dark active:bg-cream"><ExternalLink className="size-4" aria-hidden /></a>}
               </div>
               <h2 className="mt-3 text-[26px] font-extrabold leading-[1.15] text-leather-dark">{item.name}</h2>
               <p className="mt-2 text-[16px] leading-relaxed text-ink/90">{item.description || item.benefit}</p>
@@ -180,7 +190,7 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
                   </div></section>
               )}
               {item.provider && <p className="mt-6 text-sm text-muted">{item.provider}</p>}
-              <button type="button" onClick={back} className="press mt-6 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-cream px-4 text-sm font-bold text-leather-dark"><ArrowLeft className="size-4" aria-hidden />Wszystkie usługi</button>
+              {!singleId && <button type="button" onClick={back} className="press mt-6 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-cream px-4 text-sm font-bold text-leather-dark"><ArrowLeft className="size-4" aria-hidden />Wszystkie usługi</button>}
             </div>
           </article>
         )}

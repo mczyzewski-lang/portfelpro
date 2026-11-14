@@ -361,6 +361,17 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   expect(visitor.url()).toBe(publicUrl);
   await visitor.getByTestId("public-back").click();
   await expect(visitor.getByTestId("public-list")).toBeVisible();
+  // ikona „otwórz w nowym oknie”: osobna strona jednej usługi, bez katalogu
+  const [single] = await Promise.all([visitor.context().waitForEvent("page"), visitor.getByTestId("public-single-ip-box").click()]);
+  await single.waitForLoadState();
+  expect(single.url()).toBe(publicUrl + "/ip-box");
+  await expect(single.getByTestId("public-detail")).toContainText("Ulga IP Box");
+  await expect(single.getByTestId("public-bar")).toContainText("Anna Testowa");
+  await expect(single.getByTestId("public-back")).toHaveCount(0); // nie da się przejść do reszty katalogu
+  await expect(single.getByText("Zastrzeżenie znaku towarowego")).toHaveCount(0);
+  await expect(single.getByTestId("public-form")).toBeVisible();
+  expect((await single.request.get(publicUrl + "/psychoterapia-online")).status()).toBe(404); // usługa spoza portfela partnera
+  await single.close();
   // formularz kontaktowy w szczegółach usługi → polecenie przypisane do partnera
   await visitor.getByTestId("public-item-ulga-ip-box").or(visitor.getByTestId("public-item-ip-box")).click();
   await visitor.getByTestId("public-form").locator("input[name=name]").fill("Klient Publiczny");
