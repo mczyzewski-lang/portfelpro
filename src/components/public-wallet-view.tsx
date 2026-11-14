@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ChevronDown, ChevronRight, ExternalLink, MessageCircle, PhoneCall } from "lucide-react";
 import Link from "next/link";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { submitPublicLeadAction } from "@/app/actions/public";
 import { cn } from "@/lib/cn";
 import type { PublicWalletData } from "@/lib/public-wallet";
@@ -93,15 +93,14 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
   const open = (id: string) => {
     listScroll.current = window.scrollY; // wrócimy dokładnie w to miejsce listy
     history.pushState({ service: id }, ""); setDir("in"); setOpenId(id);
-    window.scrollTo({ top: 0, behavior: "instant" });
   };
-  // Po powrocie do listy przywracamy pozycję przewijania sprzed wejścia w usługę.
-  useEffect(() => {
-    if (openId === null && dir === "back") {
-      const y = listScroll.current;
-      requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "instant" }));
-    }
-  }, [openId, dir]);
+  // Pozycję przewijania ustawiamy tuż po podmianie treści, przed malowaniem: szczegóły zaczynają się od góry,
+  // a powrót do listy trafia w miejsce sprzed wejścia w usługę.
+  useLayoutEffect(() => {
+    if (singleId) return;
+    if (openId !== null) window.scrollTo({ top: 0, behavior: "instant" });
+    else if (dir === "back") window.scrollTo({ top: listScroll.current, behavior: "instant" });
+  }, [openId, dir, singleId]);
   const back = () => history.back();
 
   const photo = (size: number, cls: string) => photoUrl
@@ -125,9 +124,9 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
         </div>
       </div>
 
-      <main id="tresc" className="mx-auto w-full max-w-xl overflow-x-clip">
+      <main id="tresc" className="mx-auto w-full max-w-xl">
         {!item ? (
-          <div key="list" className={dir === "back" ? "slide-in-left" : "fade-in"}>
+          <div key="list" className={dir === "back" ? "wipe-in-left" : "fade-in"}>
             <header ref={hero} className="px-5 pb-6 pt-10 text-center" data-testid="public-hero">
               {photo(132, "mx-auto shadow-(--shadow-wallet) ring-4 ring-gold-light")}
               <h1 className="mt-4 text-[30px] font-extrabold leading-tight text-leather-dark">{wallet.name}</h1>
@@ -158,7 +157,7 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
             </ul>
           </div>
         ) : (
-          <article key={item.id} className={cn("bg-white pb-10", singleId ? "fade-in" : "slide-in-right")} data-testid="public-detail">
+          <article key={item.id} className={cn("bg-white pb-10", singleId ? "fade-in" : "wipe-in-right")} data-testid="public-detail">
             <div className="px-5 pt-5">
               <div className="flex items-center gap-2.5">
                 <CompanySheet company={item.company.info} className="flex items-center gap-2.5">
