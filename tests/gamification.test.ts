@@ -8,14 +8,14 @@ describe("gwiazdy (poziomy)", () => {
     expect(levelFor(0)).toMatchObject({ index: 0, missing: 1, progress: 0 });
     expect(levelFor(0).current).toMatchObject({ name: "Lodowa", tier: "ice" });
   });
-  it("progi: 1, 5, 20 i 50 potwierdzonych klientów", () => {
+  it("progi: 1, 5, 10 i 25 potwierdzonych klientów", () => {
     expect(levelFor(1).current.name).toBe("Szklana");
     expect(levelFor(3)).toMatchObject({ missing: 2, progress: 0.5 });
     expect(levelFor(5).current.name).toBe("Brązowa");
-    expect(levelFor(20).current.name).toBe("Srebrna");
-    expect(levelFor(49).current.name).toBe("Srebrna");
-    expect(levelFor(50)).toMatchObject({ next: null, progress: 1, missing: 0 });
-    expect(levelFor(50).current).toMatchObject({ name: "Złota", tier: "gold" });
+    expect(levelFor(10).current.name).toBe("Srebrna");
+    expect(levelFor(24).current.name).toBe("Srebrna");
+    expect(levelFor(25)).toMatchObject({ next: null, progress: 1, missing: 0 });
+    expect(levelFor(25).current).toMatchObject({ name: "Złota", tier: "gold" });
   });
 });
 

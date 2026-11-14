@@ -10,13 +10,13 @@ export type PartnerStats = {
 
 export type StarTier = "ice" | "glass" | "bronze" | "silver" | "gold";
 
-/** Gwiazdy partnera — miły dodatek graficzny do poziomów; złota przy 50 potwierdzonych klientach. */
+/** Gwiazdy partnera — miły dodatek graficzny do poziomów; złota przy 25 potwierdzonych klientach. */
 export const LEVELS = [
   { tier: "ice", name: "Lodowa", min: 0 },
   { tier: "glass", name: "Szklana", min: 1 },
   { tier: "bronze", name: "Brązowa", min: 5 },
-  { tier: "silver", name: "Srebrna", min: 20 },
-  { tier: "gold", name: "Złota", min: 50 },
+  { tier: "silver", name: "Srebrna", min: 10 },
+  { tier: "gold", name: "Złota", min: 25 },
 ] as const satisfies readonly { tier: StarTier; name: string; min: number }[];
 
 export const GLASS_LEADS = 3;       // Szklana: 1 klient, który zapłacił, albo 3 polecenia

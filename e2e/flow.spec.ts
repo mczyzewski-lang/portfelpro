@@ -419,7 +419,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByTestId("confetti")).toBeVisible(); // nowe poziomy / osiągnięcia = confetti
   await expect(page.getByTestId("level-name")).toContainText("Szklana"); // 2 potwierdzonych klientów
   await page.getByTestId("star-gold").click(); // dotknięcie gwiazdy: co trzeba zrobić, żeby ją zdobyć
-  await expect(page.getByTestId("star-tip")).toContainText("50 potwierdzonych klientów");
+  await expect(page.getByTestId("star-tip")).toContainText("25 potwierdzonych klientów");
   await page.getByTestId("star-glass").click();
   await expect(page.getByTestId("star-tip")).toContainText("to Twoja obecna gwiazda");
   await expect(page.getByTestId("star-path").locator("li")).toHaveCount(5); // gwiazdy w karcie poziomu: od lodowej do złotej
