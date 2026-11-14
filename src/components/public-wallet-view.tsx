@@ -20,8 +20,8 @@ function Buttons({ item, big = false }: { item: Item; big?: boolean }) {
   const h = big ? "min-h-12 text-[15px]" : "min-h-11 text-[13px]";
   return (
     <div className="grid grid-cols-2 gap-2">
-      {item.learn && <a href={item.learn} className={`press flex ${h} items-center justify-center whitespace-nowrap rounded-full border border-line bg-cream px-2 font-bold text-leather-dark`}>Dowiedz się więcej</a>}
-      {item.talk && <a href={item.talk} className={`leather-grad press flex ${h} items-center justify-center gap-1.5 rounded-full px-2 font-bold ${item.learn ? "" : "col-span-2"}`}><MessageCircle className="size-4" aria-hidden />Porozmawiaj</a>}
+      {item.learn && <a href={item.learn} className={`flex ${h} items-center justify-center whitespace-nowrap rounded-full border border-line bg-cream px-2 font-bold text-leather-dark`}>Dowiedz się więcej</a>}
+      {item.talk && <a href={item.talk} className={`leather-grad flex ${h} items-center justify-center gap-1.5 rounded-full px-2 font-bold ${item.learn ? "" : "col-span-2"}`}><MessageCircle className="size-4" aria-hidden />Porozmawiaj</a>}
     </div>
   );
 }
@@ -70,10 +70,9 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
 }) {
   const [openId, setOpenId] = useState<string | null>(singleId);
   const [dir, setDir] = useState<"in" | "back">("in");
-  const [scrolled, setScrolled] = useState(false);
   const hero = useRef<HTMLElement>(null);
   const item = wallet.items.find((i) => i.id === openId) ?? null;
-  const compact = scrolled || !!item;
+  const bar = useRef<HTMLDivElement>(null);
 
   // Przycisk „wstecz” przeglądarki zamyka szczegóły zamiast opuszczać stronę.
   useEffect(() => {
@@ -85,7 +84,8 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
   useEffect(() => {
     const el = hero.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => setScrolled(!e.isIntersecting), { rootMargin: "-64px 0px 0px 0px" });
+    // bez stanu Reacta: przełączamy tylko widoczność paska, lista się nie przerysowuje
+    const io = new IntersectionObserver(([e]) => { bar.current?.classList.toggle("invisible", e.isIntersecting); }, { rootMargin: "-64px 0px 0px 0px" });
     io.observe(el);
     return () => io.disconnect();
   }, [openId]);
@@ -112,8 +112,8 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
     <div data-testid="public-wallet">
       {/* Jeden biały pasek u góry: zwinięty partner + (w szczegółach) powrót do listy */}
       <div className={cn("top-0 z-30 border-b border-line bg-white shadow-[0_6px_18px_-12px_rgba(50,27,18,0.35)]",
-        item ? "sticky" : cn("fixed inset-x-0", compact ? "visible" : "invisible"))}
-        aria-hidden={!compact} data-testid="public-bar">
+        item ? "sticky" : "invisible fixed inset-x-0")} ref={bar}
+        data-testid="public-bar">
         <div className="mx-auto flex h-16 max-w-xl items-center gap-2.5 px-3">
           {item && !singleId && <button type="button" onClick={back} aria-label="Wszystkie usługi" className="press grid size-11 shrink-0 place-items-center rounded-full text-leather" data-testid="public-back"><ArrowLeft className="size-5" aria-hidden /></button>}
           {photo(40, cn("ring-2 ring-gold-light", (!item || singleId) && "ml-2"))}
@@ -137,7 +137,7 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
             <ul className="border-t border-line" data-testid="public-list">
               {wallet.items.map((i) => (
                 <li key={i.id} className="border-b border-line bg-white">
-                  <button type="button" onClick={() => open(i.id)} className="flex w-full touch-manipulation items-start gap-3.5 px-5 pb-3 pt-4 text-left [-webkit-tap-highlight-color:transparent] active:bg-cream/70" data-testid={`public-item-${i.slug}`}>
+                  <button type="button" onClick={() => open(i.id)} className="flex w-full items-start gap-3.5 px-5 pb-3 pt-4 text-left [-webkit-tap-highlight-color:transparent] active:bg-cream/70" data-testid={`public-item-${i.slug}`}>
                     <CompanyIcon name={i.company.name} color={i.company.color} iconUrl={i.company.iconUrl} size={46} />
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{i.company.name}<GoogleRating rating={i.company.googleRating} reviews={i.company.googleReviews} compact className="normal-case tracking-normal" /></span>

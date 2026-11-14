@@ -2,18 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { StarTier } from "@/lib/gamification";
+import { cn } from "@/lib/cn";
 import { StarMark } from "./star";
+import { addLights, buildStar, renderStarImage } from "./star-three";
 
-const COLORS: Record<Exclude<StarTier, "ice">, { base: number; emissive: number; metalness: number; roughness: number; opacity: number }> = {
-  glass: { base: 0xa8ece1, emissive: 0x0a2f2a, metalness: 0.25, roughness: 0.35, opacity: 0.72 },
-  bronze: { base: 0xd9925a, emissive: 0x241004, metalness: 0.5, roughness: 0.42, opacity: 1 },
-  silver: { base: 0xe6ebf1, emissive: 0x121519, metalness: 0.5, roughness: 0.4, opacity: 1 },
-  gold: { base: 0xf3cb62, emissive: 0x2e1d02, metalness: 0.5, roughness: 0.4, opacity: 1 },
-};
+/** Statyczna gwiazda wyrenderowana w Three.js (raz, do obrazka). Zanim się wyrenderuje albo bez WebGL — wersja SVG. */
+export function StarImage({ tier, size, melt = 0, dimmed = false, className }: { tier: StarTier; size: number; melt?: number; dimmed?: boolean; className?: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => { let on = true; renderStarImage(tier, melt, 192).then((u) => { if (on) setUrl(u); }); return () => { on = false; }; }, [tier, melt]);
+  if (!url) return <StarMark tier={tier} size={size} melt={melt} dimmed={dimmed} className={className} />;
+  // eslint-disable-next-line @next/next/no-img-element -- obrazek wyrenderowany lokalnie w przeglądarce
+  return <img src={url} alt="" width={size} height={size} style={{ width: size, height: size }} className={cn(dimmed && "opacity-70 saturate-[.85]", className)} data-star-3d={tier} />;
+}
 
 /**
- * Aktywna gwiazda poziomu w szklanej bańce — całość w 3D (Three.js): fasetowana gwiazda obraca się wewnątrz przezroczystej kuli.
- * Biblioteka ładuje się dopiero na tym ekranie. Bez WebGL, przy „ogranicz ruch” i dla gwiazdy Lodowej (sople, topnienie) zostaje wersja SVG.
+ * Aktywna gwiazda poziomu w szklanej bańce — całość w 3D (Three.js): gwiazda obraca się wewnątrz przezroczystej kuli.
+ * Lodowa ma sople, śnieg i topnienie także w 3D. Bez WebGL i przy „ogranicz ruch” zostaje wersja SVG.
  */
 export function Star3D({ tier, size = 60, melt = 0 }: { tier: StarTier; size?: number; melt?: number }) {
   const mount = useRef<HTMLSpanElement>(null);
@@ -26,44 +30,16 @@ export function Star3D({ tier, size = 60, melt = 0 }: { tier: StarTier; size?: n
       try {
         const THREE = await import("three");
         if (disposed || !mount.current) return;
-        const cfg = tier === "ice" ? null : COLORS[tier]; // Lodowa zostaje rysowana (sople, topnienie) — w 3D jest wtedy sama kula
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(size, size);
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 20);
         camera.position.set(0, 0, 5.6);
-
-        // gwiazda opływowa jak w logo: pełniejszy obrys z zaokrąglonymi ramionami
-        const R = 1.02, r = 0.5;
-        const pts: [number, number][] = [];
-        for (let k = 0; k < 10; k++) { const a = Math.PI / 2 + (k * Math.PI) / 5; const rad = k % 2 === 0 ? R : r; pts.push([Math.cos(a) * rad, Math.sin(a) * rad]); }
-        const shape = new THREE.Shape();
-        pts.forEach((p, i) => {
-          const prev = pts[(i + 9) % 10], next = pts[(i + 1) % 10];
-          const cut = i % 2 === 0 ? 0.22 : 0.1;
-          const toward = (q: [number, number]) => { const dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy); return [p[0] + (dx / len) * cut, p[1] + (dy / len) * cut]; };
-          const s1 = toward(prev), s2 = toward(next);
-          if (i === 0) shape.moveTo(s1[0], s1[1]); else shape.lineTo(s1[0], s1[1]);
-          shape.quadraticCurveTo(p[0], p[1], s2[0], s2[1]);
-        });
-        shape.closePath();
-        // fasety jak w logo: obrys łączymy z dwoma szczytami (przód / tył); zaokrąglone czubki łagodzą ostre krawędzie
-        const outline = shape.getPoints(10);
-        const depth = 0.4, pos: number[] = [];
-        for (let i = 0; i < outline.length; i++) {
-          const a = outline[i], b = outline[(i + 1) % outline.length];
-          if (a.distanceTo(b) < 1e-6) continue;
-          pos.push(0, 0, depth, a.x, a.y, 0, b.x, b.y, 0);
-          pos.push(0, 0, -depth, b.x, b.y, 0, a.x, a.y, 0);
-        }
-        const geo = new THREE.BufferGeometry();
-        geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-        geo.computeVertexNormals();
-        const c = cfg ?? COLORS.glass;
-        const mat = new THREE.MeshStandardMaterial({ color: c.base, emissive: c.emissive, metalness: c.metalness, roughness: c.roughness, transparent: c.opacity < 1, opacity: c.opacity, side: THREE.DoubleSide });
-        const star = new THREE.Mesh(geo, mat);
-        if (cfg) scene.add(star);
+        addLights(THREE, scene);
+        const star = buildStar(THREE, tier, melt);
+        star.group.scale.setScalar(tier === "ice" ? 0.82 : 1);
+        scene.add(star.group);
 
         // szklana bańka: przezroczysta kula, widoczna dzięki jaśniejszej krawędzi (efekt Fresnela) — bez odblasków
         const bubbleGeo = new THREE.SphereGeometry(1.5, 48, 32);
@@ -75,33 +51,28 @@ export function Star3D({ tier, size = 60, melt = 0 }: { tier: StarTier; size?: n
         const bubble = new THREE.Mesh(bubbleGeo, bubbleMat);
         bubble.renderOrder = 2;
         scene.add(bubble);
-        scene.add(new THREE.AmbientLight(0xffffff, 0.28));
-        const key = new THREE.DirectionalLight(0xffffff, 4.2); key.position.set(3.5, 4, 2.5); scene.add(key);
-        const rim = new THREE.DirectionalLight(0xffe2a8, 1.6); rim.position.set(-4, -2, 1.5); scene.add(rim);
-        const back = new THREE.PointLight(0xffffff, 6); back.position.set(0, 1.5, -3); scene.add(back);
 
         mount.current.appendChild(renderer.domElement);
         setReady(true);
         const t0 = performance.now();
         const tick = (now: number) => {
           const t = (now - t0) / 1000;
-          star.rotation.y = t * 0.75;
-          star.rotation.x = Math.sin(t * 0.6) * 0.28;
-          star.rotation.z = Math.sin(t * 0.4) * 0.08;
+          star.spin.rotation.y = t * 0.75;
+          star.spin.rotation.x = Math.sin(t * 0.6) * 0.22;
           renderer.render(scene, camera);
           raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
-        cleanup = () => { cancelAnimationFrame(raf); geo.dispose(); mat.dispose(); bubbleGeo.dispose(); bubbleMat.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+        cleanup = () => { cancelAnimationFrame(raf); star.dispose(); bubbleGeo.dispose(); bubbleMat.dispose(); renderer.dispose(); renderer.domElement.remove(); };
         if (disposed) cleanup();
       } catch { /* brak WebGL — zostaje gwiazda SVG */ }
     })();
     return () => { disposed = true; cleanup(); };
-  }, [tier, size]);
+  }, [tier, size, melt]);
 
   return (
     <span className={ready ? "relative grid place-items-center" : "orb-plain relative grid place-items-center"} style={{ width: size, height: size }} data-testid="star-3d" data-ready={ready}>
-      {(!ready || tier === "ice") && <StarMark tier={tier} size={size * 0.58} melt={melt} className="relative z-10" />}
+      {!ready && <StarMark tier={tier} size={size * 0.58} melt={melt} className="relative z-10" />}
       <span ref={mount} className="absolute inset-0" aria-hidden />
     </span>
   );

@@ -11,8 +11,8 @@ export const viewport: Viewport = { themeColor: "#F8F5EF", width: "device-width"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pl" data-scroll-behavior="smooth" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">
+    <html lang="pl" data-scroll-behavior="smooth" className="antialiased">
+      <body className="flex min-h-dvh flex-col">
         <a href="#tresc" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-full focus:bg-leather focus:px-4 focus:py-2 focus:text-white">Przejdź do treści</a>
         {children}
         <Toaster />
