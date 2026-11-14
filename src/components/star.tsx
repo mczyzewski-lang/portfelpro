@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { cn } from "@/lib/cn";
 import type { StarTier } from "@/lib/gamification";
 
@@ -12,22 +13,42 @@ const PALETTE: Record<StarTier, { light: string[]; dark: string[]; shadow: strin
 
 // pięć ramion: wierzchołki zewnętrzne (O) i wewnętrzne (I) wokół środka (50,52)
 const O = [[50, 6], [94, 38], [77, 90], [23, 90], [6, 38]];
-const I = [[62, 36], [71, 59], [50, 73], [29, 59], [38, 36]];
+// wewnętrzne wierzchołki odsunięte od środka — gwiazda jest pełniejsza, jak w logo
+const I = [[64, 33.5], [74, 60], [50, 76.5], [26, 60], [36, 33.5]];
 const C = "50,52";
 const tri = (a: number[], b: number[]) => `${a[0]},${a[1]} ${b[0]},${b[1]} ${C}`;
 const ICICLES = [[12, 40, 5, 20], [22, 42, 4, 13], [88, 40, 5, 20], [78, 42, 4, 13], [29, 88, 5, 16], [38, 76, 4, 22], [50, 73, 5, 27], [62, 76, 4, 21], [71, 88, 5, 15]];
 const SNOW = [[8, 14, 2.2], [24, 4, 1.6], [78, 6, 2], [93, 20, 1.5], [4, 62, 1.6], [96, 66, 2], [16, 84, 1.4], [86, 88, 1.6], [66, 2, 1.3], [36, 18, 1.2]];
 
+/** Obrys gwiazdy z zaokrąglonymi wierzchołkami (mocniej na czubkach ramion) — fasety są do niego przycinane. */
+const OUTLINE = (() => {
+  const pts = O.flatMap((o, k) => [o, I[k]]);
+  const n = pts.length;
+  let d = "";
+  for (let i = 0; i < n; i++) {
+    const p = pts[i], prev = pts[(i + n - 1) % n], next = pts[(i + 1) % n];
+    const cut = i % 2 === 0 ? 9 : 4; // czubek ramienia / wcięcie
+    const toward = (q: number[]) => { const dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy); return [p[0] + (dx / len) * cut, p[1] + (dy / len) * cut]; };
+    const a = toward(prev), b = toward(next);
+    d += `${i === 0 ? "M" : "L"}${a[0].toFixed(2)} ${a[1].toFixed(2)} Q${p[0]} ${p[1]} ${b[0].toFixed(2)} ${b[1].toFixed(2)} `;
+  }
+  return `${d}Z`;
+})();
+
 function Facets({ tier }: { tier: StarTier }) {
   const p = PALETTE[tier];
+  const id = useId();
   return (
     <g filter={`drop-shadow(0 3px 3px ${p.shadow})`} opacity={p.opacity ?? 1}>
+      <clipPath id={id}><path d={OUTLINE} /></clipPath>
+      <g clipPath={`url(#${id})`}>
       {O.map((o, k) => (
         <g key={k}>
           <polygon points={tri(o, I[k])} fill={p.light[k]} />
           <polygon points={tri(o, I[(k + 4) % 5])} fill={p.dark[k]} />
         </g>
       ))}
+      </g>
     </g>
   );
 }
@@ -43,8 +64,7 @@ export function StarMark({ size = 44, tier = "gold", className, dimmed = false, 
     return (
       <svg viewBox="0 0 100 100" width={size} height={size} className={cn(dimmed && "opacity-70 saturate-[.85]", className)} aria-hidden data-tier={tier}>
         <Facets tier={tier} />
-        {tier === "glass" && <polygon points="50,6 62,36 50,52" fill="#ffffff" opacity="0.55" />}
-      </svg>
+        </svg>
     );
   }
   const m = Math.min(1, Math.max(0, melt));

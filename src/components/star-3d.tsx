@@ -34,21 +34,34 @@ export function Star3D({ tier, size = 60, melt = 0 }: { tier: StarTier; size?: n
         const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 20);
         camera.position.set(0, 0, 5.6);
 
-        // gwiazda: 5 ramion, wierzchołki na płaszczyźnie z=0 i dwa szczyty (przód / tył) — daje ostre fasety jak w logo
-        const R = 1.0, r = 0.4, depth = 0.36;
-        const ring: [number, number][] = [];
-        for (let k = 0; k < 10; k++) { const a = Math.PI / 2 + (k * Math.PI) / 5; const rad = k % 2 === 0 ? R : r; ring.push([Math.cos(a) * rad, Math.sin(a) * rad]); }
-        const pos: number[] = [];
-        for (let k = 0; k < 10; k++) {
-          const [ax, ay] = ring[k], [bx, by] = ring[(k + 1) % 10];
-          pos.push(0, 0, depth, ax, ay, 0, bx, by, 0);   // przód
-          pos.push(0, 0, -depth, bx, by, 0, ax, ay, 0);  // tył
+        // gwiazda opływowa jak w logo: pełniejszy obrys z zaokrąglonymi ramionami
+        const R = 1.02, r = 0.5;
+        const pts: [number, number][] = [];
+        for (let k = 0; k < 10; k++) { const a = Math.PI / 2 + (k * Math.PI) / 5; const rad = k % 2 === 0 ? R : r; pts.push([Math.cos(a) * rad, Math.sin(a) * rad]); }
+        const shape = new THREE.Shape();
+        pts.forEach((p, i) => {
+          const prev = pts[(i + 9) % 10], next = pts[(i + 1) % 10];
+          const cut = i % 2 === 0 ? 0.22 : 0.1;
+          const toward = (q: [number, number]) => { const dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy); return [p[0] + (dx / len) * cut, p[1] + (dy / len) * cut]; };
+          const s1 = toward(prev), s2 = toward(next);
+          if (i === 0) shape.moveTo(s1[0], s1[1]); else shape.lineTo(s1[0], s1[1]);
+          shape.quadraticCurveTo(p[0], p[1], s2[0], s2[1]);
+        });
+        shape.closePath();
+        // fasety jak w logo: obrys łączymy z dwoma szczytami (przód / tył); zaokrąglone czubki łagodzą ostre krawędzie
+        const outline = shape.getPoints(10);
+        const depth = 0.4, pos: number[] = [];
+        for (let i = 0; i < outline.length; i++) {
+          const a = outline[i], b = outline[(i + 1) % outline.length];
+          if (a.distanceTo(b) < 1e-6) continue;
+          pos.push(0, 0, depth, a.x, a.y, 0, b.x, b.y, 0);
+          pos.push(0, 0, -depth, b.x, b.y, 0, a.x, a.y, 0);
         }
         const geo = new THREE.BufferGeometry();
         geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
         geo.computeVertexNormals();
         const c = cfg ?? COLORS.glass;
-        const mat = new THREE.MeshStandardMaterial({ color: c.base, emissive: c.emissive, metalness: c.metalness, roughness: c.roughness, flatShading: true, transparent: c.opacity < 1, opacity: c.opacity, side: THREE.DoubleSide });
+        const mat = new THREE.MeshStandardMaterial({ color: c.base, emissive: c.emissive, metalness: c.metalness, roughness: c.roughness, transparent: c.opacity < 1, opacity: c.opacity, side: THREE.DoubleSide });
         const star = new THREE.Mesh(geo, mat);
         if (cfg) scene.add(star);
 
