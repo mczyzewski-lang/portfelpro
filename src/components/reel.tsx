@@ -13,11 +13,32 @@ export function ReelPlayer({ src, poster, title, children, className, testId, on
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const video = useRef<HTMLVideoElement>(null);
-  const open = () => { dialog.current?.showModal(); video.current?.play().catch(() => {}); onOpen?.(); };
-  const close = () => { video.current?.pause(); dialog.current?.close(); };
+  const trigger = useRef<HTMLButtonElement>(null);
+  /** Prostokąt miniatury, z której „wyrasta” wideo (i do której wraca przy zamknięciu). */
+  const frames = () => {
+    const el = trigger.current?.querySelector<HTMLElement>("[data-reel-thumb]") ?? trigger.current;
+    const r = el?.getBoundingClientRect();
+    if (!r || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return null;
+    const small = { transform: `translate(${r.left}px, ${r.top}px) scale(${r.width / window.innerWidth}, ${r.height / window.innerHeight})`, borderRadius: "48px", opacity: 0.6 };
+    return [small, { transform: "none", borderRadius: "0px", opacity: 1 }];
+  };
+  const open = () => {
+    const d = dialog.current; if (!d) return;
+    d.showModal();
+    const f = frames();
+    if (f) { d.style.transformOrigin = "0 0"; d.animate(f, { duration: 320, easing: "cubic-bezier(.2,.75,.2,1)" }); }
+    video.current?.play().catch(() => {}); onOpen?.();
+  };
+  const close = async () => {
+    const d = dialog.current; if (!d) return;
+    video.current?.pause();
+    const f = frames();
+    if (f) await d.animate([...f].reverse(), { duration: 260, easing: "cubic-bezier(.4,0,.6,1)" }).finished.catch(() => {});
+    d.close();
+  };
   return (
     <>
-      <button type="button" onClick={open} aria-label={`Odtwórz wideo: ${title}`} className={cn("press", className)} data-testid={testId}>{children}</button>
+      <button ref={trigger} type="button" onClick={open} aria-label={`Odtwórz wideo: ${title}`} className={cn("press", className)} data-testid={testId}>{children}</button>
       <dialog ref={dialog} onClose={() => { video.current?.pause(); onClose?.(); }} onClick={(e) => { if (e.target === dialog.current) close(); }}
         className="m-0 h-dvh max-h-none w-screen max-w-none bg-black p-0 backdrop:bg-black" data-testid="reel-dialog">
         <div className="relative mx-auto flex h-full max-w-[calc(100dvh*9/16)] items-center justify-center">
@@ -36,7 +57,7 @@ export function ReelPlayer({ src, poster, title, children, className, testId, on
 export function ReelTile({ src, poster, title, caption }: { src: string; poster?: string | null; title: string; caption: string }) {
   return (
     <ReelPlayer src={src} poster={poster} title={title} testId="service-reel" className="group flex w-full items-center gap-4 rounded-3xl border border-line bg-white p-3 text-left shadow-(--shadow-card)">
-      <span className="wallet relative block aspect-[9/16] w-[84px] shrink-0 overflow-hidden rounded-2xl !shadow-none">
+      <span data-reel-thumb className="wallet relative block aspect-[9/16] w-[84px] shrink-0 overflow-hidden rounded-2xl !shadow-none">
         {/* eslint-disable-next-line @next/next/no-img-element -- okładka wideo ustawiana w panelu */}
         {poster && <img src={poster} alt="" className="absolute inset-0 size-full object-cover" />}
         <span className="absolute inset-0 grid place-items-center bg-black/20"><span className="gold-grad grid size-10 place-items-center rounded-full"><Play className="size-5 translate-x-px fill-current" aria-hidden /></span></span>

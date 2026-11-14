@@ -29,7 +29,7 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
     <>
       <PageHeader title="Partnerzy" sub={`${rows.length} wyników`}><a href="/admin/eksport/partnerzy" className={btnSm()}>Eksport CSV</a></PageHeader>
       <form className="mb-4 flex flex-wrap gap-2">
-        <input name="q" defaultValue={q} placeholder="Szukaj: nazwisko, e-mail, firma, PP-…" aria-label="Szukaj partnera" className={`${inputCls} max-w-xs`} />
+        <input name="q" defaultValue={q} placeholder="Szukaj: nazwisko, e-mail, firma, iqid-…" aria-label="Szukaj partnera" className={`${inputCls} max-w-xs`} />
         <select name="status" defaultValue={status} aria-label="Status" className={`${inputCls} max-w-[220px]`}>
           <option value="">Wszystkie statusy</option><option value="pending">Oczekujące</option><option value="active">Aktywne</option><option value="suspended">Zawieszone</option>
         </select>

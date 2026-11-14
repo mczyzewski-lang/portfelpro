@@ -26,6 +26,7 @@ export async function submitLeadAction(_: FormState, fd: FormData): Promise<Form
   await createLead({
     serviceId: row.service.id,
     ref: String(fd.get("pp_ref") ?? "") || null,
+    iqid: Number(String(fd.get("iqid") ?? "")) || null,
     visitorId: (await cookies()).get(VISITOR_COOKIE)?.value ?? null,
     stage: row.asset.stage, source: "form",
     contact: { name: parsed.data.name, email: parsed.data.email, phone: parsed.data.phone },

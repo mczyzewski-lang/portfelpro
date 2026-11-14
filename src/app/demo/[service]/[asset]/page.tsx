@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { contentAssets } from "@/db/schema";
 import { assetTypeLabel } from "@/lib/labels";
 import { getPublishedAssets, getServiceBySlug } from "@/lib/queries";
-import { REF_PARAM } from "@/lib/tracking";
+import { IQID_PARAM, REF_PARAM } from "@/lib/tracking";
 import { LeadForm } from "./lead-form";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +22,8 @@ export default async function DemoAsset({ params, searchParams }: {
   const { service: serviceSlug, asset: assetSlug } = await params;
   const sp = await searchParams;
   const ref = /^[A-Za-z0-9]{10,40}$/.test(sp[REF_PARAM] ?? "") ? sp[REF_PARAM]! : "";
+  const iqid = /^\d{1,9}$/.test(sp[IQID_PARAM] ?? "") ? sp[IQID_PARAM]! : "";
+  const query = new URLSearchParams({ ...(ref ? { [REF_PARAM]: ref } : {}), ...(iqid ? { [IQID_PARAM]: iqid } : {}) }).toString();
   const found = await getServiceBySlug(serviceSlug);
   if (!found || found.service.status !== "published") notFound();
   const { service, company } = found;
@@ -31,7 +33,7 @@ export default async function DemoAsset({ params, searchParams }: {
   const all = await getPublishedAssets(service.id);
   const next = (stage: "consultation" | "transaction") => {
     const a = all.find((x) => x.stage === stage && !x.targetUrl);
-    return a ? `/demo/${service.slug}/${a.slug}${ref ? `?${REF_PARAM}=${ref}` : ""}` : null;
+    return a ? `/demo/${service.slug}/${a.slug}${query ? `?${query}` : ""}` : null;
   };
   const consult = next("consultation");
   const offer = next("transaction");
@@ -62,7 +64,7 @@ export default async function DemoAsset({ params, searchParams }: {
           <>
             <p className="mt-3 text-[15px] text-ink/85">{asset.description}</p>
             <Card className="mt-6 p-5">
-              <LeadForm assetId={asset.id} refToken={ref} sensitive={service.sensitive}
+              <LeadForm assetId={asset.id} refToken={ref} iqid={iqid} sensitive={service.sensitive}
                 cta={asset.stage === "consultation" ? "Poproszę o kontakt" : "Rozpocznij — wyślij zgłoszenie"} />
             </Card>
             {asset.stage === "consultation" && offer && (

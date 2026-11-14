@@ -56,7 +56,7 @@ export default async function AdminLeads({ searchParams }: { searchParams: Promi
         <ActionForm action={createManualLeadAction} className="pb-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Usługa"><select name="serviceId" className={inputCls}>{allServices.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
-            <Field label="Partner (PP-…)" hint="Puste = bez partnera"><input name="partnerNumber" placeholder="PP-000101" className={inputCls} /></Field>
+            <Field label="Partner (IQ ID)" hint="Puste = bez partnera"><input name="partnerNumber" placeholder="iqid-101" className={inputCls} /></Field>
             <Field label="Imię i nazwisko klienta"><input name="name" className={inputCls} /></Field>
             <Field label="E-mail klienta"><input name="email" type="email" className={inputCls} /></Field>
             <Field label="Telefon"><input name="phone" className={inputCls} /></Field>

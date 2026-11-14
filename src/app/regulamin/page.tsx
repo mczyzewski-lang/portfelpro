@@ -7,7 +7,7 @@ export default function Terms() {
     <LegalPage title="Regulamin programu partnerskiego">
       <section><h2>1. Czym jest Portfel.pro</h2><p>Portfel.pro to platforma, przez którą partnerzy polecają usługi realizowane przez spółki z grupy AV i mogą otrzymać wynagrodzenie za skuteczne polecenia, na warunkach określonych dla danej usługi.</p></section>
       <section><h2>2. Konto partnera</h2><ul>
-        <li>Konto jest bezpłatne. Każdy partner otrzymuje stały identyfikator (Partner ID).</li>
+        <li>Konto jest bezpłatne. Każdy partner otrzymuje stały inteligentny identyfikator (IQ ID). Klient, który zostawi kontakt z linku zawierającego IQ ID partnera, jest przypisany do tego partnera — z zachowaniem reguły pierwszego partnera opisanej w pkt 4.</li>
         <li>Konto wymaga zatwierdzenia. Do tego czasu linki polecające są nieaktywne.</li>
         <li>Polecanie wybranych usług (prawnych, finansowych, zdrowotnych, rodzinnych) wymaga odrębnego zatwierdzenia formy współpracy.</li>
       </ul></section>

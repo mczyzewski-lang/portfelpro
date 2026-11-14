@@ -45,7 +45,8 @@ export const rateStatusLabel: Record<string, string> = {
 export const publishLabel: Record<string, string> = { draft: "Szkic", published: "Opublikowana", hidden: "Ukryta" };
 export const accessLabel: Record<string, string> = { requested: "Wniosek oczekuje", approved: "Dostęp przyznany", rejected: "Odmowa" };
 
-export const partnerId = (n: number) => `PP-${String(n).padStart(6, "0")}`;
+/** IQ ID — inteligentny identyfikator partnera, np. iqid-101. */
+export const partnerId = (n: number) => `iqid-${n}`;
 export const leadRef = (n: number) => `L-${String(n).padStart(5, "0")}`;
 
 const dFmt = new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Europe/Warsaw" });

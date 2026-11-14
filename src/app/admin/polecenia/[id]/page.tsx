@@ -63,7 +63,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
           <ActionForm action={assignPartnerAction} className="mt-4 border-t border-line pt-4" confirm="Zmienić przypisanie partnera? Zmiana zostanie zapisana w historii.">
             <input type="hidden" name="leadId" value={l.id} />
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Partner (PP-…)" hint="Puste = usuń przypisanie"><input name="partnerNumber" defaultValue={p ? partnerId(p.number) : ""} className={inputCls} /></Field>
+              <Field label="Partner (IQ ID)" hint="Puste = usuń przypisanie"><input name="partnerNumber" defaultValue={p ? partnerId(p.number) : ""} className={inputCls} /></Field>
               <Field label="Powód korekty (wymagany)"><input name="reason" required className={inputCls} /></Field>
             </div>
             <SubmitButton small variant="secondary" className="mt-3">Zmień przypisanie</SubmitButton>

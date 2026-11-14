@@ -24,7 +24,7 @@ async function register(page: Page, email: string, first: string) {
   await expect(page.getByRole("heading", { name: "Polecane dla Ciebie" })).toBeVisible();
   await expect(page.getByText(SERVICE)).toBeVisible();
   const pid = (await page.getByTestId("partner-id").innerText()).trim();
-  expect(pid).toMatch(/^PP-\d{6}$/);
+  expect(pid).toMatch(/^iqid-\d+$/);
   await expect(page.getByTestId("partner-name")).toHaveText(`${first} Testowa`); // w nagłówku imię i nazwisko, pod nim ID
   return pid;
 }
@@ -141,6 +141,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   const client = await clientCtx.newPage();
   await client.goto(link);
   await expect(client).toHaveURL(/\/demo\/znak-towarowy\/ryzyko-niezarejestrowanej-marki\?pp_ref=[A-Za-z0-9]{20}/);
+  expect(client.url()).toContain(`iqid=${pid.replace("iqid-", "")}`); // IQ ID partnera widoczny w linku
   await client.goto(link); // odświeżenie nie dubluje kliknięcia
 
   // 12–13. Klient przechodzi do konsultacji — powiązanie z partnerem zostaje
@@ -439,6 +440,20 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.goto("/app/poziomy"); // po obejrzeniu nie ma już nowości
   await expect(page.getByTestId("new-badge")).toHaveCount(0);
   await expect(page.locator('[data-testid="levels-new"]')).toHaveCount(0);
+
+  // Sam IQ ID w adresie (bez tokenu i bez cookie) wystarcza do przypisania klienta
+  const iqCtx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const iq = await iqCtx.newPage();
+  await iq.goto(`/demo/ip-box/konsultacja-ip-box?iqid=${pid.replace("iqid-", "")}`);
+  await iq.locator("input[name=name]").fill("Klient IQ");
+  await iq.locator("input[name=email]").fill("iq@e2e.test");
+  await iq.getByLabel(/Zgadzam się/).check();
+  await iq.getByTestId("lead-submit").click();
+  await expect(iq.getByTestId("lead-success")).toBeVisible();
+  await admin.goto("/admin/polecenia");
+  await expect(admin.getByRole("row", { name: /iq@e2e\.test/ })).toContainText("Anna Testowa");
+  await page.goto("/app/konto");
+  await expect(page.getByTestId("iqid-note")).toContainText("inteligentny identyfikator");
 
   // Izolacja: partner nie wejdzie do panelu admina, anonim nie wejdzie do panelu partnera
   await page.goto("/admin");

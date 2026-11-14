@@ -19,9 +19,9 @@ const contact = z.object({
 }).optional();
 
 export const webhookSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("lead.created"), ...base, ref: z.string().max(60).optional(), stage: z.enum(["education", "consultation", "transaction"]).optional(), contact, consent: z.boolean().optional() }),
+  z.object({ type: z.literal("lead.created"), ...base, ref: z.string().max(60).optional(), iqid: z.coerce.number().int().positive().optional(), stage: z.enum(["education", "consultation", "transaction"]).optional(), contact, consent: z.boolean().optional() }),
   z.object({ type: z.literal("lead.status"), ...base, status: z.enum(["contacted", "qualified", "in_progress", "rejected", "cancelled"]), note: z.string().max(300).optional() }),
-  z.object({ type: z.literal("sale.confirmed"), ...base, ref: z.string().max(60).optional(), net_amount: z.number().nonnegative().max(100_000_000).optional(), occurred_at: z.string().datetime().optional(), contact }),
+  z.object({ type: z.literal("sale.confirmed"), ...base, ref: z.string().max(60).optional(), iqid: z.coerce.number().int().positive().optional(), net_amount: z.number().nonnegative().max(100_000_000).optional(), occurred_at: z.string().datetime().optional(), contact }),
   z.object({ type: z.literal("sale.refunded"), ...base, reason: z.string().max(300).optional() }),
 ]);
 export type WebhookEvent = z.infer<typeof webhookSchema>;
@@ -40,7 +40,7 @@ export async function processEvent(ev: WebhookEvent): Promise<Record<string, unk
   switch (ev.type) {
     case "lead.created": {
       const { lead, duplicate } = await createLead({
-        serviceId: service.id, ref: ev.ref, stage: ev.stage, source: "webhook", externalId: ev.external_id,
+        serviceId: service.id, ref: ev.ref, iqid: ev.iqid, stage: ev.stage, source: "webhook", externalId: ev.external_id,
         contact: ev.contact, consent: ev.consent, actor,
       });
       // Lead mógł wcześniej powstać z formularza bez identyfikatora zewnętrznego — uzupełniamy go.
@@ -56,7 +56,7 @@ export async function processEvent(ev: WebhookEvent): Promise<Record<string, unk
     case "sale.confirmed": {
       let lead = await findLead(service.id, ev.external_id);
       if (!lead) {
-        ({ lead } = await createLead({ serviceId: service.id, ref: ev.ref, source: "webhook", externalId: ev.external_id, contact: ev.contact, stage: "transaction", actor }));
+        ({ lead } = await createLead({ serviceId: service.id, ref: ev.ref, iqid: ev.iqid, source: "webhook", externalId: ev.external_id, contact: ev.contact, stage: "transaction", actor }));
         if (!lead.externalId) await db.update(leads).set({ externalId: ev.external_id }).where(eq(leads.id, lead.id));
       }
       const r = await recordConversion({

@@ -37,7 +37,7 @@ export function CompanySheet({ company, children, className }: { company: Compan
                 {company.videos.map((v) => (
                   <li key={v.url + v.title} className="w-[130px] shrink-0">
                     <ReelPlayer src={v.url} title={`${company.name} — ${v.title}`} testId="company-video" className="block w-full text-left">
-                      <span className="leather-band relative grid aspect-[9/16] w-full place-items-center overflow-hidden rounded-2xl"><span className="gold-grad grid size-11 place-items-center rounded-full"><Play className="size-5 translate-x-px fill-current" aria-hidden /></span></span>
+                      <span data-reel-thumb className="leather-band relative grid aspect-[9/16] w-full place-items-center overflow-hidden rounded-2xl"><span className="gold-grad grid size-11 place-items-center rounded-full"><Play className="size-5 translate-x-px fill-current" aria-hidden /></span></span>
                       <span className="mt-1.5 block text-[13px] font-semibold leading-snug text-leather-dark">{v.title}</span>
                     </ReelPlayer>
                   </li>

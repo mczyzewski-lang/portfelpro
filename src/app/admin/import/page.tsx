@@ -5,7 +5,7 @@ import { Field, btnSm, inputCls } from "@/components/ui";
 import { requireAdmin } from "@/lib/auth";
 
 const sample = `type;service;external_id;partner_id;name;email;net_amount;status
-lead;znak-towarowy;CRM-1001;PP-000101;Jan Kowalski;jan@example.com;;
+lead;znak-towarowy;CRM-1001;iqid-101;Jan Kowalski;jan@example.com;;
 sale;znak-towarowy;CRM-1001;;;;2500,00;
 lead;domy-modulowe;CRM-1002;;Anna Nowak;anna@example.com;;qualified`;
 
@@ -27,7 +27,7 @@ export default async function ImportPage() {
             <li><b>type</b> — <code>lead</code> (domyślnie) lub <code>sale</code></li>
             <li><b>service</b> — adres (slug) usługi, np. <code>znak-towarowy</code></li>
             <li><b>external_id</b> — identyfikator w systemie spółki (wymagany)</li>
-            <li><b>partner_id</b> — opcjonalnie <code>PP-000101</code> (ręczne przypisanie), <b>ref</b> — token <code>pp_ref</code></li>
+            <li><b>partner_id</b> — opcjonalnie <code>iqid-101</code> (ręczne przypisanie), <b>ref</b> — token <code>pp_ref</code></li>
             <li><b>name, email, phone</b> — dane kontaktowe (opcjonalne)</li>
             <li><b>net_amount</b> — wartość netto sprzedaży w zł (dla <code>sale</code>)</li>
             <li><b>status</b> — registered / contacted / qualified / in_progress / rejected / cancelled</li>

@@ -106,9 +106,9 @@ export function StarterCard({ hasPhoto, avatarSrc, initials, tier, tierName, mel
       {videoUrl && confirmed && (
         <div className="mt-2.5 rounded-2xl bg-cream/70 p-3" data-testid="starter-video-step">
           <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(3, watched)}<span className={active === 3 ? "step-now" : undefined} data-active={active === 3}>Obejrzyj krótkie nagranie</span>{active === 3 && now}</p>
-          <ReelPlayer src={videoUrl} title="Pakiet startowy — co dalej" testId="starter-video" onOpen={() => { setWatched(true); void markStarterVideoSeenAction(); }} onClose={() => { setHidden(true); router.refresh(); }}
+          <ReelPlayer src={videoUrl} title="Pakiet startowy — co dalej" testId="starter-video" onOpen={() => setWatched(true)} onClose={() => { setHidden(true); void markStarterVideoSeenAction().then(() => router.refresh()); }}
             className="flex min-h-12 w-full items-center gap-3 rounded-2xl border border-gold bg-white px-3 text-left ring-2 ring-gold-light/60">
-            <span className="gold-grad grid size-9 shrink-0 place-items-center rounded-full"><Play className="size-4 translate-x-px fill-current" aria-hidden /></span>
+            <span data-reel-thumb className="gold-grad grid size-9 shrink-0 place-items-center rounded-full"><Play className="size-4 translate-x-px fill-current" aria-hidden /></span>
             <span className="text-sm font-bold text-leather-dark">{watched ? "Obejrzyj ponownie" : "Odtwórz nagranie"}<span className="block text-xs font-medium text-muted">Pół minuty na cały ekran</span></span>
           </ReelPlayer>
         </div>

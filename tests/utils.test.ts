@@ -21,7 +21,7 @@ describe("csv", () => {
 });
 
 describe("identyfikatory", () => {
-  it("Partner ID ma stały format", () => expect(partnerId(123)).toBe("PP-000123"));
+  it("IQ ID ma stały format", () => expect(partnerId(123)).toBe("iqid-123"));
   it("tokeny są losowe i z bezpiecznego alfabetu", () => {
     const a = randomToken(7), b = randomToken(7);
     expect(a).toMatch(/^[A-Za-z0-9]{7}$/);

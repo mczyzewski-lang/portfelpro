@@ -37,12 +37,16 @@ export default async function AccountPage() {
         {partner.companyName && <p className="relative z-10 text-sm text-white/75">{partner.companyName}</p>}
         <div className="relative z-10 mt-4 flex items-end justify-between gap-3 border-t border-white/15 pt-3.5">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Partner ID</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">IQ ID · inteligentny identyfikator</p>
             <p className="tabular text-2xl font-extrabold tracking-wide">{pid}</p>
           </div>
           <CopyButton small variant="gold" text={pid} label="Kopiuj" />
         </div>
       </div>
+
+      <p className="rounded-2xl border border-gold/40 bg-white px-4 py-3 text-[13px] leading-snug text-ink/85" data-testid="iqid-note">
+        <b className="text-leather-dark">IQ ID to Twój inteligentny identyfikator.</b> Jest w każdym linku, który wysyłasz. Gdy klient zostawi kontakt z linku z Twoim IQ ID, zostaje przypisany do Ciebie na stałe.
+      </p>
 
       <Card className="p-5">
         <h2 className="font-extrabold text-leather-dark">Czym się zajmujesz?</h2>

@@ -90,9 +90,12 @@ export function assetTargetUrl(asset: Pick<ContentAsset, "targetUrl" | "slug">, 
   return asset.targetUrl?.trim() || `${env.appUrl}/demo/${serviceSlug}/${asset.slug}`;
 }
 
-export function withRef(url: string, refToken: string | null): string {
+export const IQID_PARAM = "iqid";
+
+export function withRef(url: string, refToken: string | null, iqid?: number | null): string {
   const u = new URL(url, env.appUrl);
   if (refToken) u.searchParams.set(REF_PARAM, refToken);
+  if (refToken && iqid) u.searchParams.set(IQID_PARAM, String(iqid)); // IQ ID partnera widoczny w adresie
   if (u.origin !== new URL(env.appUrl).origin && !u.searchParams.has("utm_source")) {
     u.searchParams.set("utm_source", "portfel.pro");
     u.searchParams.set("utm_medium", "partner");
@@ -150,7 +153,7 @@ export async function handleClick(token: string, req: {
       referer: req.referer ? safeOrigin(req.referer) : null,
     });
   }
-  return { ok: true, redirectTo: withRef(target, attr.token), visitorId, setCookieDays: windowDays };
+  return { ok: true, redirectTo: withRef(target, attr.token, row.partner.number), visitorId, setCookieDays: windowDays };
 }
 
 function safeOrigin(url: string): string | null {
@@ -193,12 +196,24 @@ export type CreateLeadInput = {
   externalId?: string | null;
   contact?: { name?: string | null; email?: string | null; phone?: string | null };
   consent?: boolean;
+  /** IQ ID z adresu strony — używany, gdy nie ma tokenu ani wcześniejszej atrybucji */
+  iqid?: number | null;
   partnerId?: string | null; // tylko ręczne przypisanie przez administratora / import
   actor: Actor;
 };
 
 export async function createLead(input: CreateLeadInput): Promise<{ lead: Lead; duplicate: boolean }> {
   const attr = input.partnerId ? null : await resolveAttribution(input.serviceId, input.ref, input.visitorId);
+  // Sam IQ ID w linku wystarcza do przypisania — o ile partner jest aktywny i może polecać tę usługę.
+  let iqPartnerId: string | null = null;
+  if (!attr && !input.partnerId && input.iqid && Number.isInteger(input.iqid) && input.iqid > 0) {
+    const [p] = await db.select().from(partners).where(eq(partners.number, input.iqid));
+    const [svc] = await db.select().from(services).where(eq(services.id, input.serviceId));
+    if (p && svc) {
+      const [term] = await db.select().from(partnerServiceTerms).where(and(eq(partnerServiceTerms.partnerId, p.id), eq(partnerServiceTerms.serviceId, svc.id)));
+      if (recommendState(p, svc, term).can) iqPartnerId = p.id;
+    }
+  }
   const hash = contactHash(input.contact?.email, input.contact?.phone);
   const externalId = input.externalId?.trim() || null;
 
@@ -214,7 +229,7 @@ export async function createLead(input: CreateLeadInput): Promise<{ lead: Lead; 
     }
     const [lead] = await tx.insert(leads).values({
       serviceId: input.serviceId,
-      partnerId: input.partnerId ?? attr?.partnerId ?? null,
+      partnerId: input.partnerId ?? attr?.partnerId ?? iqPartnerId,
       attributionId: attr?.id ?? null,
       linkId: attr?.linkId ?? null,
       stage: input.stage ?? null,
@@ -228,7 +243,7 @@ export async function createLead(input: CreateLeadInput): Promise<{ lead: Lead; 
     }).returning();
     await tx.insert(leadEvents).values({
       leadId: lead.id, type: "created", toValue: "registered",
-      note: input.source === "partner" ? "Kontakt przekazany przez partnera" : lead.partnerId ? (attr ? "Przypisano na podstawie linku polecającego" : "Przypisano ręcznie") : "Brak atrybucji partnera",
+      note: input.source === "partner" ? "Kontakt przekazany przez partnera" : iqPartnerId ? "Przypisano na podstawie IQ ID w linku" : lead.partnerId ? (attr ? "Przypisano na podstawie linku polecającego" : "Przypisano ręcznie") : "Brak atrybucji partnera",
       actorUserId: input.actor.userId, actorLabel: input.actor.label,
     });
     return { lead, duplicate: false };
