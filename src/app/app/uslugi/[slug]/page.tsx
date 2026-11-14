@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShareData, requestAccessAction } from "@/app/actions/partner";
 import { ActionForm, CopyButton, SubmitButton } from "@/components/client";
+import { ExpertCard, Hook } from "@/components/expert";
 import { GoogleRating } from "@/components/google";
 import { Rate } from "@/components/rate";
 import { ReelTile } from "@/components/reel";
@@ -14,6 +15,7 @@ import { CompanyIcon, Notice } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { displayRate } from "@/lib/commission";
 import { env } from "@/lib/env";
+import { expertOf } from "@/lib/expert";
 import { getPartnerTerms, getPublishedAssets, getServiceBySlug } from "@/lib/queries";
 import { recommendBlockLabel, recommendState } from "@/lib/tracking";
 import { visibleVideo } from "@/lib/video";
@@ -50,7 +52,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/75">{company.name}</span>
           <GoogleRating rating={company.googleRating} reviews={company.googleReviews} url={company.googleUrl} onDark className="ml-auto rounded-full bg-white/10 px-2.5 py-1" />
         </div>
-        <h1 className="relative z-10 mt-3 text-[26px] font-extrabold leading-[1.12]">{service.name}</h1>
+        <Hook text={service.hook} onDark className="relative z-10 mt-3" />
+        <h1 className="relative z-10 mt-0.5 text-[26px] font-extrabold leading-[1.12]">{service.name}</h1>
         <p className="relative z-10 mt-1.5 text-sm leading-snug text-white/80">{service.clientBenefit}</p>
         <div className="relative z-10 mt-4 border-t border-white/15 pt-3.5">
           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twoja prowizja</p>
@@ -58,6 +61,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           {service.commissionCondition && <p className="mt-1 text-[13px] text-white/75">{service.commissionCondition}</p>}
         </div>
       </header>
+
+      <ExpertCard expert={expertOf(service)} className="mt-4" />
 
       {reel && <div className="mt-4"><ReelTile src={reel} poster={service.reelPosterUrl} title={service.name} caption="Krótkie wideo, które wyjaśnia, komu i jak polecać tę usługę." /></div>}
 

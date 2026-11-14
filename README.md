@@ -120,6 +120,10 @@ Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny
 
 W Koncie partner może włączyć „Portfel Publiczny”: stronę `/p/imie-nazwisko` (przy powtórce nazwiska z dopiskiem `-2`, `-3`…) ze swoim zdjęciem, imieniem i nazwiskiem, podpisem oraz usługami, które może polecać. Każda usługa ma przyciski „Dowiedz się więcej” (link edukacyjny) i „Porozmawiaj” (link do konsultacji) — to linki polecające partnera, liczone osobno jako kampania „portfel publiczny”. Każda usługa ma też własny adres `/p/imie-nazwisko/<usługa>` (ikona „otwórz w nowym oknie”) — stronę samej usługi do wysłania klientowi bez całego katalogu. W szczegółach każdej usługi jest też formularz „Zostaw kontakt” — zgłoszenie trafia jako polecenie przypisane do partnera (z zachowaniem reguły pierwszego partnera). Strona nie pokazuje prowizji, a po wyłączeniu przełącznika przestaje istnieć (także zdjęcie).
 
+### Hasło skojarzeniowe i ekspert usługi
+
+Każda usługa ma hasło „Słyszysz: „…”?” (co partner słyszy od klienta — np. „długi osobiste” przy upadłości) pokazywane nad nazwą usługi w panelu i katalogu, oraz eksperta-twarz usługi (imię i nazwisko, rola, zdjęcie). Oba ustawia się w edycji usługi. Eksperci z danych startowych są fikcyjni: mają dopisek „(demo)”, wygenerowane portrety w `public/demo/eksperci/` i są widoczni tylko przy `DEMO_MODE=true`.
+
 ### Wideo (reels 9:16)
 
 - **Usługa:** pole „Wideo o usłudze” w edycji usługi — w karcie usługi pojawia się kafelek, który otwiera pionowe wideo na cały ekran.

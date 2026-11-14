@@ -29,6 +29,15 @@ async function main() {
       await db.update(s.companies).set({ logoUrl: c.logoUrl, iconUrl: c.iconUrl, color: c.color }).where(eq(s.companies.id, row.id));
     }
   }
+  // Hasło skojarzeniowe i ekspert demo — uzupełniamy tylko puste pola istniejących usług.
+  for (const sv of SERVICES) {
+    const [row] = await db.select().from(s.services).where(eq(s.services.slug, sv.slug));
+    if (!row) continue;
+    const patch: Partial<typeof s.services.$inferInsert> = {};
+    if (!row.hook) patch.hook = sv.hook;
+    if (!row.expertName && !row.expertPhotoUrl) Object.assign(patch, { expertName: sv.expertName, expertTitle: sv.expertTitle, expertPhotoUrl: sv.expertPhotoUrl });
+    if (Object.keys(patch).length) await db.update(s.services).set(patch).where(eq(s.services.id, row.id));
+  }
   // Dopasowania dodane po pierwszym seedzie (np. nowa grupa „Barber / fryzjer”) — tylko brakujące wpisy.
   for (const sv of SERVICES) {
     const [row] = await db.select({ id: s.services.id }).from(s.services).where(eq(s.services.slug, sv.slug));

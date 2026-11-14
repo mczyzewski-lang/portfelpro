@@ -11,6 +11,10 @@ type AssetSeed = {
 };
 export type ServiceSeed = {
   company: string; slug: string; name: string; category: string;
+  /** co partner słyszy od klienta → skojarzenie z usługą */
+  hook: string;
+  /** ekspert DEMO: fikcyjna osoba z wygenerowanym portretem — do podmiany na prawdziwego eksperta w panelu */
+  expertName: string; expertTitle: string; expertPhotoUrl: string;
   access?: "open" | "approval_required"; sensitive?: boolean;
   clientBenefit: string; audienceShort: string; description: string;
   problems: string[]; audience: string[]; whenToRecommend: string[]; signals: string[]; arguments: string[];
@@ -77,6 +81,7 @@ const baseTerms = "Prowizja przysługuje za klienta przypisanego do Twojego link
 export const SERVICES: ServiceSeed[] = [
   {
     company: "pravna", slug: "znak-towarowy", name: "Zastrzeżenie znaku towarowego", category: "Ochrona marki",
+    hook: "nowa nazwa firmy", expertName: "Michał Borowski", expertTitle: "Ekspert ds. znaków towarowych (demo)", expertPhotoUrl: "/demo/eksperci/m1.jpg",
     clientBenefit: "Pomóż przedsiębiorcy chronić nazwę i markę, którą buduje.",
     audienceShort: "Firmy z własną nazwą, logo lub produktem",
     description: "Rejestracja nazwy, logo lub hasła jako znaku towarowego w Urzędzie Patentowym RP lub w EUIPO. Specjaliści sprawdzają, czy znak ma szansę na rejestrację, przygotowują zgłoszenie i prowadzą sprawę do decyzji urzędu.",
@@ -131,7 +136,8 @@ export const SERVICES: ServiceSeed[] = [
     ],
   },
   {
-    company: "pravna", slug: "upadlosc-konsumencka", name: "Upadłość konsumencka", category: "Finanse osobiste", access: "approval_required",
+    company: "pravna", slug: "upadlosc-konsumencka", name: "Upadłość konsumencka", category: "Finanse osobiste",
+    hook: "długi osobiste", expertName: "Tomasz Lewandowski", expertTitle: "Ekspert ds. oddłużania (demo)", expertPhotoUrl: "/demo/eksperci/m2.jpg", access: "approval_required",
     clientBenefit: "Wskaż osobie przytłoczonej długami legalną drogę do uporządkowania sytuacji.",
     audienceShort: "Osoby prywatne, które nie są w stanie spłacać zobowiązań",
     description: "Postępowanie sądowe dla osób fizycznych, które stały się niewypłacalne. Specjaliści analizują sytuację, przygotowują wniosek i prowadzą klienta przez postępowanie.",
@@ -164,7 +170,8 @@ export const SERVICES: ServiceSeed[] = [
     ],
   },
   {
-    company: "pravna", slug: "sankcja-kredytu-darmowego", name: "Sankcja Kredytu Darmowego", category: "Finanse osobiste", access: "approval_required",
+    company: "pravna", slug: "sankcja-kredytu-darmowego", name: "Sankcja Kredytu Darmowego", category: "Finanse osobiste",
+    hook: "kredyt gotówkowy", expertName: "Agnieszka Sowa", expertTitle: "Ekspertka ds. kredytów konsumenckich (demo)", expertPhotoUrl: "/demo/eksperci/k1.jpg", access: "approval_required",
     clientBenefit: "Pokaż kredytobiorcy możliwość sprawdzenia, czy jego umowa kredytu konsumenckiego jest prawidłowa.",
     audienceShort: "Osoby z kredytem konsumenckim lub pożyczką",
     description: "Analiza umowy kredytu konsumenckiego pod kątem naruszeń obowiązków informacyjnych banku. Jeżeli analiza wykaże podstawy, specjaliści mogą poprowadzić sprawę o zastosowanie sankcji kredytu darmowego.",
@@ -198,6 +205,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "ip-box", name: "Ulga IP Box", category: "Podatki",
+    hook: "programista na B2B", expertName: "Marta Wilk", expertTitle: "Ekspertka ds. ulg podatkowych (demo)", expertPhotoUrl: "/demo/eksperci/k2.jpg",
     clientBenefit: "Pokaż programiście lub firmie IT możliwość skorzystania z preferencji podatkowej, jeśli spełnia warunki ustawowe.",
     audienceShort: "Programiści B2B i firmy tworzące oprogramowanie",
     description: "Kompleksowe sprawdzenie, czy klient może korzystać z preferencyjnego opodatkowania dochodów z kwalifikowanych praw własności intelektualnej, oraz wsparcie we wdrożeniu: ewidencja, dokumentacja, wniosek o interpretację.",
@@ -238,6 +246,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "restrukturyzacja", name: "Restrukturyzacja przedsiębiorstwa", category: "Firma w kryzysie",
+    hook: "zaległości w ZUS", expertName: "Paweł Zając", expertTitle: "Ekspert ds. restrukturyzacji (demo)", expertPhotoUrl: "/demo/eksperci/m3.jpg",
     clientBenefit: "Pomóż firmie w kłopotach płynnościowych poznać sposoby na porozumienie z wierzycielami.",
     audienceShort: "Firmy z problemami z płynnością lub zadłużeniem",
     description: "Analiza sytuacji firmy i dobór postępowania restrukturyzacyjnego, którego celem jest zawarcie układu z wierzycielami i dalsze prowadzenie działalności.",
@@ -270,7 +279,8 @@ export const SERVICES: ServiceSeed[] = [
     ],
   },
   {
-    company: "nowy-etap", slug: "rozwod-za-porozumieniem", name: "Rozwód za porozumieniem i mediacje online", category: "Sprawy rodzinne", access: "approval_required", sensitive: true,
+    company: "nowy-etap", slug: "rozwod-za-porozumieniem", name: "Rozwód za porozumieniem i mediacje online", category: "Sprawy rodzinne",
+    hook: "rozstajemy się", expertName: "Joanna Krajewska", expertTitle: "Mediatorka rodzinna (demo)", expertPhotoUrl: "/demo/eksperci/k3.jpg", access: "approval_required", sensitive: true,
     clientBenefit: "Pomóż osobom rozważającym rozwód poznać spokojniejszą drogę do uporządkowania formalności.",
     audienceShort: "Osoby, które chcą rozstać się bez wojny w sądzie",
     description: "Wsparcie w rozwodzie za porozumieniem stron: przygotowanie do rozwodu, mediacje rozwodowe online i pomoc w uzgodnieniu najważniejszych kwestii przed złożeniem pozwu.",
@@ -303,7 +313,8 @@ export const SERVICES: ServiceSeed[] = [
     ],
   },
   {
-    company: "risify", slug: "psychoterapia-online", name: "Psychoterapia online", category: "Zdrowie psychiczne", access: "approval_required", sensitive: true,
+    company: "risify", slug: "psychoterapia-online", name: "Psychoterapia online", category: "Zdrowie psychiczne",
+    hook: "szukam terapeuty", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka doboru terapeutów (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg", access: "approval_required", sensitive: true,
     clientBenefit: "Wskaż osobie, która szuka wsparcia, sprawdzone miejsce z psychoterapeutami online.",
     audienceShort: "Dorośli szukający profesjonalnego wsparcia psychologicznego",
     description: "Spotkania z psychoterapeutami w formie online. Platforma pomaga dobrać specjalistę i umówić pierwszą sesję.",
@@ -336,7 +347,8 @@ export const SERVICES: ServiceSeed[] = [
     ],
   },
   {
-    company: "duo", slug: "duo-terapia-dla-malzenstw", name: "Duo terapia dla małżeństw", category: "Zdrowie psychiczne", access: "approval_required", sensitive: true,
+    company: "duo", slug: "duo-terapia-dla-malzenstw", name: "Duo terapia dla małżeństw", category: "Zdrowie psychiczne",
+    hook: "kryzys w związku", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka terapii par (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg", access: "approval_required", sensitive: true,
     clientBenefit: "Wskaż parze, która chce popracować nad relacją, terapię prowadzoną online dla obojga partnerów.",
     audienceShort: "Małżeństwa i pary, które chcą wspólnie pracować nad relacją",
     description: "Terapia małżeństw i par w DUO: para najpierw porządkuje sytuację z psychologiem, a potem — zależnie od potrzeb — pracuje nad odbudową relacji, decyzją co dalej albo świadomym rozstaniem.",
@@ -370,6 +382,7 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "budaro", slug: "domy-modulowe", name: "Domy modułowe i szkieletowe", category: "Budownictwo",
+    hook: "kupiliśmy działkę", expertName: "Adam Górski", expertTitle: "Doradca techniczny (demo)", expertPhotoUrl: "/demo/eksperci/m4.jpg",
     clientBenefit: "Pokaż osobie planującej budowę szybszą technologię z przewidywalnym procesem.",
     audienceShort: "Inwestorzy indywidualni planujący dom lub obiekt na wynajem",
     description: "Projektowanie i budowa domów w technologii modułowej i szkieletowej — od doboru projektu, przez prefabrykację, po montaż na działce.",

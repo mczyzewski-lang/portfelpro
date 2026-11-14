@@ -78,6 +78,13 @@
       "when": 1794639606912,
       "tag": "0010_starter_video",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794669705475,
+      "tag": "0011_service_hook_expert",
+      "breakpoints": true
     }
   ]
 }

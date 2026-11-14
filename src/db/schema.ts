@@ -123,6 +123,10 @@ export const services = pgTable("services", {
   category: text("category").notNull().default("Inne"),
   status: publishStatus("status").notNull().default("draft"),
   access: serviceAccess("access").notNull().default("open"),
+  hook: text("hook"),                       // hasło skojarzeniowe: co partner słyszy od klienta, np. „długi osobiste”
+  expertName: text("expert_name"),          // ekspert-twarz usługi (marka osobista)
+  expertTitle: text("expert_title"),
+  expertPhotoUrl: text("expert_photo_url"),
   reelUrl: text("reel_url"),              // pionowe wideo 9:16 o usłudze (adres pliku mp4/webm)
   reelPosterUrl: text("reel_poster_url"), // okładka wideo
   sensitive: boolean("sensitive").notNull().default(false), // zdrowie / sprawy rodzinne — dodatkowa minimalizacja danych

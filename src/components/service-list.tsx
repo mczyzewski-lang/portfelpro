@@ -2,6 +2,7 @@ import { ChevronRight, Lock, Sparkles } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { CatalogItem } from "@/lib/queries";
+import { Hook } from "./expert";
 import { GoogleRating } from "./google";
 import { Rate } from "./rate";
 import { CompanyIcon } from "./ui";
@@ -24,7 +25,8 @@ export function ServiceList({ items }: { items: PickerItem[] }) {
                 {i.company.name}
                 {i.recommended && <span className="inline-flex items-center gap-1 normal-case tracking-normal text-gold-deep"><Sparkles className="size-3" aria-hidden />dla Ciebie</span>}
               </span>
-              <span className="mt-0.5 block text-[17px] font-extrabold leading-snug text-leather-dark">{i.name}</span>
+              <Hook text={i.hook} className="mt-1" />
+              <span className="block text-[17px] font-extrabold leading-snug text-leather-dark">{i.name}</span>
               <span className="mt-0.5 block text-[13px] leading-snug text-muted">{i.audienceShort}</span>
               <span className="mt-2.5 flex flex-wrap items-center gap-2">
                 <span className="rounded-xl bg-cream px-2.5 py-1"><Rate rate={i.rate} size="sm" /></span>

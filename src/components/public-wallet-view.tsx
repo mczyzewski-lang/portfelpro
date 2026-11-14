@@ -7,6 +7,7 @@ import { submitPublicLeadAction } from "@/app/actions/public";
 import { cn } from "@/lib/cn";
 import type { PublicWalletData } from "@/lib/public-wallet";
 import { SubmitButton } from "./client";
+import { ExpertCard } from "./expert";
 import { GoogleRating } from "./google";
 import { CompanyIcon, inputCls } from "./ui";
 
@@ -165,6 +166,7 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
               </div>
               <h2 className="mt-3 text-[26px] font-extrabold leading-[1.15] text-leather-dark">{item.name}</h2>
               <p className="mt-2 text-[16px] leading-relaxed text-ink/90">{item.description || item.benefit}</p>
+              <ExpertCard expert={item.expert} label="Twoją sprawą zajmie się" className="mt-4 shadow-none" />
               <div className="mt-4"><Buttons item={item} big /></div>
 
               {item.problems.length > 0 && (

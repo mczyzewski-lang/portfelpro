@@ -98,13 +98,17 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.getByTestId("go-wallet").click(); // Portfel = lista usług
   await page.waitForURL("**/app/uslugi");
   await expect(page.getByTestId("google-trust")).toContainText("Tylko firmy sprawdzone przez klientów"); // także w panelu partnera
+  await expect(page.getByTestId("service-upadlosc-konsumencka").getByTestId("service-hook")).toHaveText("Słyszysz: „długi osobiste”?");
   await page.getByTestId("service-znak-towarowy").click();
   await page.waitForURL("**/app/uslugi/znak-towarowy");
   await expect(page.getByRole("heading", { name: "Wybierz link dla klienta" })).toBeVisible();
   await expect(page.getByTestId("service-screen")).toBeVisible(); // usługa na cały ekran
   await expect(page.getByTestId("stage-transaction")).toHaveCount(0); // tylko Edukacja i Konsultacja
   await expect(page.getByTestId("offer-links").getByTestId("copy-transaction")).toHaveText("Kopiuj");
-  await expect(page.getByTestId("pitch-bubble")).toContainText("Budujesz markę"); // dymek nad wyborem linku // link do oferty: widoczny adres + „Kopiuj”
+  await expect(page.getByTestId("pitch-bubble")).toContainText("Budujesz markę"); // dymek nad wyborem linku
+  await expect(page.getByTestId("service-screen").getByTestId("service-hook")).toHaveText("Słyszysz: „nowa nazwa firmy”?"); // hasło skojarzeniowe nad nazwą
+  await expect(page.getByTestId("service-expert")).toContainText("Michał Borowski"); // ekspert usługi ze zdjęciem
+  expect((await page.request.get("/demo/eksperci/m1.jpg")).headers()["content-type"]).toBe("image/jpeg"); // link do oferty: widoczny adres + „Kopiuj”
   await page.getByTestId("stage-consultation").click();
   await expect(page.getByTestId("copy-consultation")).toHaveCount(1);
   await expect(page.getByTestId("copy-education")).toHaveCount(0); // każdy etap to inne linki
@@ -355,6 +359,8 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   // wejście w usługę: ten sam ekran, partner dalej w przypiętym pasku, szczegóły zamiast listy
   await visitor.getByTestId("public-item-znak-towarowy").click();
   await expect(visitor.getByTestId("public-detail")).toContainText("W czym pomaga");
+  await expect(visitor.getByTestId("public-detail").getByTestId("service-expert")).toContainText("Twoją sprawą zajmie się");
+  await expect(visitor.getByTestId("service-hook")).toHaveCount(0); // hasło „Słyszysz…” jest tylko dla partnera
   await expect(visitor.getByTestId("public-list")).toHaveCount(0);
   await expect(visitor.getByTestId("public-bar")).toContainText("Anna Testowa"); // partner zwinięty do białego paska u góry
   await expect(visitor.getByTestId("public-bar")).toBeInViewport();

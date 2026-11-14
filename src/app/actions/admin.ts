@@ -255,6 +255,8 @@ export const saveServiceAction = adminAction(async (fd, actor) => {
     clientBenefit: str(fd, "clientBenefit"), audienceShort: str(fd, "audienceShort"), description: str(fd, "description"),
     problems: lines(fd, "problems"), audience: lines(fd, "audience"), whenToRecommend: lines(fd, "whenToRecommend"),
     signals: lines(fd, "signals"), arguments: lines(fd, "arguments"), pitch: str(fd, "pitch"), faq,
+    hook: str(fd, "hook").slice(0, 80) || null, expertName: str(fd, "expertName").slice(0, 120) || null, expertTitle: str(fd, "expertTitle").slice(0, 120) || null,
+    expertPhotoUrl: videoUrl(fd, "expertPhotoUrl", "Zdjęcie eksperta"),
     reelUrl: videoUrl(fd, "reelUrl", "Wideo o usłudze"), reelPosterUrl: videoUrl(fd, "reelPosterUrl", "Okładka wideo"),
     doNotPromise: lines(fd, "doNotPromise"), provider: str(fd, "provider"), commissionTerms: str(fd, "commissionTerms"),
     commissionModel: rate.model, commissionAmount: rate.amount, commissionBps: rate.bps,
