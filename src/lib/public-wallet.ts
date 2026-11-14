@@ -1,6 +1,7 @@
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { companies, contentAssets, partnerServiceTerms, partners, services, users } from "@/db/schema";
+import { factsOf } from "@/components/service-facts";
 import { expertOf } from "./expert";
 import { getOrCreateLink, recommendState } from "./tracking";
 
@@ -31,7 +32,7 @@ export async function getPublicWallet(slug: string) {
     items.push({
       id: s.id, slug: s.slug, name: s.name, benefit: s.clientBenefit, learn, talk, sensitive: s.sensitive,
       // tylko treści dla klienta — bez wskazówek sprzedażowych i prowizji
-      expert: expertOf(s),
+      expert: expertOf(s), facts: factsOf(s),
       description: s.description, problems: s.problems, audience: s.audience, faq: s.faq, provider: s.provider,
       company: { name: c.name, color: c.color, iconUrl: c.iconUrl, googleRating: c.googleRating, googleReviews: c.googleReviews },
     });

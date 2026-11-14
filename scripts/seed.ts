@@ -36,6 +36,9 @@ async function main() {
     const patch: Partial<typeof s.services.$inferInsert> = {};
     if (!row.hook) patch.hook = sv.hook;
     if (!row.expertName && !row.expertPhotoUrl) Object.assign(patch, { expertName: sv.expertName, expertTitle: sv.expertTitle, expertPhotoUrl: sv.expertPhotoUrl });
+    if (!row.serviceFacts.length && !row.companyFacts.length && !row.comparison.length) {
+      Object.assign(patch, { serviceFacts: sv.serviceFacts, companyFacts: sv.companyFacts, comparison: sv.comparison, factsDemo: true });
+    }
     if (Object.keys(patch).length) await db.update(s.services).set(patch).where(eq(s.services.id, row.id));
   }
   // Dopasowania dodane po pierwszym seedzie (np. nowa grupa „Barber / fryzjer”) — tylko brakujące wpisy.
@@ -58,7 +61,7 @@ async function main() {
   for (const [i, sv] of SERVICES.entries()) {
     const { company, professions, assets, ...rest } = sv;
     const [created] = await db.insert(s.services)
-      .values({ ...rest, companyId: companyIds[company], status: "published", sort: i })
+      .values({ ...rest, factsDemo: true, companyId: companyIds[company], status: "published", sort: i })
       .onConflictDoNothing().returning();
     if (!created) continue;
     for (const [slug, reason] of Object.entries(professions)) {

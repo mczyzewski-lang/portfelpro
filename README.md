@@ -124,6 +124,10 @@ W Koncie partner może włączyć „Portfel Publiczny”: stronę `/p/imie-nazw
 
 Każda usługa ma hasło „Słyszysz: „…”?” (co partner słyszy od klienta — np. „długi osobiste” przy upadłości) pokazywane nad nazwą usługi w panelu i katalogu, oraz eksperta-twarz usługi (imię i nazwisko, rola, zdjęcie). Oba ustawia się w edycji usługi. Eksperci z danych startowych są fikcyjni: mają dopisek „(demo)”, wygenerowane portrety w `public/demo/eksperci/` i są widoczni tylko przy `DEMO_MODE=true`.
 
+### Fakty i tabela porównawcza
+
+Każda usługa ma trzy bloki edytowane w panelu: „Najważniejsze o usłudze”, „Firma przy tej usłudze” i tabelę „my vs inni” (wiersz = `Kryterium | My | Inni`). Treści startowe są oznaczone jako niepotwierdzone (`facts_demo`): fakty o usługach to ogólne informacje prawne, fakty o firmach pochodzą ze stron firm i wizytówek Google, a wiersze tabel porównawczych są przykładowe. Niepotwierdzone treści widać tylko przy `DEMO_MODE=true`; zapis usługi w panelu oznacza je jako potwierdzone.
+
 ### Wideo (reels 9:16)
 
 - **Usługa:** pole „Wideo o usłudze” w edycji usługi — w karcie usługi pojawia się kafelek, który otwiera pionowe wideo na cały ekran.

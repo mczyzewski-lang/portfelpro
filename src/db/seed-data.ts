@@ -11,6 +11,12 @@ type AssetSeed = {
 };
 export type ServiceSeed = {
   company: string; slug: string; name: string; category: string;
+  /** ogólne, sprawdzalne fakty o samej usłudze */
+  serviceFacts: string[];
+  /** fakty o firmie: tylko z jej strony / wizytówki Google albo oznaczone „do potwierdzenia” */
+  companyFacts: string[];
+  /** tabela „my vs inni” — wiersze PRZYKŁADOWE, do potwierdzenia przez firmę */
+  comparison: { label: string; us: string; others: string }[];
   /** co partner słyszy od klienta → skojarzenie z usługą */
   hook: string;
   /** ekspert DEMO: fikcyjna osoba z wygenerowanym portretem — do podmiany na prawdziwego eksperta w panelu */
@@ -82,6 +88,9 @@ export const SERVICES: ServiceSeed[] = [
   {
     company: "pravna", slug: "znak-towarowy", name: "Zastrzeżenie znaku towarowego", category: "Ochrona marki",
     hook: "nowa nazwa firmy", expertName: "Michał Borowski", expertTitle: "Ekspert ds. znaków towarowych (demo)", expertPhotoUrl: "/demo/eksperci/m1.jpg",
+    serviceFacts: ["Ochrona znaku trwa 10 lat i można ją przedłużać na kolejne 10-letnie okresy.", "Znak zgłasza się w Polsce (Urząd Patentowy RP) albo od razu na całą Unię Europejską (EUIPO).", "Ochrona obejmuje tylko wskazane w zgłoszeniu klasy towarów i usług."],
+    companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Przykład do potwierdzenia: „zastrzegamy 5× więcej znaków niż drugi pełnomocnik na liście UPRP”.", "Zastrzeżenie znaku towarowego to jedna z dwóch głównych specjalizacji wskazanych na stronie pravna.pl."],
+    comparison: [{"label": "Ocena szans przed opłatami", "us": "Wstępna analiza przed zgłoszeniem", "others": "Często dopiero po zleceniu"}, {"label": "Proces", "us": "W całości online", "others": "Wizyty i dokumenty papierowe"}, {"label": "Kontakt", "us": "Jeden opiekun sprawy", "others": "Różne osoby na kolejnych etapach"}],
     clientBenefit: "Pomóż przedsiębiorcy chronić nazwę i markę, którą buduje.",
     audienceShort: "Firmy z własną nazwą, logo lub produktem",
     description: "Rejestracja nazwy, logo lub hasła jako znaku towarowego w Urzędzie Patentowym RP lub w EUIPO. Specjaliści sprawdzają, czy znak ma szansę na rejestrację, przygotowują zgłoszenie i prowadzą sprawę do decyzji urzędu.",
@@ -137,7 +146,10 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "upadlosc-konsumencka", name: "Upadłość konsumencka", category: "Finanse osobiste",
-    hook: "długi osobiste", expertName: "Tomasz Lewandowski", expertTitle: "Ekspert ds. oddłużania (demo)", expertPhotoUrl: "/demo/eksperci/m2.jpg", access: "approval_required",
+    hook: "długi osobiste", expertName: "Tomasz Lewandowski", expertTitle: "Ekspert ds. oddłużania (demo)", expertPhotoUrl: "/demo/eksperci/m2.jpg",
+    serviceFacts: ["Postępowanie prowadzi sąd upadłościowy z udziałem syndyka.", "Sąd ustala plan spłaty wierzycieli — co do zasady na okres do 36 miesięcy.", "O umorzeniu pozostałych zobowiązań decyduje sąd po wykonaniu planu spłaty."],
+    companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Sprawy prowadzone są zdalnie, bez konieczności wizyt w kancelarii."],
+    comparison: [{"label": "Pierwsza rozmowa", "us": "Poufna analiza sytuacji", "others": "Od razu oferta podpisania umowy"}, {"label": "Dokumenty", "us": "Pomoc w skompletowaniu wniosku", "others": "Klient kompletuje sam"}, {"label": "Kontakt", "us": "Jeden opiekun sprawy", "others": "Infolinia"}], access: "approval_required",
     clientBenefit: "Wskaż osobie przytłoczonej długami legalną drogę do uporządkowania sytuacji.",
     audienceShort: "Osoby prywatne, które nie są w stanie spłacać zobowiązań",
     description: "Postępowanie sądowe dla osób fizycznych, które stały się niewypłacalne. Specjaliści analizują sytuację, przygotowują wniosek i prowadzą klienta przez postępowanie.",
@@ -171,7 +183,10 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "pravna", slug: "sankcja-kredytu-darmowego", name: "Sankcja Kredytu Darmowego", category: "Finanse osobiste",
-    hook: "kredyt gotówkowy", expertName: "Agnieszka Sowa", expertTitle: "Ekspertka ds. kredytów konsumenckich (demo)", expertPhotoUrl: "/demo/eksperci/k1.jpg", access: "approval_required",
+    hook: "kredyt gotówkowy", expertName: "Agnieszka Sowa", expertTitle: "Ekspertka ds. kredytów konsumenckich (demo)", expertPhotoUrl: "/demo/eksperci/k1.jpg",
+    serviceFacts: ["Dotyczy kredytów konsumenckich do 255 550 zł.", "Kredytobiorca składa kredytodawcy pisemne oświadczenie.", "Uprawnienie wygasa po roku od wykonania umowy — także przy kredytach już spłaconych."],
+    companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Analiza umowy odbywa się zdalnie, na podstawie przesłanych dokumentów."],
+    comparison: [{"label": "Analiza umowy", "us": "Bezpłatna, przed decyzją klienta", "others": "Płatna lub po podpisaniu umowy"}, {"label": "Decyzja", "us": "Klient poznaje ocenę i sam decyduje", "others": "Presja na szybkie podpisanie"}, {"label": "Prowadzenie sprawy", "us": "Prawnicy", "others": "Pośrednicy"}], access: "approval_required",
     clientBenefit: "Pokaż kredytobiorcy możliwość sprawdzenia, czy jego umowa kredytu konsumenckiego jest prawidłowa.",
     audienceShort: "Osoby z kredytem konsumenckim lub pożyczką",
     description: "Analiza umowy kredytu konsumenckiego pod kątem naruszeń obowiązków informacyjnych banku. Jeżeli analiza wykaże podstawy, specjaliści mogą poprowadzić sprawę o zastosowanie sankcji kredytu darmowego.",
@@ -206,6 +221,9 @@ export const SERVICES: ServiceSeed[] = [
   {
     company: "pravna", slug: "ip-box", name: "Ulga IP Box", category: "Podatki",
     hook: "programista na B2B", expertName: "Marta Wilk", expertTitle: "Ekspertka ds. ulg podatkowych (demo)", expertPhotoUrl: "/demo/eksperci/k2.jpg",
+    serviceFacts: ["Stawka podatku od kwalifikowanego dochodu wynosi 5%.", "Wymaga prowadzenia działalności badawczo-rozwojowej i odrębnej ewidencji.", "Ulgę rozlicza się w zeznaniu rocznym."],
+    companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "IP Box to jedna z dwóch głównych specjalizacji wskazanych na stronie pravna.pl."],
+    comparison: [{"label": "Start", "us": "Ocena, czy warunki ustawowe są spełnione", "others": "Wdrożenie bez weryfikacji"}, {"label": "Ewidencja", "us": "Pomoc w jej ułożeniu", "others": "Klient prowadzi sam"}, {"label": "Bezpieczeństwo", "us": "Wsparcie przy interpretacji indywidualnej", "others": "Brak"}],
     clientBenefit: "Pokaż programiście lub firmie IT możliwość skorzystania z preferencji podatkowej, jeśli spełnia warunki ustawowe.",
     audienceShort: "Programiści B2B i firmy tworzące oprogramowanie",
     description: "Kompleksowe sprawdzenie, czy klient może korzystać z preferencyjnego opodatkowania dochodów z kwalifikowanych praw własności intelektualnej, oraz wsparcie we wdrożeniu: ewidencja, dokumentacja, wniosek o interpretację.",
@@ -247,6 +265,9 @@ export const SERVICES: ServiceSeed[] = [
   {
     company: "pravna", slug: "restrukturyzacja", name: "Restrukturyzacja przedsiębiorstwa", category: "Firma w kryzysie",
     hook: "zaległości w ZUS", expertName: "Paweł Zając", expertTitle: "Ekspert ds. restrukturyzacji (demo)", expertPhotoUrl: "/demo/eksperci/m3.jpg",
+    serviceFacts: ["Prawo przewiduje cztery tryby postępowania restrukturyzacyjnego.", "Celem jest zawarcie układu z wierzycielami i dalsze prowadzenie firmy.", "Układ przyjmują wierzyciele w głosowaniu, a zatwierdza go sąd."],
+    companyFacts: ["Ocena w Google: 4,7/5 z 1290 opinii (stan na 13.11.2026).", "Wstępna analiza sytuacji firmy odbywa się zdalnie."],
+    comparison: [{"label": "Pierwszy krok", "us": "Analiza sytuacji i dobór trybu", "others": "Jeden tryb dla wszystkich"}, {"label": "Wierzyciele", "us": "Wsparcie w rozmowach", "others": "Klient negocjuje sam"}, {"label": "Zakres", "us": "Od analizy po wykonanie układu", "others": "Tylko przygotowanie wniosku"}],
     clientBenefit: "Pomóż firmie w kłopotach płynnościowych poznać sposoby na porozumienie z wierzycielami.",
     audienceShort: "Firmy z problemami z płynnością lub zadłużeniem",
     description: "Analiza sytuacji firmy i dobór postępowania restrukturyzacyjnego, którego celem jest zawarcie układu z wierzycielami i dalsze prowadzenie działalności.",
@@ -280,7 +301,10 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "nowy-etap", slug: "rozwod-za-porozumieniem", name: "Rozwód za porozumieniem i mediacje online", category: "Sprawy rodzinne",
-    hook: "rozstajemy się", expertName: "Joanna Krajewska", expertTitle: "Mediatorka rodzinna (demo)", expertPhotoUrl: "/demo/eksperci/k3.jpg", access: "approval_required", sensitive: true,
+    hook: "rozstajemy się", expertName: "Joanna Krajewska", expertTitle: "Mediatorka rodzinna (demo)", expertPhotoUrl: "/demo/eksperci/k3.jpg",
+    serviceFacts: ["Rozwód orzeka sąd okręgowy.", "Mediacja jest dobrowolna i poufna.", "Sąd nie orzeka o winie, gdy oboje małżonkowie zgodnie o to wnoszą."],
+    companyFacts: ["Ocena w Google: 4,8/5 z 964 opinii (stan na 13.11.2026).", "Wg strony nowy-etap.pl: zaufało im ponad 5205 osób.", "Wg strony nowy-etap.pl: 98% skutecznych spraw."],
+    comparison: [{"label": "Podejście", "us": "Porozumienie i mediacja", "others": "Spór sądowy"}, {"label": "Forma", "us": "Online, bez dojazdów", "others": "Spotkania w kancelarii"}, {"label": "Zakres", "us": "Przygotowanie, mediacja i formalności w jednym miejscu", "others": "Osobno mediator i prawnik"}], access: "approval_required", sensitive: true,
     clientBenefit: "Pomóż osobom rozważającym rozwód poznać spokojniejszą drogę do uporządkowania formalności.",
     audienceShort: "Osoby, które chcą rozstać się bez wojny w sądzie",
     description: "Wsparcie w rozwodzie za porozumieniem stron: przygotowanie do rozwodu, mediacje rozwodowe online i pomoc w uzgodnieniu najważniejszych kwestii przed złożeniem pozwu.",
@@ -314,7 +338,10 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "risify", slug: "psychoterapia-online", name: "Psychoterapia online", category: "Zdrowie psychiczne",
-    hook: "szukam terapeuty", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka doboru terapeutów (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg", access: "approval_required", sensitive: true,
+    hook: "szukam terapeuty", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka doboru terapeutów (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg",
+    serviceFacts: ["Sesja trwa zwykle około 50 minut.", "Spotkania odbywają się w stałym rytmie, najczęściej raz w tygodniu.", "Terapeutę obowiązuje tajemnica zawodowa."],
+    companyFacts: ["Ocena w Google: 4,8/5 z 141 opinii (stan na 13.11.2026).", "Sesje odbywają się online — z dowolnego miejsca."],
+    comparison: [{"label": "Dobór specjalisty", "us": "Pomoc w doborze terapeuty", "others": "Samodzielne szukanie"}, {"label": "Forma", "us": "Online", "others": "Dojazdy do gabinetu"}, {"label": "Umówienie sesji", "us": "Rezerwacja przez platformę", "others": "Telefonicznie"}], access: "approval_required", sensitive: true,
     clientBenefit: "Wskaż osobie, która szuka wsparcia, sprawdzone miejsce z psychoterapeutami online.",
     audienceShort: "Dorośli szukający profesjonalnego wsparcia psychologicznego",
     description: "Spotkania z psychoterapeutami w formie online. Platforma pomaga dobrać specjalistę i umówić pierwszą sesję.",
@@ -348,7 +375,10 @@ export const SERVICES: ServiceSeed[] = [
   },
   {
     company: "duo", slug: "duo-terapia-dla-malzenstw", name: "Duo terapia dla małżeństw", category: "Zdrowie psychiczne",
-    hook: "kryzys w związku", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka terapii par (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg", access: "approval_required", sensitive: true,
+    hook: "kryzys w związku", expertName: "Ewa Sadowska", expertTitle: "Koordynatorka terapii par (demo)", expertPhotoUrl: "/demo/eksperci/k4.jpg",
+    serviceFacts: ["W sesjach uczestniczą oboje partnerzy.", "Terapeuta pozostaje bezstronny wobec obu stron.", "Treść spotkań jest poufna."],
+    companyFacts: ["Wg strony duo.pl: praca zaczyna się od „Mapy Relacji” z psychologiem.", "Wg strony duo.pl: trzy możliwe kierunki — odbudowa relacji, wsparcie w decyzji albo świadome rozstanie."],
+    comparison: [{"label": "Początek", "us": "Uporządkowanie sytuacji („Mapa Relacji”)", "others": "Od razu cykl sesji"}, {"label": "Kierunek", "us": "Odbudowa, decyzja albo rozstanie", "others": "Jeden schemat pracy"}, {"label": "Forma", "us": "Online dla obojga partnerów", "others": "Wspólne dojazdy"}], access: "approval_required", sensitive: true,
     clientBenefit: "Wskaż parze, która chce popracować nad relacją, terapię prowadzoną online dla obojga partnerów.",
     audienceShort: "Małżeństwa i pary, które chcą wspólnie pracować nad relacją",
     description: "Terapia małżeństw i par w DUO: para najpierw porządkuje sytuację z psychologiem, a potem — zależnie od potrzeb — pracuje nad odbudową relacji, decyzją co dalej albo świadomym rozstaniem.",
@@ -383,6 +413,9 @@ export const SERVICES: ServiceSeed[] = [
   {
     company: "budaro", slug: "domy-modulowe", name: "Domy modułowe i szkieletowe", category: "Budownictwo",
     hook: "kupiliśmy działkę", expertName: "Adam Górski", expertTitle: "Doradca techniczny (demo)", expertPhotoUrl: "/demo/eksperci/m4.jpg",
+    serviceFacts: ["Elementy domu powstają w hali, a na działce odbywa się montaż.", "Technologia szkieletowa opiera się na konstrukcji drewnianej.", "Dom o powierzchni zabudowy do 70 m² można — po spełnieniu warunków ustawowych — budować na zgłoszenie."],
+    companyFacts: ["Ocena w Google: 5,0/5 z 27 opinii (stan na 13.11.2026).", "Wg strony budaro.pl: firma ma na koncie realizację 200 domów.", "Wg strony budaro.pl: domy modułowe od 229 635 zł."],
+    comparison: [{"label": "Wykonawca", "us": "Jeden — od projektu po montaż", "others": "Kilka ekip do koordynacji"}, {"label": "Miejsce prac", "us": "Większość w hali", "others": "Całość na działce"}, {"label": "Start", "us": "Bezpłatna konsultacja doboru technologii", "others": "Wycena dopiero po projekcie"}],
     clientBenefit: "Pokaż osobie planującej budowę szybszą technologię z przewidywalnym procesem.",
     audienceShort: "Inwestorzy indywidualni planujący dom lub obiekt na wynajem",
     description: "Projektowanie i budowa domów w technologii modułowej i szkieletowej — od doboru projektu, przez prefabrykację, po montaż na działce.",

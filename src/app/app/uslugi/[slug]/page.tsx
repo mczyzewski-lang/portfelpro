@@ -9,6 +9,7 @@ import { GoogleRating } from "@/components/google";
 import { Rate } from "@/components/rate";
 import { ReelTile } from "@/components/reel";
 import { ServiceDetails } from "@/components/service-details";
+import { factsOf, ServiceFacts } from "@/components/service-facts";
 import { ClientHandoff } from "@/components/client-handoff";
 import { StagePaths } from "@/components/share";
 import { CompanyIcon, Notice } from "@/components/ui";
@@ -112,7 +113,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
       <section className="mt-6" aria-labelledby="poznaj">
         <h2 id="poznaj" className="text-xl font-extrabold text-leather-dark">Poznaj usługę</h2>
-        <div className="mt-3"><ServiceDetails service={service} company={company} collapsible /></div>
+        <div className="mt-3"><ServiceFacts facts={factsOf(service)} companyName={company.name} /></div>
+        <div className="mt-4"><ServiceDetails service={service} company={company} collapsible /></div>
       </section>
     </article>
     </div>

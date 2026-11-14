@@ -123,6 +123,10 @@ export const services = pgTable("services", {
   category: text("category").notNull().default("Inne"),
   status: publishStatus("status").notNull().default("draft"),
   access: serviceAccess("access").notNull().default("open"),
+  serviceFacts: jsonb("service_facts").$type<string[]>().notNull().default([]),   // najważniejsze o samej usłudze
+  companyFacts: jsonb("company_facts").$type<string[]>().notNull().default([]),   // fakty o firmie w kontekście tej usługi
+  comparison: jsonb("comparison").$type<{ label: string; us: string; others: string }[]>().notNull().default([]), // my vs inni
+  factsDemo: boolean("facts_demo").notNull().default(false),                      // treści startowe do potwierdzenia — widoczne tylko w trybie demo
   hook: text("hook"),                       // hasło skojarzeniowe: co partner słyszy od klienta, np. „długi osobiste”
   expertName: text("expert_name"),          // ekspert-twarz usługi (marka osobista)
   expertTitle: text("expert_title"),

@@ -9,6 +9,7 @@ import type { PublicWalletData } from "@/lib/public-wallet";
 import { SubmitButton } from "./client";
 import { ExpertCard } from "./expert";
 import { GoogleRating } from "./google";
+import { ServiceFacts } from "./service-facts";
 import { CompanyIcon, inputCls } from "./ui";
 
 type Item = PublicWalletData["items"][number];
@@ -177,6 +178,8 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
                 <section className="mt-6"><h3 className="text-[17px] font-extrabold text-leather-dark">Dla kogo</h3>
                   <ul className="mt-2 space-y-1.5 text-[15px] text-ink/85">{item.audience.map((t) => <li key={t} className="flex gap-2.5"><span className="mt-[9px] size-1.5 shrink-0 rounded-full bg-gold" aria-hidden />{t}</li>)}</ul></section>
               )}
+
+              <div className="mt-6"><ServiceFacts facts={item.facts} companyName={item.company.name} /></div>
 
               <ContactForm slug={slug} item={item} partnerFirstName={wallet.name.split(" ")[0]} />
 

@@ -108,6 +108,10 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByTestId("pitch-bubble")).toContainText("Budujesz markę"); // dymek nad wyborem linku
   await expect(page.getByTestId("service-screen").getByTestId("service-hook")).toHaveText("Słyszysz: „nowa nazwa firmy”?"); // hasło skojarzeniowe nad nazwą
   await expect(page.getByTestId("service-expert")).toContainText("Michał Borowski"); // ekspert usługi ze zdjęciem
+  await expect(page.getByTestId("service-facts")).toContainText("Ochrona znaku trwa 10 lat"); // najważniejsze o usłudze
+  await expect(page.getByTestId("service-facts")).toContainText("PRAVNA przy tej usłudze"); // firma w kontekście usługi
+  await expect(page.getByTestId("comparison-table").getByRole("columnheader", { name: "PRAVNA" })).toBeVisible(); // tabela my vs inni
+  await expect(page.getByTestId("comparison-table").getByRole("columnheader", { name: "Inni" })).toBeVisible();
   expect((await page.request.get("/demo/eksperci/m1.jpg")).headers()["content-type"]).toBe("image/jpeg"); // link do oferty: widoczny adres + „Kopiuj”
   await page.getByTestId("stage-consultation").click();
   await expect(page.getByTestId("copy-consultation")).toHaveCount(1);
@@ -360,6 +364,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await visitor.getByTestId("public-item-znak-towarowy").click();
   await expect(visitor.getByTestId("public-detail")).toContainText("W czym pomaga");
   await expect(visitor.getByTestId("public-detail").getByTestId("service-expert")).toContainText("Twoją sprawą zajmie się");
+  await expect(visitor.getByTestId("public-detail").getByTestId("comparison-table")).toBeVisible(); // klient też widzi porównanie
   await expect(visitor.getByTestId("service-hook")).toHaveCount(0); // hasło „Słyszysz…” jest tylko dla partnera
   await expect(visitor.getByTestId("public-list")).toHaveCount(0);
   await expect(visitor.getByTestId("public-bar")).toContainText("Anna Testowa"); // partner zwinięty do białego paska u góry

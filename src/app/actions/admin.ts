@@ -255,6 +255,9 @@ export const saveServiceAction = adminAction(async (fd, actor) => {
     clientBenefit: str(fd, "clientBenefit"), audienceShort: str(fd, "audienceShort"), description: str(fd, "description"),
     problems: lines(fd, "problems"), audience: lines(fd, "audience"), whenToRecommend: lines(fd, "whenToRecommend"),
     signals: lines(fd, "signals"), arguments: lines(fd, "arguments"), pitch: str(fd, "pitch"), faq,
+    serviceFacts: lines(fd, "serviceFacts"), companyFacts: lines(fd, "companyFacts"),
+    comparison: lines(fd, "comparison").map((l) => { const [label = "", us = "", others = ""] = l.split("|").map((x) => x.trim()); return { label, us, others }; }).filter((r) => r.label && r.us),
+    factsDemo: false, // zapis w panelu = treści potwierdzone przez administratora
     hook: str(fd, "hook").slice(0, 80) || null, expertName: str(fd, "expertName").slice(0, 120) || null, expertTitle: str(fd, "expertTitle").slice(0, 120) || null,
     expertPhotoUrl: videoUrl(fd, "expertPhotoUrl", "Zdjęcie eksperta"),
     reelUrl: videoUrl(fd, "reelUrl", "Wideo o usłudze"), reelPosterUrl: videoUrl(fd, "reelPosterUrl", "Okładka wideo"),

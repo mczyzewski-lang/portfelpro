@@ -94,6 +94,12 @@ export default async function EditService({ params }: { params: Promise<{ id: st
               <TA name="arguments" label="Najważniejsze argumenty" value={s.arguments} hint={oneLine} />
               <TA name="doNotPromise" label="Czego nie obiecywać" value={s.doNotPromise} hint={oneLine} />
             </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <TA name="serviceFacts" label="Najważniejsze o usłudze" value={s.serviceFacts} hint="Jeden fakt w wierszu, np. Ochrona trwa 10 lat" />
+              <TA name="companyFacts" label="Firma w kontekście tej usługi" value={s.companyFacts} hint="Jeden fakt w wierszu — tylko potwierdzone dane" />
+            </div>
+            <TA name="comparison" label="Tabela „my vs inni”" value={s.comparison.map((r) => `${r.label} | ${r.us} | ${r.others}`)} hint="Jeden wiersz = Kryterium | My | Inni" rows={4} />
+            {s.factsDemo && <p className="rounded-xl bg-warn-bg px-3 py-2 text-xs font-medium text-warn">Fakty i tabela to treści startowe do potwierdzenia — partnerzy i klienci widzą je tylko w trybie demo. Po zapisaniu usługi zostaną uznane za potwierdzone.</p>}
             <TA name="pitch" label="Jak przedstawić w 15–30 sekund" value={s.pitch} />
             <TA name="faq" label="Pytania klientów (FAQ)" value={s.faq.map((f) => `${f.q} | ${f.a}`)} hint="Jeden wiersz = Pytanie | Odpowiedź" rows={5} />
             <div className="grid gap-3 sm:grid-cols-2">

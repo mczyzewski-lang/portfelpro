@@ -4,6 +4,7 @@ import { ExpertCard, Hook } from "@/components/expert";
 import { GoogleRating } from "@/components/google";
 import { Rate } from "@/components/rate";
 import { ServiceDetails } from "@/components/service-details";
+import { factsOf, ServiceFacts } from "@/components/service-facts";
 import { SiteFooter } from "@/components/site";
 import { Card, CompanyMark, LinkButton, Wordmark } from "@/components/ui";
 import { displayRate } from "@/lib/commission";
@@ -53,6 +54,7 @@ export default async function PublicService({ params }: { params: Promise<{ slug
           </div>
           <LinkButton href="/rejestracja" className="mt-4 w-full sm:w-auto">Załóż konto i odbierz swoje linki</LinkButton>
         </Card>
+        <div className="mt-5"><ServiceFacts facts={factsOf(service)} companyName={company.name} /></div>
         <Card className="mt-5 p-5"><ServiceDetails service={service} company={company} showPitchCopy={false} /></Card>
       </main>
       <SiteFooter />
