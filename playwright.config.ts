@@ -18,7 +18,7 @@ export const testEnv = {
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 120_000,
+  timeout: 240_000, // jeden długi scenariusz; zapas na zimną kompilację serwera deweloperskiego
   fullyParallel: false,
   workers: 1,
   reporter: "list",

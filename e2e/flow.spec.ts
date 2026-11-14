@@ -387,11 +387,13 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await visitor.getByTestId("public-detail").getByRole("link", { name: "Porozmawiaj" }).click();
   await expect(visitor).toHaveURL(/ocena-mozliwosci-rejestracji\?pp_ref=/); // link polecający partnera
   await page.reload();
+  await page.waitForLoadState("networkidle");
   await expect(page.getByTestId("open-public")).toHaveAttribute("href", "/p/anna-testowa"); // ikona w nagłówku, gdy profil jest aktywny
   await page.getByTestId("public-toggle").uncheck({ force: true });
   await page.getByTestId("public-save").click();
   await expect(page.getByText("Portfel Publiczny jest wyłączony.")).toBeVisible();
   await page.reload();
+  await page.waitForLoadState("networkidle");
   await expect(page.getByTestId("open-public")).toHaveCount(0); // po wyłączeniu ikona znika
   expect((await visitor.request.get(publicUrl)).status()).toBe(404);
   expect((await visitor.request.get(publicUrl + "/photo")).status()).toBe(404);
