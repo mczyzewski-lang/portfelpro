@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { and, eq, isNull, like } from "drizzle-orm";
 
+const DEMO_EXPERT_BIO = "Opis przykładowy (demo).\n\nW tym miejscu pojawi się krótka notka o ekspercie: czym się zajmuje, jakie ma doświadczenie i jak pracuje z klientami. Treść ustawisz w edycji usługi w panelu administratora.";
+
 async function main() {
   const { db } = await import("../src/db");
   const s = await import("../src/db/schema");
@@ -41,6 +43,7 @@ async function main() {
     const patch: Partial<typeof s.services.$inferInsert> = {};
     if (!row.hook) patch.hook = sv.hook;
     if (!row.headline) patch.headline = sv.headline;
+    if (!row.expertBio && row.expertPhotoUrl?.startsWith("/demo/")) patch.expertBio = DEMO_EXPERT_BIO;
     if (!row.expertName && !row.expertPhotoUrl) Object.assign(patch, { expertName: sv.expertName, expertTitle: sv.expertTitle, expertPhotoUrl: sv.expertPhotoUrl });
     if (!row.serviceFacts.length && !row.companyFacts.length && !row.comparison.length) {
       Object.assign(patch, { serviceFacts: sv.serviceFacts, companyFacts: sv.companyFacts, comparison: sv.comparison, factsDemo: true });
@@ -67,7 +70,7 @@ async function main() {
   for (const [i, sv] of SERVICES.entries()) {
     const { company, professions, assets, ...rest } = sv;
     const [created] = await db.insert(s.services)
-      .values({ ...rest, factsDemo: true, companyId: companyIds[company], status: "published", sort: i })
+      .values({ ...rest, expertBio: DEMO_EXPERT_BIO, factsDemo: true, companyId: companyIds[company], status: "published", sort: i })
       .onConflictDoNothing().returning();
     if (!created) continue;
     for (const [slug, reason] of Object.entries(professions)) {

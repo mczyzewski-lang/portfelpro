@@ -85,6 +85,7 @@ export default async function EditService({ params }: { params: Promise<{ id: st
               <Field label="Ekspert — rola / tytuł"><input name="expertTitle" defaultValue={s.expertTitle ?? ""} className={inputCls} /></Field>
               <Field label="Ekspert — zdjęcie (https://… lub /…)"><input name="expertPhotoUrl" defaultValue={s.expertPhotoUrl ?? ""} className={inputCls} /></Field>
             </div>
+            <TA name="expertBio" label="Ekspert — krótki opis (okno po dotknięciu)" value={s.expertBio ?? ""} rows={3} />
             <Field label="Dla kogo — jedna linia"><input name="audienceShort" defaultValue={s.audienceShort} className={inputCls} /></Field>
             <TA name="description" label="Czym jest usługa (pełny opis)" value={s.description} />
             <div className="grid gap-3 md:grid-cols-2">

@@ -264,7 +264,7 @@ export const saveServiceAction = adminAction(async (fd, actor) => {
     factsDemo: false, // zapis w panelu = treści potwierdzone przez administratora
     headline: str(fd, "headline").slice(0, 120) || null,
     hook: str(fd, "hook").slice(0, 80) || null, expertName: str(fd, "expertName").slice(0, 120) || null, expertTitle: str(fd, "expertTitle").slice(0, 120) || null,
-    expertPhotoUrl: videoUrl(fd, "expertPhotoUrl", "Zdjęcie eksperta"),
+    expertPhotoUrl: videoUrl(fd, "expertPhotoUrl", "Zdjęcie eksperta"), expertBio: str(fd, "expertBio").slice(0, 1500) || null,
     reelUrl: videoUrl(fd, "reelUrl", "Wideo o usłudze"), reelPosterUrl: videoUrl(fd, "reelPosterUrl", "Okładka wideo"),
     doNotPromise: lines(fd, "doNotPromise"), provider: str(fd, "provider"), commissionTerms: str(fd, "commissionTerms"),
     commissionModel: rate.model, commissionAmount: rate.amount, commissionBps: rate.bps,

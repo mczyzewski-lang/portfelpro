@@ -134,6 +134,7 @@ export const services = pgTable("services", {
   expertName: text("expert_name"),          // ekspert-twarz usługi (marka osobista)
   expertTitle: text("expert_title"),
   expertPhotoUrl: text("expert_photo_url"),
+  expertBio: text("expert_bio"),            // krótki opis eksperta (okno po dotknięciu)
   reelUrl: text("reel_url"),              // pionowe wideo 9:16 o usłudze (adres pliku mp4/webm)
   reelPosterUrl: text("reel_poster_url"), // okładka wideo
   sensitive: boolean("sensitive").notNull().default(false), // zdrowie / sprawy rodzinne — dodatkowa minimalizacja danych

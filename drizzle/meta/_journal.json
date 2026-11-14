@@ -99,6 +99,13 @@
       "when": 1794684244733,
       "tag": "0013_company_info_headline",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794685884244,
+      "tag": "0014_expert_bio",
+      "breakpoints": true
     }
   ]
 }

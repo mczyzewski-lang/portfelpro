@@ -107,8 +107,11 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(page.getByTestId("stage-transaction")).toHaveCount(0); // tylko Edukacja i Konsultacja
   await expect(page.getByTestId("offer-links").getByTestId("copy-transaction")).toHaveText("Kopiuj");
   await expect(page.getByTestId("pitch-bubble")).toContainText("Budujesz markę"); // dymek nad wyborem linku
-  await expect(page.getByTestId("service-screen").getByTestId("service-hook")).toHaveText("Słyszysz: „nowa nazwa firmy”?"); // hasło skojarzeniowe nad nazwą
+  await expect(page.getByTestId("service-screen").getByTestId("service-headline")).toHaveText("Jak ochronić nazwę firmy?"); // pytanie klienta w dymku pod nazwą
   await expect(page.getByTestId("service-expert")).toContainText("Michał Borowski"); // ekspert usługi ze zdjęciem
+  await page.getByTestId("expert-open").click(); // dotknięcie eksperta: okno z opisem
+  await expect(page.getByTestId("expert-sheet")).toContainText("Opis przykładowy");
+  await page.getByTestId("expert-sheet").getByRole("button", { name: "Zamknij" }).click();
   await page.getByTestId("company-open").click(); // dotknięcie firmy: więcej informacji i referencje wideo
   await expect(page.getByTestId("company-sheet")).toContainText("Referencje wideo");
   await expect(page.getByTestId("company-sheet")).toContainText("pravna.pl");

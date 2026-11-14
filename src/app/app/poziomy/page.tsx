@@ -3,7 +3,7 @@ import { Check, Gift, Lock } from "lucide-react";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { ConfettiBurst } from "@/components/confetti";
-import { StarMark } from "@/components/star";
+import { Star3D } from "@/components/star-3d";
 import { StarPath } from "@/components/star-path";
 import { btn, btnSm } from "@/components/ui";
 import { db } from "@/db";
@@ -37,7 +37,7 @@ export default async function LevelsPage() {
       <section className="wallet wallet-sheen rounded-[28px] p-5" aria-label="Twój poziom">
 <Stitch radius={19} />
         <div className="relative z-10 flex items-center gap-4">
-          <span className="orb pop" data-testid="level-orb"><StarMark tier={level.current.tier} size={54} melt={ice?.melt ?? 0} className="relative" /><span aria-hidden className="orb-glint" /></span>
+          <span className="orb pop" data-testid="level-orb"><Star3D tier={level.current.tier} size={66} melt={ice?.melt ?? 0} /><span aria-hidden className="orb-glint" /></span>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twój poziom</p>
             <p className="text-3xl font-extrabold leading-tight" data-testid="level-name">{level.current.name}{fresh.levelUp && <span className="pop ml-2 inline-block whitespace-nowrap rounded-full px-2 py-0.5 align-middle text-[11px] font-bold success-grad">Nowy poziom</span>}</p>

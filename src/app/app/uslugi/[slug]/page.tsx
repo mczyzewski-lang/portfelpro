@@ -1,11 +1,11 @@
 import { Stitch } from "@/components/stitch";
-import { ArrowLeft, Lock, MessageSquareQuote, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Lock, MessageCircle, MessageSquareQuote, X } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShareData, requestAccessAction } from "@/app/actions/partner";
 import { ActionForm, CopyButton, SubmitButton } from "@/components/client";
 import { CompanySheet } from "@/components/company-sheet";
-import { ExpertCard, Hook } from "@/components/expert";
+import { ExpertCard } from "@/components/expert";
 import { GoogleRating } from "@/components/google";
 import { Rate } from "@/components/rate";
 import { ReelTile } from "@/components/reel";
@@ -53,15 +53,24 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       <header className="wallet wallet-sheen rounded-[28px] p-5">
 <Stitch radius={19} />
         <div className="relative z-10 flex items-center gap-2.5">
-          <CompanySheet company={companyInfo(company)} className="flex items-center gap-2.5 rounded-full pr-2">
-            <CompanyIcon name={company.name} color={company.color} iconUrl={company.iconUrl} size={34} />
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/85 underline decoration-white/30 underline-offset-4">{company.name}</span>
+          <CompanySheet company={companyInfo(company)} className="flex items-center gap-2 rounded-full bg-white/10 py-1 pl-1 pr-3 ring-1 ring-white/15">
+            <CompanyIcon name={company.name} color={company.color} iconUrl={company.iconUrl} size={26} className="!rounded-full" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/90">{company.name}</span>
+            <ChevronRight className="-ml-0.5 size-3.5 text-white/60" aria-hidden />
           </CompanySheet>
           <GoogleRating rating={company.googleRating} reviews={company.googleReviews} url={company.googleUrl} onDark className="ml-auto rounded-full bg-white/10 px-2.5 py-1" />
         </div>
-        <Hook text={service.hook} onDark className="relative z-10 mt-3" />
-        <h1 className="relative z-10 mt-0.5 text-[26px] font-extrabold leading-[1.12]">{service.name}</h1>
-        <p className="relative z-10 mt-1.5 text-sm leading-snug text-white/80">{service.clientBenefit}</p>
+        <h1 className="relative z-10 mt-3.5 text-[26px] font-extrabold leading-[1.12]">{service.name}</h1>
+        {service.headline && (
+          <div className="relative z-10 mt-3 flex items-start gap-2.5 rounded-2xl rounded-tl-md bg-white/10 px-3.5 py-2.5 ring-1 ring-white/10">
+            <MessageCircle className="mt-0.5 size-[18px] shrink-0 text-gold-light" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-white/60">Klient pyta</p>
+              <p className="text-[15px] font-bold leading-snug" data-testid="service-headline">{service.headline}</p>
+            </div>
+          </div>
+        )}
+        <p className="relative z-10 mt-2.5 text-sm leading-snug text-white/80">{service.clientBenefit}</p>
         <div className="relative z-10 mt-4 border-t border-white/15 pt-3.5">
           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">Twoja prowizja</p>
           <div className="mt-0.5" data-testid="service-rate"><Rate rate={rate} size="lg" onDark /></div>
