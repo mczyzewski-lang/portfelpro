@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Minus, Plus, Trash2, X } from "lucide-react";
+import { Camera, Image as ImageIcon, Minus, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
 import type { FormState } from "./client";
 import { cn } from "@/lib/cn";
@@ -24,6 +24,7 @@ export function AvatarEditor({ src, initials, onSave, onRemove, light = false }:
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const file = useRef<HTMLInputElement>(null);
+  const camera = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [zoom, setZoom] = useState(1);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -71,10 +72,18 @@ export function AvatarEditor({ src, initials, onSave, onRemove, light = false }:
     <div className="flex items-center gap-4">
       <Avatar src={src} initials={initials} size={72} />
       <div className="flex flex-wrap gap-2">
-        <input ref={file} type="file" accept="image/*" className="sr-only" aria-label="Wybierz zdjęcie" data-testid="avatar-file"
+        {/* aparat (przedni) — na telefonie otwiera od razu kamerę; na komputerze zwykły wybór pliku */}
+        <input ref={camera} type="file" accept="image/*" capture="user" className="sr-only" aria-label="Zrób zdjęcie aparatem" data-testid="avatar-camera"
           onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
-        <button type="button" onClick={() => file.current?.click()} className={cn("press inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-bold", light ? "border border-line bg-white text-leather-dark hover:bg-sand" : "bg-white/15 text-white hover:bg-white/25")}>
-          <Camera className="size-4" aria-hidden />{src ? "Zmień zdjęcie" : "Dodaj zdjęcie"}
+        <input ref={file} type="file" accept="image/*" className="sr-only" aria-label="Wybierz zdjęcie z galerii" data-testid="avatar-file"
+          onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
+        <button type="button" onClick={() => camera.current?.click()} data-testid="avatar-take"
+          className={cn("press inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold", light ? "leather-grad" : "gold-grad")}>
+          <Camera className="size-4" aria-hidden />{src ? "Zrób nowe zdjęcie" : "Zrób zdjęcie"}
+        </button>
+        <button type="button" onClick={() => file.current?.click()} data-testid="avatar-choose"
+          className={cn("press inline-flex min-h-11 items-center gap-2 rounded-full px-3.5 text-sm font-semibold", light ? "border border-line bg-white text-leather-dark hover:bg-sand" : "bg-white/15 text-white hover:bg-white/25")}>
+          <ImageIcon className="size-4" aria-hidden />Wybierz zdjęcie
         </button>
         {src && (
           <button type="button" disabled={pending} aria-label="Usuń zdjęcie" onClick={() => start(async () => { await onRemove(); toast("Zdjęcie usunięte."); })}

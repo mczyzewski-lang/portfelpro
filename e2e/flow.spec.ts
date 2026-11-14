@@ -312,6 +312,9 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
 
   // Konto: zdjęcie z kadrowaniem, branża z ikonami nad statusem, zmiana hasła jako link
   await page.goto("/app/konto");
+  await expect(page.getByTestId("avatar-take")).toHaveText("Zrób zdjęcie"); // główny przycisk: aparat
+  await expect(page.getByTestId("avatar-camera")).toHaveAttribute("capture", "user");
+  await expect(page.getByTestId("avatar-choose")).toHaveText("Wybierz zdjęcie"); // opcjonalnie: galeria
   await page.getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");
   await expect(page.getByTestId("avatar-crop")).toBeVisible();
   await page.getByLabel("Powiększ", { exact: true }).click();
