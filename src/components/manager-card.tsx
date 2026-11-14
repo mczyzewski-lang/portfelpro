@@ -21,7 +21,7 @@ export function ManagerCard({ manager }: { manager: Manager }) {
         {video ? (
           <ReelPlayer src={video} title={`${manager.firstName} — przywitanie`} testId="manager-video" className="relative shrink-0 rounded-full">
             {photo}
-            <span className="gold-grad absolute -bottom-0.5 -right-0.5 grid size-[22px] place-items-center rounded-full ring-2 ring-[#40190c]"><Play className="size-3 translate-x-px fill-current" aria-hidden /></span>
+            <span className="gold-grad absolute -bottom-0.5 -right-0.5 grid size-[22px] place-items-center rounded-full ring-2 ring-[#2f1209]"><Play className="size-3 translate-x-px fill-current" aria-hidden /></span>
           </ReelPlayer>
         ) : photo}
         <div className="min-w-0 flex-1">

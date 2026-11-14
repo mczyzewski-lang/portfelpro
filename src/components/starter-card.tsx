@@ -11,7 +11,6 @@ import { ConfettiBurst } from "./confetti";
 import type { StarTier } from "@/lib/gamification";
 import { ReelPlayer } from "./reel";
 import { StarMark } from "./star";
-import { Stitch } from "./stitch";
 
 /**
  * „Wiszące” okienko na pulpicie: potwierdzenie odbioru pakietu startowego.
@@ -68,42 +67,43 @@ export function StarterCard({ hasPhoto, avatarSrc, initials, tier, tierName, mel
   if (hidden) return done ? <ConfettiBurst /> : null;
   const confetti = burst ? <ConfettiBurst /> : null;
   const step = (n: number, ok: boolean) => (
-    <span className={ok ? "success-grad grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold" : "grid size-6 shrink-0 place-items-center rounded-full bg-white/20 text-xs font-bold text-white"}>
+    <span className={ok ? "success-grad grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold" : "grid size-6 shrink-0 place-items-center rounded-full bg-sand text-xs font-bold text-leather-dark"}>
       {ok ? <Check className="size-3.5" aria-hidden /> : n}
     </span>
   );
 
   return (
-    <>{confetti}<section className="wallet rise rounded-[28px] p-5" aria-labelledby="starter-h" data-testid="starter-card">
-      <Stitch radius={19} />
-      <div className="relative z-10">
+    <>{confetti}
+    {/* brązowy pas tła strony na całą szerokość — jasne okienko leży na nim */}
+    <div className="leather-band -mx-5 -mt-4 rounded-b-[32px] px-5 pb-6 pt-5 sm:mx-0 sm:mt-0 sm:rounded-[32px]" data-testid="starter-band">
+    <section className="rise relative rounded-3xl bg-white p-4 shadow-[0_20px_44px_-18px_rgba(0,0,0,0.6)]" aria-labelledby="starter-h" data-testid="starter-card">
       <div className="flex items-start gap-3">
         <span ref={star} className="relative block shrink-0" data-testid="starter-star"><StarMark size={56} tier={tier} melt={melt} /></span>
         <div>
-          <h2 id="starter-h" className="font-extrabold leading-snug text-white">Potwierdzenie odbioru pakietu startowego</h2>
-          <p className="mt-0.5 text-[13px] leading-snug text-white/75">{videoUrl ? "Trzy kroki" : "Dwa kroki"}: po kodzie Twoja pierwsza gwiazda — <b className="text-gold-light">{tierName}</b> — trafia do profilu.</p>
+          <h2 id="starter-h" className="font-extrabold leading-snug text-leather-dark">Potwierdzenie odbioru pakietu startowego</h2>
+          <p className="mt-0.5 text-[13px] leading-snug text-muted">{videoUrl ? "Trzy kroki" : "Dwa kroki"}: po kodzie Twoja pierwsza gwiazda — <b className="text-leather-dark">{tierName}</b> — trafia do profilu.</p>
         </div>
       </div>
 
-      <div className="mt-3.5 rounded-2xl bg-white/10 p-3" data-testid="starter-photo-step">
-        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-white">{step(1, hasPhoto)}Dodaj swoje zdjęcie</p>
-        <AvatarEditor src={avatarSrc} initials={initials} onSave={saveAvatarAction} onRemove={removeAvatarAction} />
+      <div className="mt-3.5 rounded-2xl bg-cream/70 p-3" data-testid="starter-photo-step">
+        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(1, hasPhoto)}Dodaj swoje zdjęcie</p>
+        <AvatarEditor light src={avatarSrc} initials={initials} onSave={saveAvatarAction} onRemove={removeAvatarAction} />
       </div>
 
-      <form action={action} className="mt-2.5 rounded-2xl bg-white/10 p-3">
-        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-white">{step(2, confirmed)}Wpisz kod z karty w pakiecie</p>
+      <form action={action} className="mt-2.5 rounded-2xl bg-cream/70 p-3">
+        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(2, confirmed)}Wpisz kod z karty w pakiecie</p>
         <div className="flex gap-2">
           <input name="code" required disabled={!codeReady} autoComplete="off" autoCapitalize="characters" spellCheck={false} maxLength={14} placeholder="KOD" aria-label="Kod z pakietu startowego"
             className="tabular min-h-12 min-w-0 flex-1 rounded-2xl border border-line bg-white px-4 text-center text-lg font-extrabold uppercase tracking-[0.3em] text-leather-dark placeholder:tracking-[0.2em] placeholder:text-muted/50 focus:border-leather focus:outline-none focus:ring-2 focus:ring-leather/20 disabled:opacity-50" />
-          <button disabled={pending || !codeReady} className="gold-grad press min-h-12 shrink-0 rounded-2xl px-5 font-bold disabled:opacity-50" data-testid="starter-submit">{pending ? "…" : "Potwierdź"}</button>
+          <button disabled={pending || !codeReady} className="leather-grad press min-h-12 shrink-0 rounded-2xl px-5 font-bold disabled:opacity-50" data-testid="starter-submit">{pending ? "…" : "Potwierdź"}</button>
         </div>
-        {!hasPhoto && !confirmed && <p className="mt-2 text-xs text-white/65">Najpierw dodaj zdjęcie — potem odblokuje się pole kodu.</p>}
-        {confirmed && <p className="mt-2 text-xs font-semibold text-[#8fe0b6]">Kod potwierdzony.</p>}
+        {!hasPhoto && !confirmed && <p className="mt-2 text-xs text-muted">Najpierw dodaj zdjęcie — potem odblokuje się pole kodu.</p>}
+        {confirmed && <p className="mt-2 text-xs font-semibold text-ok">Kod potwierdzony.</p>}
         {state?.error && <p role="alert" className="mt-2 rounded-xl bg-danger-bg px-3 py-2 text-sm font-medium text-danger">{state.error}</p>}
       </form>
       {videoUrl && confirmed && (
-        <div className="mt-2.5 rounded-2xl bg-white/10 p-3" data-testid="starter-video-step">
-          <p className="mb-2 flex items-center gap-2 text-sm font-bold text-white">{step(3, watched)}Obejrzyj krótkie nagranie</p>
+        <div className="mt-2.5 rounded-2xl bg-cream/70 p-3" data-testid="starter-video-step">
+          <p className="mb-2 flex items-center gap-2 text-sm font-bold text-leather-dark">{step(3, watched)}Obejrzyj krótkie nagranie</p>
           <ReelPlayer src={videoUrl} title="Pakiet startowy — co dalej" testId="starter-video" onOpen={() => { setWatched(true); void markStarterVideoSeenAction(); }} onClose={() => { setHidden(true); router.refresh(); }}
             className="flex min-h-12 w-full items-center gap-3 rounded-2xl border border-gold bg-white px-3 text-left ring-2 ring-gold-light/60">
             <span className="gold-grad grid size-9 shrink-0 place-items-center rounded-full"><Play className="size-4 translate-x-px fill-current" aria-hidden /></span>
@@ -113,12 +113,12 @@ export function StarterCard({ hasPhoto, avatarSrc, initials, tier, tierName, mel
       )}
 
       {videoUrl && !confirmed && (
-        <div className="mt-2.5 rounded-2xl bg-white/5 p-3" data-testid="starter-video-locked">
-          <p className="flex items-center gap-2 text-sm font-bold text-white/60">{step(3, false)}Obejrzyj krótkie nagranie<Lock className="ml-auto size-4 text-white/50" aria-hidden /></p>
-          <p className="mt-1 pl-8 text-xs text-white/50">Odblokuje się po wpisaniu kodu.</p>
+        <div className="mt-2.5 rounded-2xl bg-cream/70 p-3 opacity-60" data-testid="starter-video-locked">
+          <p className="flex items-center gap-2 text-sm font-bold text-leather-dark">{step(3, false)}Obejrzyj krótkie nagranie<Lock className="ml-auto size-4 text-muted" aria-hidden /></p>
+          <p className="mt-1 pl-8 text-xs text-muted">Odblokuje się po wpisaniu kodu.</p>
         </div>
       )}
-      </div>
-    </section></>
+    </section>
+    </div></>
   );
 }

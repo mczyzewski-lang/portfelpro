@@ -39,9 +39,9 @@ body[data-chat-typing] nav[aria-label="Główna"].fixed { display: none; }
 /* Karta „portfela” — ciemna skóra jak w logo, z delikatnym załamaniem światła */
 .wallet {
   background:
-    linear-gradient(118deg, rgb(255 255 255 / 0.05) 0 34%, transparent 36%),
-    radial-gradient(120% 80% at 0% 0%, rgb(255 190 140 / 0.12), transparent 55%),
-    linear-gradient(160deg, #5c2a15 0%, #40190c 52%, #260e07 100%);
+    linear-gradient(118deg, rgb(255 255 255 / 0.04) 0 34%, transparent 36%),
+    radial-gradient(120% 80% at 0% 0%, rgb(255 190 140 / 0.09), transparent 55%),
+    linear-gradient(160deg, #47200f 0%, #2f1209 52%, #1a0904 100%);
   color: #fff;
   box-shadow: var(--shadow-wallet);
   position: relative;
@@ -138,3 +138,10 @@ dialog::backdrop { background: rgb(50 27 18 / 0.5); backdrop-filter: blur(2px); 
 /* Portfel Publiczny: przejście bez przesuwania w poziomie — samo przenikanie, żeby nic nie zaburzało przewijania */
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 .fade-in { animation: fade-in .2s ease-out backwards; }
+
+/* Brązowy pas tła strony (np. pod okienkiem pakietu startowego) — ta sama skóra co karty, bez obszycia */
+.leather-band {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgb(255 190 140 / 0.10), transparent 55%),
+    linear-gradient(170deg, #47200f 0%, #2f1209 55%, #1f0b05 100%);
+}
