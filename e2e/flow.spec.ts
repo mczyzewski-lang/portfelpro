@@ -141,7 +141,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   const client = await clientCtx.newPage();
   await client.goto(link);
   await expect(client).toHaveURL(/\/demo\/znak-towarowy\/ryzyko-niezarejestrowanej-marki\?pp_ref=[A-Za-z0-9]{20}/);
-  expect(client.url()).toContain(`iqid=${pid.replace("iqid-", "")}`); // IQ ID partnera widoczny w linku
+  expect(client.url()).toContain(`utm_source=${pid}`); // IQ ID partnera widoczny w linku
   await client.goto(link); // odświeżenie nie dubluje kliknięcia
 
   // 12–13. Klient przechodzi do konsultacji — powiązanie z partnerem zostaje
@@ -179,6 +179,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
 
   // Panel partnera: kliknięcie i polecenia widoczne, prowizji jeszcze brak; dane klienta ukryte
   await page.goto("/app");
+  await expect(page.getByTestId("funnel")).toContainText("Wejścia");
   await expect(page.getByTestId("stat-clicks")).toHaveText("1");
   await expect(page.getByTestId("stat-leads")).toHaveText("2");
   await expect(page.getByTestId("sum-pending")).toHaveText("0 zł");
@@ -354,6 +355,10 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
 
   // Portfel Publiczny: przełącznik w Koncie, strona dla klienta z przyciskami „Dowiedz się więcej” / „Porozmawiaj”
   await page.goto("/app/konto");
+  await page.getByTestId("konto-tab-publiczny").click(); // Portfel Publiczny jako zakładka w Koncie
+  await page.waitForURL("**tab=publiczny");
+  await page.waitForLoadState("networkidle");
+  await page.getByTestId("public-svc-restrukturyzacja").uncheck({ force: true }); // wybór usług pokazywanych publicznie
   await page.getByTestId("public-wallet-card").locator("input[name=bio]").fill("Agencja marketingowa · Poznań");
   await page.getByTestId("public-toggle").check({ force: true });
   await page.getByTestId("public-save").click();
@@ -366,6 +371,8 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(visitor.getByTestId("public-hero")).toContainText("Agencja marketingowa · Poznań"); // duży, wycentrowany nagłówek
   await expect(visitor.getByText("300 zł")).toHaveCount(0); // klient nie widzi prowizji
   await expect(visitor.getByText("Psychoterapia online")).toHaveCount(0); // tylko usługi, które partner może polecać
+  await expect(visitor.getByTestId("public-item-restrukturyzacja")).toHaveCount(0); // usługa wyłączona przełącznikiem
+  await expect(visitor.getByTestId("public-item-znak-towarowy")).toBeVisible();
   expect((await visitor.request.get(publicUrl + "/photo")).headers()["content-type"]).toBe("image/jpeg");
   const card = visitor.locator("li").filter({ hasText: SERVICE });
   await expect(card.getByRole("link", { name: "Dowiedz się więcej" })).toBeVisible();
@@ -444,7 +451,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   // Sam IQ ID w adresie (bez tokenu i bez cookie) wystarcza do przypisania klienta
   const iqCtx = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const iq = await iqCtx.newPage();
-  await iq.goto(`/demo/ip-box/konsultacja-ip-box?iqid=${pid.replace("iqid-", "")}`);
+  await iq.goto(`/demo/ip-box/konsultacja-ip-box?utm_source=${pid}`);
   await iq.locator("input[name=name]").fill("Klient IQ");
   await iq.locator("input[name=email]").fill("iq@e2e.test");
   await iq.getByLabel(/Zgadzam się/).check();

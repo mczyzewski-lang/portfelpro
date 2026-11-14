@@ -182,7 +182,13 @@ export async function savePublicWalletAction(_: FormState, fd: FormData): Promis
     const [taken] = await db.select({ id: partners.id }).from(partners).where(eq(partners.publicSlug, candidate));
     if (!taken) slug = candidate;
   }
-  await db.update(partners).set({ publicEnabled: enable, publicBio: bio || null, publicSlug: slug ?? `${base}-${randomToken(5)}` }).where(eq(partners.id, partner.id));
+  let publicServices = partner.publicServices;
+  try {
+    const raw: unknown = JSON.parse(String(fd.get("services") ?? "null"));
+    const parsed = z.array(z.object({ id: z.string().uuid(), on: z.boolean() })).max(200).safeParse(raw);
+    if (parsed.success) publicServices = parsed.data;
+  } catch { /* brak listy — zostaje poprzednie ustawienie */ }
+  await db.update(partners).set({ publicEnabled: enable, publicBio: bio || null, publicServices, publicSlug: slug ?? `${base}-${randomToken(5)}` }).where(eq(partners.id, partner.id));
   revalidatePath("/app/konto");
   return { ok: enable ? "Portfel Publiczny jest aktywny." : "Portfel Publiczny jest wyłączony." };
 }

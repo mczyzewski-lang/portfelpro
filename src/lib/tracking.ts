@@ -90,15 +90,16 @@ export function assetTargetUrl(asset: Pick<ContentAsset, "targetUrl" | "slug">, 
   return asset.targetUrl?.trim() || `${env.appUrl}/demo/${serviceSlug}/${asset.slug}`;
 }
 
-export const IQID_PARAM = "iqid";
+export const IQID_PARAM = "utm_source";
+/** IQ ID w linku ma postać utm_source=iqid-271. */
+export const parseIqid = (v: string | null | undefined): number | null => { const m = /^iqid-(\d{1,9})$/i.exec((v ?? "").trim()); return m ? Number(m[1]) : null; };
 
 export function withRef(url: string, refToken: string | null, iqid?: number | null): string {
   const u = new URL(url, env.appUrl);
   if (refToken) u.searchParams.set(REF_PARAM, refToken);
-  if (refToken && iqid) u.searchParams.set(IQID_PARAM, String(iqid)); // IQ ID partnera widoczny w adresie
-  if (u.origin !== new URL(env.appUrl).origin && !u.searchParams.has("utm_source")) {
-    u.searchParams.set("utm_source", "portfel.pro");
-    u.searchParams.set("utm_medium", "partner");
+  if (refToken && iqid) { u.searchParams.set(IQID_PARAM, `iqid-${iqid}`); u.searchParams.set("utm_medium", "partner"); }
+  else if (u.origin !== new URL(env.appUrl).origin && !u.searchParams.has("utm_source")) {
+    u.searchParams.set("utm_source", "portfel.pro"); u.searchParams.set("utm_medium", "partner");
   }
   return u.toString();
 }

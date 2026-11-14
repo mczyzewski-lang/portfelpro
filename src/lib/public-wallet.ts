@@ -1,12 +1,24 @@
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { companies, contentAssets, partnerServiceTerms, partners, services, users } from "@/db/schema";
+import { companies, contentAssets, partnerServiceTerms, partners, services, users, type Partner } from "@/db/schema";
 import { factsOf } from "@/components/service-facts";
 import { companyInfo } from "./company";
 import { expertOf } from "./expert";
 import { getOrCreateLink, recommendState } from "./tracking";
 
 const CAMPAIGN = "portfel publiczny";
+
+/** Usługi, które partner może polecać — w kolejności i z widocznością ustawioną w Koncie (nowe usługi trafiają na koniec jako włączone). */
+export async function publicServiceRows(partner: Partner) {
+  const terms = await db.select().from(partnerServiceTerms).where(eq(partnerServiceTerms.partnerId, partner.id));
+  const list = await db.select({ s: services, c: companies }).from(services).innerJoin(companies, eq(companies.id, services.companyId))
+    .where(and(eq(services.status, "published"), eq(companies.published, true))).orderBy(asc(services.sort));
+  const allowed = list.filter(({ s }) => recommendState(partner, s, terms.find((t) => t.serviceId === s.id)).can);
+  const pref = partner.publicServices ?? [];
+  const rank = (id: string) => { const i = pref.findIndex((x) => x.id === id); return i < 0 ? 1000 : i; };
+  return allowed.map((row, i) => ({ ...row, on: pref.find((x) => x.id === row.s.id)?.on ?? true, order: rank(row.s.id) * 1000 + i }))
+    .sort((a, b) => a.order - b.order);
+}
 
 /** Dane strony /p/<slug>: partner (tylko to, co sam upublicznia) i usługi, które może polecać, z jego linkami. */
 export async function getPublicWallet(slug: string) {
@@ -15,12 +27,9 @@ export async function getPublicWallet(slug: string) {
     .from(partners).innerJoin(users, eq(users.id, partners.userId))
     .where(and(eq(partners.publicSlug, slug), eq(partners.publicEnabled, true), eq(partners.status, "active")));
   if (!row) return null;
-  const terms = await db.select().from(partnerServiceTerms).where(eq(partnerServiceTerms.partnerId, row.p.id));
-  const list = await db.select({ s: services, c: companies }).from(services).innerJoin(companies, eq(companies.id, services.companyId))
-    .where(and(eq(services.status, "published"), eq(companies.published, true))).orderBy(asc(services.sort));
   const items = [];
-  for (const { s, c } of list) {
-    if (!recommendState(row.p, s, terms.find((t) => t.serviceId === s.id)).can) continue;
+  for (const { s, c, on } of await publicServiceRows(row.p)) {
+    if (!on) continue;
     const assets = await db.select().from(contentAssets)
       .where(and(eq(contentAssets.serviceId, s.id), eq(contentAssets.status, "published"))).orderBy(asc(contentAssets.sort));
     const link = async (stage: "education" | "consultation") => {

@@ -4,8 +4,8 @@ import type { StarTier } from "@/lib/gamification";
 
 /** Palety faset dla każdej gwiazdy: jasne i ciemne ścianki oraz cień. */
 const PALETTE: Record<StarTier, { light: string[]; dark: string[]; shadow: string; opacity?: number }> = {
-  ice: { light: ["#ffffff", "#e6f6ff", "#cdeaff", "#dff3ff", "#f4fbff"], dark: ["#a9d8f5", "#8cc6ec", "#74b4e0", "#93cbee", "#b9e1f8"], shadow: "rgba(60,120,170,.35)" },
-  glass: { light: ["#f3fffd", "#d2f5ef", "#b4eae2", "#c8f1ea", "#e6fbf8"], dark: ["#8fd6cc", "#74c5ba", "#5cb3a8", "#7ccbc0", "#a3e0d7"], shadow: "rgba(40,120,110,.3)", opacity: 0.82 },
+  ice: { light: ["#ffffff", "#e6f6ff", "#cdeaff", "#dff3ff", "#f4fbff"], dark: ["#a9d8f5", "#8cc6ec", "#74b4e0", "#93cbee", "#b9e1f8"], shadow: "rgba(60,120,170,.35)", opacity: 0.84 },
+  glass: { light: ["#f3fffd", "#d2f5ef", "#b4eae2", "#c8f1ea", "#e6fbf8"], dark: ["#8fd6cc", "#74c5ba", "#5cb3a8", "#7ccbc0", "#a3e0d7"], shadow: "rgba(40,120,110,.3)", opacity: 0.74 },
   bronze: { light: ["#f0c9a0", "#e0a877", "#cf8f5a", "#dba06c", "#ebbb8d"], dark: ["#a8693a", "#93582d", "#7e4822", "#9a5e31", "#b97a48"], shadow: "rgba(90,45,15,.45)" },
   silver: { light: ["#ffffff", "#eceff3", "#d9dee5", "#e4e8ee", "#f6f8fa"], dark: ["#a9b1bd", "#959eab", "#828b99", "#9aa3b0", "#b9c0ca"], shadow: "rgba(60,70,85,.4)" },
   gold: { light: ["#fbe9b0", "#f3d27a", "#e6c15f", "#f0cf78", "#f8e09a"], dark: ["#d9aa45", "#c2912f", "#b07f22", "#c99a3c", "#e1bd6a"], shadow: "rgba(80,45,10,.4)" },

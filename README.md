@@ -63,7 +63,7 @@ Logowanie administratora: `ADMIN_EMAIL` / `ADMIN_PASSWORD` z `.env` → `/logowa
 
 ### Role i statusy
 
-- **Partner**: `pending` → `active` → `suspended`. Konto oczekujące przegląda katalog, ale nie dostaje linków. Każdy partner ma stały IQ ID (inteligentny identyfikator) w formacie `iqid-123`; jest on dopisywany do adresów docelowych jako `?iqid=123` i sam wystarcza do przypisania klienta, gdy brak tokenu `pp_ref`. Numer pochodzi z (sekwencja w bazie).
+- **Partner**: `pending` → `active` → `suspended`. Konto oczekujące przegląda katalog, ale nie dostaje linków. Każdy partner ma stały IQ ID (inteligentny identyfikator) w formacie `iqid-123`; jest on dopisywany do adresów docelowych jako `utm_source=iqid-123` i sam wystarcza do przypisania klienta, gdy brak tokenu `pp_ref`. Numer pochodzi z (sekwencja w bazie).
 - **Usługi regulowane** (prawne, finansowe, zdrowotne, rodzinne) mają `access = approval_required`: partner składa wniosek, administrator zatwierdza formę współpracy i ewentualną stawkę indywidualną dla tej pary partner–usługa.
 - **Administrator**: `/admin`. Każda strona i każda akcja zaczyna się od `requireAdmin()`.
 

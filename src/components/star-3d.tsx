@@ -5,7 +5,7 @@ import type { StarTier } from "@/lib/gamification";
 import { StarMark } from "./star";
 
 const COLORS: Record<Exclude<StarTier, "ice">, { base: number; emissive: number; metalness: number; roughness: number; opacity: number }> = {
-  glass: { base: 0xa8ece1, emissive: 0x0a2f2a, metalness: 0.25, roughness: 0.35, opacity: 0.94 },
+  glass: { base: 0xa8ece1, emissive: 0x0a2f2a, metalness: 0.25, roughness: 0.35, opacity: 0.72 },
   bronze: { base: 0xd9925a, emissive: 0x241004, metalness: 0.5, roughness: 0.42, opacity: 1 },
   silver: { base: 0xe6ebf1, emissive: 0x121519, metalness: 0.5, roughness: 0.4, opacity: 1 },
   gold: { base: 0xf3cb62, emissive: 0x2e1d02, metalness: 0.5, roughness: 0.4, opacity: 1 },

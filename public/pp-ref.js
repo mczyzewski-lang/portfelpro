@@ -10,8 +10,9 @@
     var v = new URLSearchParams(location.search).get(KEY);
     if (v && /^[A-Za-z0-9]{10,40}$/.test(v)) sessionStorage.setItem(KEY, v);
     v = sessionStorage.getItem(KEY);
-    var iq = new URLSearchParams(location.search).get("iqid");
-    if (iq && /^\d{1,9}$/.test(iq)) sessionStorage.setItem("iqid", iq);
+    var src = new URLSearchParams(location.search).get("utm_source") || "";
+    var iq = (/^iqid-(\d{1,9})$/i.exec(src) || [])[1];
+    if (iq) sessionStorage.setItem("iqid", iq);
     iq = sessionStorage.getItem("iqid");
     if (iq) document.addEventListener("DOMContentLoaded", function () { document.querySelectorAll('input[name="iqid"]').forEach(function (el) { el.value = iq; }); });
     if (!v) return;

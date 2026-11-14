@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { contentAssets } from "@/db/schema";
 import { assetTypeLabel } from "@/lib/labels";
 import { getPublishedAssets, getServiceBySlug } from "@/lib/queries";
-import { IQID_PARAM, REF_PARAM } from "@/lib/tracking";
+import { IQID_PARAM, parseIqid, REF_PARAM } from "@/lib/tracking";
 import { LeadForm } from "./lead-form";
 
 export const dynamic = "force-dynamic";
@@ -22,8 +22,9 @@ export default async function DemoAsset({ params, searchParams }: {
   const { service: serviceSlug, asset: assetSlug } = await params;
   const sp = await searchParams;
   const ref = /^[A-Za-z0-9]{10,40}$/.test(sp[REF_PARAM] ?? "") ? sp[REF_PARAM]! : "";
-  const iqid = /^\d{1,9}$/.test(sp[IQID_PARAM] ?? "") ? sp[IQID_PARAM]! : "";
-  const query = new URLSearchParams({ ...(ref ? { [REF_PARAM]: ref } : {}), ...(iqid ? { [IQID_PARAM]: iqid } : {}) }).toString();
+  const iqNum = parseIqid(sp[IQID_PARAM]);
+  const iqid = iqNum ? String(iqNum) : "";
+  const query = new URLSearchParams({ ...(ref ? { [REF_PARAM]: ref } : {}), ...(iqid ? { [IQID_PARAM]: `iqid-${iqid}` } : {}) }).toString();
   const found = await getServiceBySlug(serviceSlug);
   if (!found || found.service.status !== "published") notFound();
   const { service, company } = found;

@@ -1,5 +1,6 @@
 import { ArrowRight, ChevronRight, MousePointerClick, Sparkles, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
+import { Fragment } from "react";
 import { redirect } from "next/navigation";
 import { dismissFirstSuccessAction } from "@/app/actions/partner";
 import { CountUp } from "@/components/client";
@@ -27,8 +28,8 @@ export default async function Dashboard() {
   const melt = level.current.tier === "ice" ? iceMelt(partner.createdAt).melt : 0;
   const starterVideo = visibleVideo((await getSettings()).starter_video_url);
   const stats = [
-    { label: "Kliknięcia", value: sum.clicks, icon: MousePointerClick, test: "stat-clicks", href: "/app/polecenia" },
-    { label: "Polecenia", value: sum.leads, icon: Users, test: "stat-leads", href: "/app/polecenia" },
+    { label: "Wejścia", value: sum.clicks, icon: MousePointerClick, test: "stat-clicks", href: "/app/polecenia" },
+    { label: "Leady", value: sum.leads, icon: Users, test: "stat-leads", href: "/app/polecenia" },
     { label: "Klienci", value: sum.clients, icon: UserCheck, test: "stat-clients", href: "/app/polecenia" },
   ];
 
@@ -64,13 +65,17 @@ export default async function Dashboard() {
           </dl>
         </Link>
 
-        <div className="stagger mt-3 grid grid-cols-3 gap-2.5">
-          {stats.map((s, n) => (
-            <Link key={s.label} href={s.href} style={{ "--i": n } as React.CSSProperties} className="press rounded-2xl border border-line bg-white px-3 py-3">
-              <s.icon className="size-4 text-gold-deep" aria-hidden />
-              <p className="mt-1"><CountUp value={s.value} format="int" testId={s.test} className="tabular text-2xl font-extrabold leading-none text-leather-dark" /></p>
-              <p className="mt-0.5 text-xs leading-tight text-muted">{s.label}</p>
-            </Link>
+        {/* proces od lewej: wejścia → leady → klienci, w jednym połączonym kontenerze */}
+        <div className="mt-3 flex items-stretch rounded-2xl border border-line bg-white" data-testid="funnel">
+          {stats.map((st, n) => (
+            <Fragment key={st.label}>
+              {n > 0 && <span aria-hidden className="grid w-5 shrink-0 place-items-center text-gold"><ChevronRight className="size-5" /></span>}
+              <Link href={st.href} className="press min-w-0 flex-1 rounded-2xl px-3 py-3">
+                <st.icon className="size-4 text-gold-deep" aria-hidden />
+                <p className="mt-1"><CountUp value={st.value} format="int" testId={st.test} className="tabular text-2xl font-extrabold leading-none text-leather-dark" /></p>
+                <p className="mt-0.5 text-xs leading-tight text-muted">{st.label}</p>
+              </Link>
+            </Fragment>
           ))}
         </div>
 

@@ -1,0 +1,1 @@
+ALTER TABLE "partners" ADD COLUMN "public_services" jsonb;

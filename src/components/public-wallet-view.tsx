@@ -112,7 +112,7 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
     <div data-testid="public-wallet">
       {/* Jeden biały pasek u góry: zwinięty partner + (w szczegółach) powrót do listy */}
       <div className={cn("top-0 z-30 border-b border-line bg-white shadow-[0_6px_18px_-12px_rgba(50,27,18,0.35)]",
-        item ? "sticky" : cn("fixed inset-x-0 transition-transform duration-300", compact ? "translate-y-0" : "-translate-y-full"))}
+        item ? "sticky" : cn("fixed inset-x-0", compact ? "visible" : "invisible"))}
         aria-hidden={!compact} data-testid="public-bar">
         <div className="mx-auto flex h-16 max-w-xl items-center gap-2.5 px-3">
           {item && !singleId && <button type="button" onClick={back} aria-label="Wszystkie usługi" className="press grid size-11 shrink-0 place-items-center rounded-full text-leather" data-testid="public-back"><ArrowLeft className="size-5" aria-hidden /></button>}
@@ -126,7 +126,7 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
 
       <main id="tresc" className="mx-auto w-full max-w-xl">
         {!item ? (
-          <div key="list" className={dir === "back" ? "wipe-in-left" : "fade-in"}>
+          <div key="list">
             <header ref={hero} className="px-5 pb-6 pt-10 text-center" data-testid="public-hero">
               {photo(132, "mx-auto shadow-(--shadow-wallet) ring-4 ring-gold-light")}
               <h1 className="mt-4 text-[30px] font-extrabold leading-tight text-leather-dark">{wallet.name}</h1>
@@ -157,7 +157,7 @@ export function PublicWalletView({ wallet, photoUrl, slug, singleId = null }: {
             </ul>
           </div>
         ) : (
-          <article key={item.id} className={cn("bg-white pb-10", singleId ? "fade-in" : "wipe-in-right")} data-testid="public-detail">
+          <article key={item.id} className="bg-white pb-10" data-testid="public-detail">
             <div className="px-5 pt-5">
               <div className="flex items-center gap-2.5">
                 <CompanySheet company={item.company.info} className="flex items-center gap-2.5">

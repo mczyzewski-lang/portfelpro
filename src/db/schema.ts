@@ -82,7 +82,8 @@ export const partners = pgTable("partners", {
   adminNote: text("admin_note"),
   publicEnabled: boolean("public_enabled").notNull().default(false), // Portfel Publiczny włączony
   publicSlug: text("public_slug").unique(),                          // losowy adres /p/<slug>
-  publicBio: text("public_bio"),                                     // podpis pod nazwiskiem
+  publicBio: text("public_bio"),
+  publicServices: jsonb("public_services").$type<{ id: string; on: boolean }[]>(), // wybór i kolejność usług w Portfelu Publicznym; null = wszystkie                                     // podpis pod nazwiskiem
   starterCode: text("starter_code"),          // kod z pakietu startowego (wpisywany przez partnera na pulpicie)
   starterVideoSeenAt: ts("starter_video_seen_at"), // partner obejrzał nagranie z pakietu startowego
   starterConfirmedAt: ts("starter_confirmed_at"),

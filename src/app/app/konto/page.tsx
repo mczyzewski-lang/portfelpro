@@ -6,18 +6,21 @@ import { removeAvatarAction, saveAvatarAction, setProfessionAction } from "@/app
 import { AvatarEditor } from "@/components/avatar";
 import { CopyButton } from "@/components/client";
 import { ProfessionSelect } from "@/components/profession-select";
-import { PublicWalletCard } from "@/components/public-wallet-card";
+import { PublicWalletManager } from "@/components/public-wallet-card";
 import { PartnerStatusBadge } from "@/components/status";
 import { Card } from "@/components/ui";
 import { requirePartner } from "@/lib/auth";
 import { avatarSrc, initialsOf } from "@/lib/avatar";
+import { cn } from "@/lib/cn";
 import { env } from "@/lib/env";
+import { publicServiceRows } from "@/lib/public-wallet";
 import { activityLabel, fmtDate, partnerId } from "@/lib/labels";
 import { getProfessions } from "@/lib/queries";
 
 export const metadata = { title: "Konto" };
 
-export default async function AccountPage() {
+export default async function AccountPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  const tab = (await searchParams).tab === "publiczny" ? "publiczny" : "profil";
   const { user, partner } = await requirePartner();
   const professions = await getProfessions();
   const pid = partnerId(partner.number);
@@ -29,6 +32,17 @@ export default async function AccountPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-5">
       <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Konto</h1>
+      <nav aria-label="Konto" className="flex gap-1 rounded-full bg-sand p-1">
+        {[["profil", "Profil", "/app/konto"], ["publiczny", "Portfel Publiczny", "/app/konto?tab=publiczny"]].map(([t, l, href]) => (
+          <Link key={t} href={href} aria-current={tab === t ? "page" : undefined} data-testid={`konto-tab-${t}`}
+            className={cn("flex min-h-10 flex-1 items-center justify-center rounded-full text-sm font-bold", tab === t ? "leather-grad" : "text-muted")}>{l}</Link>
+        ))}
+      </nav>
+      {tab === "publiczny" ? (
+        <PublicWalletManager enabled={partner.publicEnabled} bio={partner.publicBio ?? ""} canEnable={partner.status === "active"}
+          url={partner.publicSlug ? `${env.appUrl}/p/${partner.publicSlug}` : null}
+          services={(await publicServiceRows(partner)).map(({ s, c, on }) => ({ id: s.id, slug: s.slug, name: s.name, on, company: { name: c.name, color: c.color, iconUrl: c.iconUrl } }))} />
+      ) : (<>
 
       <div className="wallet rounded-[28px] p-5">
 <Stitch radius={19} />
@@ -57,9 +71,6 @@ export default async function AccountPage() {
         </form>
       </Card>
 
-      <PublicWalletCard enabled={partner.publicEnabled} bio={partner.publicBio ?? ""} canEnable={partner.status === "active"}
-        url={partner.publicSlug ? `${env.appUrl}/p/${partner.publicSlug}` : null} />
-
       <Card className="divide-y divide-line">
         {rows.map(([l, v]) => (
           <div key={l} className="flex items-center justify-between gap-4 px-4 py-3 text-sm"><span className="text-muted">{l}</span><span className="text-right font-semibold">{v}</span></div>
@@ -74,6 +85,7 @@ export default async function AccountPage() {
         </form>
       </Card>
 
+      </>)}
     </div>
   );
 }
