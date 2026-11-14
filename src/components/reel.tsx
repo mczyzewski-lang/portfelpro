@@ -8,8 +8,8 @@ import { cn } from "@/lib/cn";
  * Pionowe wideo 9:16 na cały ekran (jak reels). `children` to element, który je otwiera.
  * Odtwarzanie startuje po otwarciu i zatrzymuje się po zamknięciu.
  */
-export function ReelPlayer({ src, poster, title, children, className, testId, onOpen }: {
-  src: string; poster?: string | null; title: string; children: ReactNode; className?: string; testId?: string; onOpen?: () => void;
+export function ReelPlayer({ src, poster, title, children, className, testId, onOpen, onClose }: {
+  src: string; poster?: string | null; title: string; children: ReactNode; className?: string; testId?: string; onOpen?: () => void; onClose?: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -18,7 +18,7 @@ export function ReelPlayer({ src, poster, title, children, className, testId, on
   return (
     <>
       <button type="button" onClick={open} aria-label={`Odtwórz wideo: ${title}`} className={cn("press", className)} data-testid={testId}>{children}</button>
-      <dialog ref={dialog} onClose={() => video.current?.pause()} onClick={(e) => { if (e.target === dialog.current) close(); }}
+      <dialog ref={dialog} onClose={() => { video.current?.pause(); onClose?.(); }} onClick={(e) => { if (e.target === dialog.current) close(); }}
         className="m-0 h-dvh max-h-none w-screen max-w-none bg-black p-0 backdrop:bg-black" data-testid="reel-dialog">
         <div className="relative mx-auto flex h-full max-w-[calc(100dvh*9/16)] items-center justify-center">
           <video ref={video} src={src} poster={poster ?? undefined} controls playsInline preload="metadata" className="aspect-[9/16] max-h-full w-full bg-black object-contain" data-testid="reel-video">

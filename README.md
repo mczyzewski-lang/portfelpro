@@ -114,7 +114,7 @@ Content-Type: application/json
 
 ### Pakiet startowy i poziomy
 
-Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny w widoku partnera w panelu admina). Dopóki go nie wpisze, na pulpicie wisi okienko „Potwierdzenie odbioru pakietu startowego” (zdjęcie → krótkie nagranie → kod; adres nagrania ustawia się w `/admin/ustawienia`). Gwiazda Szklana jest za 1 klienta, który zapłacił, albo 3 polecenia; Lodowa topnieje przez 12 tygodni od dołączenia i zostaje po niej woda. Kod konta demo: `F3F4F5`. Poziomom towarzyszą gwiazdy — Lodowa (z soplami), Szklana (1 klient), Brązowa (5), Srebrna (20), Złota (50) — pokazane w karcie poziomu w zakładce Poziomy; gwiazda aktualnego poziomu jest też w okienku pakietu startowego i przy awatarze. Nowe osiągnięcia i poziomy sygnalizuje confetti przy ikonie Poziomy; po wejściu w zakładkę oznaczają się jako obejrzane.
+Każdy nowy partner dostaje losowy kod pakietu startowego (widoczny i edytowalny w widoku partnera w panelu admina). Dopóki go nie wpisze, na pulpicie wisi okienko „Potwierdzenie odbioru pakietu startowego” (zdjęcie → kod → krótkie nagranie odblokowane kodem; adres nagrania ustawia się w `/admin/ustawienia`). Gwiazda Szklana jest za 1 klienta, który zapłacił, albo 3 polecenia; Lodowa topnieje przez 12 tygodni od dołączenia i zostaje po niej woda. Kod konta demo: `F3F4F5`. Poziomom towarzyszą gwiazdy — Lodowa (z soplami), Szklana (1 klient), Brązowa (5), Srebrna (20), Złota (50) — pokazane w karcie poziomu w zakładce Poziomy; gwiazda aktualnego poziomu jest też w okienku pakietu startowego i przy awatarze. Nowe osiągnięcia i poziomy sygnalizuje confetti przy ikonie Poziomy; po wejściu w zakładkę oznaczają się jako obejrzane.
 
 ### Portfel Publiczny
 

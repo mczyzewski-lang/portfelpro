@@ -134,3 +134,7 @@ dialog::backdrop { background: rgb(50 27 18 / 0.5); backdrop-filter: blur(2px); 
 @keyframes confetti-pop { 0% { transform: translate(0,0) scale(.4); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(var(--dx,0), var(--dy,-14px)) scale(1) rotate(var(--rot,90deg)); opacity: 0; } }
 .confetti-piece { position: absolute; top: 0; width: 9px; height: 14px; border-radius: 2px; animation: confetti-fall var(--dur, 2.6s) cubic-bezier(.3,.6,.5,1) var(--delay, 0s) both; }
 .confetti-mini { position: absolute; left: 50%; top: 40%; width: 4px; height: 6px; border-radius: 1px; animation: confetti-pop 1.6s ease-out var(--delay, 0s) infinite; }
+
+/* Portfel Publiczny: przejście bez przesuwania w poziomie — samo przenikanie, żeby nic nie zaburzało przewijania */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fade-in .2s ease-out backwards; }

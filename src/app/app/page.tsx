@@ -43,7 +43,7 @@ export default async function Dashboard() {
         </section>
       )}
 
-      {partner.starterCode && !partner.starterConfirmedAt && <StarterCard hasPhoto={!!partner.avatar} avatarSrc={avatarSrc(partner)} initials={initialsOf(user)} tier={level.current.tier} tierName={level.current.name} melt={melt} videoUrl={starterVideo} videoSeen={!!partner.starterVideoSeenAt} />}
+      {partner.starterCode && (!partner.starterConfirmedAt || (starterVideo && !partner.starterVideoSeenAt)) && <StarterCard hasPhoto={!!partner.avatar} avatarSrc={avatarSrc(partner)} initials={initialsOf(user)} tier={level.current.tier} tierName={level.current.name} melt={melt} videoUrl={starterVideo} confirmed={!!partner.starterConfirmedAt} />}
 
       <section aria-labelledby="pulpit">
         <p className="text-sm text-muted">Dzień dobry, {user.firstName}</p>

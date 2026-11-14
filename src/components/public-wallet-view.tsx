@@ -82,7 +82,19 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
     io.observe(el);
     return () => io.disconnect();
   }, [openId]);
-  const open = (id: string) => { history.pushState({ service: id }, ""); setDir("in"); setOpenId(id); window.scrollTo({ top: 0, behavior: "instant" }); };
+  const listScroll = useRef(0);
+  const open = (id: string) => {
+    listScroll.current = window.scrollY; // wrócimy dokładnie w to miejsce listy
+    history.pushState({ service: id }, ""); setDir("in"); setOpenId(id);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  };
+  // Po powrocie do listy przywracamy pozycję przewijania sprzed wejścia w usługę.
+  useEffect(() => {
+    if (openId === null && dir === "back") {
+      const y = listScroll.current;
+      requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "instant" }));
+    }
+  }, [openId, dir]);
   const back = () => history.back();
 
   const photo = (size: number, cls: string) => photoUrl
@@ -91,7 +103,7 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
     : <span aria-hidden style={{ width: size, height: size, fontSize: size * 0.36 }} className={cn("gold-grad grid shrink-0 place-items-center rounded-full font-extrabold", cls)}>{wallet.initials}</span>;
 
   return (
-    <div className="flex min-h-dvh flex-col" data-testid="public-wallet">
+    <div data-testid="public-wallet">
       {/* Jeden biały pasek u góry: zwinięty partner + (w szczegółach) powrót do listy */}
       <div className={cn("fixed inset-x-0 top-0 z-30 border-b border-line bg-white shadow-[0_6px_18px_-12px_rgba(50,27,18,0.35)] transition-transform duration-300", compact ? "translate-y-0" : "-translate-y-full")}
         aria-hidden={!compact} data-testid="public-bar">
@@ -105,9 +117,9 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
         </div>
       </div>
 
-      <main id="tresc" className="mx-auto w-full max-w-xl flex-1 overflow-x-clip">
+      <main id="tresc" className="mx-auto w-full max-w-xl flex-1">
         {!item ? (
-          <div key="list" className={dir === "back" ? "slide-in-left" : "page-enter"}>
+          <div key="list" className={dir === "back" ? undefined : "fade-in"}>
             <header ref={hero} className="px-5 pb-6 pt-10 text-center" data-testid="public-hero">
               {photo(132, "mx-auto shadow-(--shadow-wallet) ring-4 ring-gold-light")}
               <h1 className="mt-4 text-[30px] font-extrabold leading-tight text-leather-dark">{wallet.name}</h1>
@@ -118,7 +130,7 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
             <ul className="border-t border-line" data-testid="public-list">
               {wallet.items.map((i) => (
                 <li key={i.id} className="border-b border-line bg-white">
-                  <button type="button" onClick={() => open(i.id)} className="press flex w-full items-start gap-3.5 px-5 pb-3 pt-4 text-left" data-testid={`public-item-${i.slug}`}>
+                  <button type="button" onClick={() => open(i.id)} className="flex w-full touch-manipulation items-start gap-3.5 px-5 pb-3 pt-4 text-left [-webkit-tap-highlight-color:transparent] active:bg-cream/70" data-testid={`public-item-${i.slug}`}>
                     <CompanyIcon name={i.company.name} color={i.company.color} iconUrl={i.company.iconUrl} size={46} />
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase tracking-[0.08em] text-muted">{i.company.name}<GoogleRating rating={i.company.googleRating} reviews={i.company.googleReviews} compact className="normal-case tracking-normal" /></span>
@@ -134,7 +146,7 @@ export function PublicWalletView({ wallet, photoUrl, slug }: { wallet: Wallet; p
             </ul>
           </div>
         ) : (
-          <article key={item.id} className="slide-in-right bg-white pb-10 pt-16" data-testid="public-detail">
+          <article key={item.id} className="fade-in bg-white pb-10 pt-16" data-testid="public-detail">
             <div className="px-5 pt-5">
               <div className="flex items-center gap-2.5">
                 <CompanyIcon name={item.company.name} color={item.company.color} iconUrl={item.company.iconUrl} size={36} />

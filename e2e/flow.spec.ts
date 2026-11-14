@@ -314,7 +314,7 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await page.goto("/app/konto");
   await expect(page.getByTestId("avatar-take")).toHaveText("Zrób zdjęcie"); // główny przycisk: aparat
   await expect(page.getByTestId("avatar-camera")).toHaveAttribute("capture", "user");
-  await expect(page.getByTestId("avatar-choose")).toHaveText("Wybierz zdjęcie"); // opcjonalnie: galeria
+  await expect(page.getByTestId("avatar-choose")).toHaveText("Wybierz"); // opcjonalnie: galeria
   await page.getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");
   await expect(page.getByTestId("avatar-crop")).toBeVisible();
   await page.getByLabel("Powiększ", { exact: true }).click();
@@ -383,8 +383,6 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   // Poziomy: liczone z faktycznych danych (2 potwierdzonych klientów → Brązowy)
   await page.goto("/app");
   await expect(page.locator('nav[aria-label="Główna"] [data-testid="levels-new"]').last()).toBeVisible(); // confetti przy ikonie = coś nowego
-  await page.getByTestId("starter-video").click(); // krok „obejrzyj nagranie” odblokowuje pole kodu
-  await page.getByRole("button", { name: "Zamknij wideo" }).click();
   await page.getByTestId("starter-card").locator("input[name=code]").fill("ZLYKOD");
   await page.getByTestId("starter-submit").click();
   await expect(page.getByTestId("starter-card")).toContainText("Kod jest nieprawidłowy");
@@ -424,14 +422,16 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeDisabled();
   await demo.getByTestId("starter-card").getByTestId("avatar-file").setInputFiles("public/brand/logo-512.png");
   await demo.getByTestId("avatar-save").click();
-  await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeDisabled(); // jeszcze krok z nagraniem
-  await demo.getByTestId("starter-video").click();
-  await expect(demo.getByTestId("reel-video").first()).toHaveAttribute("src", "/demo/pakiet-startowy.mp4");
-  await demo.getByRole("button", { name: "Zamknij wideo" }).first().click();
   await expect(demo.getByTestId("starter-card").locator("input[name=code]")).toBeEnabled();
+  await expect(demo.getByTestId("starter-video-locked")).toContainText("Odblokuje się po wpisaniu kodu"); // nagranie zablokowane do czasu kodu
+  await expect(demo.getByTestId("starter-video")).toHaveCount(0);
   await demo.getByTestId("starter-card").locator("input[name=code]").fill("f3f4f5"); // kod pakietu startowego konta demo
   await demo.getByTestId("starter-submit").click();
   await expect(demo.getByText("Pakiet startowy potwierdzony!")).toBeVisible();
+  // kod odblokował nagranie; po obejrzeniu okienko znika
+  await demo.getByTestId("starter-video").click();
+  await expect(demo.getByTestId("reel-video").first()).toHaveAttribute("src", "/demo/pakiet-startowy.mp4");
+  await demo.getByRole("button", { name: "Zamknij wideo" }).first().click();
   await expect(demo.getByTestId("avatar-star").locator("svg")).toHaveAttribute("data-tier", "glass"); // gwiazda poziomu przy awatarze
   await expect(demo.getByTestId("starter-card")).toHaveCount(0);
   await demo.goto("/app/uslugi");
