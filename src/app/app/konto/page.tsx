@@ -1,4 +1,5 @@
 import { Stitch } from "@/components/stitch";
+import { IqidCube, IqidMark } from "@/components/iqid";
 import { CertificatesTab } from "@/components/certificates-tab";
 import { formatPhone } from "@/lib/phone";
 import { ChevronRight, LogOut } from "lucide-react";
@@ -54,16 +55,20 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         {partner.companyName && <p className="relative z-10 text-sm text-white/75">{partner.companyName}</p>}
         <div className="relative z-10 mt-4 flex items-end justify-between gap-3 border-t border-white/15 pt-3.5">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light">IQ ID · inteligentny identyfikator</p>
+            <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-gold-light"><IqidMark size={16} onDark />IQ ID · inteligentny identyfikator</p>
             <p className="tabular text-2xl font-extrabold tracking-wide">{pid}</p>
           </div>
           <CopyButton small variant="gold" text={pid} label="Kopiuj" />
         </div>
       </div>
 
-      <p className="rounded-2xl border border-gold/40 bg-white px-4 py-3 text-[13px] leading-snug text-ink/85" data-testid="iqid-note">
-        <b className="text-leather-dark">IQ ID to Twój inteligentny identyfikator.</b> Jest w każdym linku, który wysyłasz. Gdy klient zostawi kontakt z linku z Twoim IQ ID, zostaje przypisany do Ciebie na stałe.
-      </p>
+      <section className="flex items-center gap-4 rounded-3xl border border-gold/40 bg-white p-4" data-testid="iqid-note">
+        <IqidCube size={104} className="shrink-0" />
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-gold-deep"><IqidMark size={30} labels />IQ ID</p>
+          <p className="mt-1.5 text-[13px] leading-snug text-ink/85"><b className="text-leather-dark">IQ ID to Twój inteligentny identyfikator.</b> Jest w każdym linku, który wysyłasz. Gdy klient zostawi kontakt z linku z Twoim IQ ID, zostaje przypisany do Ciebie na stałe.</p>
+        </div>
+      </section>
 
       <Card className="p-5">
         <h2 className="font-extrabold text-leather-dark">Czym się zajmujesz?</h2>
