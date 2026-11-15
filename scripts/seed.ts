@@ -114,11 +114,29 @@ async function main() {
     }
     // Przykładowe wideo o usłudze (plik z /demo/ — widoczny tylko w trybie demo) tam, gdzie nie ustawiono własnego.
     await db.update(s.services).set({ reelUrl: "/demo/usluga-reel.mp4", reelPosterUrl: "/demo/usluga-reel.jpg" }).where(isNull(s.services.reelUrl));
+    // Szkolenia startowe (filmy-plansze z /demo/ i pytania do potwierdzenia) — tylko tam, gdzie nie ma jeszcze testu.
+    const { quizFor } = await import("../src/db/seed-training");
+    for (const row of await db.select().from(s.services)) {
+      const t = quizFor(row.slug);
+      if (!t || row.quiz.length) continue;
+      await db.update(s.services).set({ certArea: t.area, quiz: t.quiz, trainingDemo: true, trainingVideos: [
+        { title: "Na czym polega usługa i komu pomaga (materiał przykładowy)", url: "/demo/usluga-reel.mp4" },
+        { title: "Jak rozpoznać moment na polecenie (materiał przykładowy)", url: "/demo/referencja.mp4" },
+      ] }).where(eq(s.services.id, row.id));
+    }
     await seedDemoLeads(DEMO_ACCOUNT.email);
     // Opiekun demo: przypisany do konta demo (także wtedy, gdy konto powstało przed dodaniem opiekunów).
     const manager = await demoManager();
     const [dp] = await db.select({ p: s.partners }).from(s.partners).innerJoin(s.users, eq(s.users.id, s.partners.userId)).where(eq(s.users.email, DEMO_ACCOUNT.email));
     if (dp) {
+      // Konto demo ma gotowy certyfikat z upadłości konsumenckiej — tak jakby obejrzało filmy i zaliczyło test.
+      const [uk] = await db.select().from(s.services).where(eq(s.services.slug, "upadlosc-konsumencka"));
+      if (uk?.quiz.length) {
+        await db.insert(s.partnerTraining).values({
+          partnerId: dp.p.id, serviceId: uk.id, watched: uk.trainingVideos.map((_, i) => i), attempts: 1, bestScore: uk.quiz.length,
+          certifiedAt: new Date(), certNumber: `CP-${dp.p.number}-01`, certArea: uk.certArea ?? uk.name,
+        }).onConflictDoNothing();
+      }
       // Konto demo: przy każdym wdrożeniu pakiet startowy wraca do stanu „niepotwierdzony”, żeby dało się go pokazać ponownie.
       const seen = dp.p.gamificationSeen;
       await db.update(s.partners).set({

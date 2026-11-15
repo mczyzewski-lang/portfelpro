@@ -1,5 +1,5 @@
 import { Stitch } from "@/components/stitch";
-import { ArrowLeft, ChevronRight, Lock, MessageCircle, MessageSquareQuote, X } from "lucide-react";
+import { ArrowLeft, Award, ChevronRight, Lock, MessageCircle, MessageSquareQuote, X } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShareData, requestAccessAction } from "@/app/actions/partner";
@@ -21,6 +21,7 @@ import { env } from "@/lib/env";
 import { expertOf } from "@/lib/expert";
 import { getPartnerTerms, getPublishedAssets, getServiceBySlug } from "@/lib/queries";
 import { recommendBlockLabel, recommendState } from "@/lib/tracking";
+import { getTraining, trainingOf } from "@/lib/training";
 import { visibleVideo } from "@/lib/video";
 
 export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -34,6 +35,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const rate = displayRate(service, term, env.demoMode);
   const share = state.can ? await getShareData(service.id) : null;
   const reel = visibleVideo(service.reelUrl);
+  const training = trainingOf(service);
+  const trainingRow = training ? await getTraining(partner.id, service.id) : undefined;
   const lockedAssets = state.can ? [] : await getPublishedAssets(service.id);
 
   return (
@@ -79,6 +82,17 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       </header>
 
       <ExpertCard expert={expertOf(service)} className="mt-4" />
+
+      {training && (
+        <Link href={`/app/certyfikaty/${service.slug}`} className="press mt-4 flex items-center gap-3 rounded-3xl border border-gold/50 bg-white p-4" data-testid="service-training">
+          <span className={trainingRow?.certifiedAt ? "success-grad grid size-11 shrink-0 place-items-center rounded-full" : "gold-grad grid size-11 shrink-0 place-items-center rounded-full"}><Award className="size-5" aria-hidden /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-extrabold leading-snug text-leather-dark">{trainingRow?.certifiedAt ? "Masz certyfikat z tego obszaru" : "Filmy o usłudze i certyfikat"}</span>
+            <span className="block text-[13px] leading-snug text-muted">{trainingRow?.certifiedAt ? `Certyfikowany Profesjonalista · nr ${trainingRow.certNumber}` : `${training.videos.length} ${training.videos.length === 1 ? "film" : "filmy"} i ${training.questions} pytań · ok. 15 minut`}</span>
+          </span>
+          <ChevronRight className="size-5 shrink-0 text-muted" aria-hidden />
+        </Link>
+      )}
 
       {reel && <div className="mt-4"><ReelTile src={reel} poster={service.reelPosterUrl} title={service.name} caption="Krótkie wideo, które wyjaśnia, komu i jak polecać tę usługę." /></div>}
 

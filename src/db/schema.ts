@@ -139,6 +139,10 @@ export const services = pgTable("services", {
   expertTitle: text("expert_title"),
   expertPhotoUrl: text("expert_photo_url"),
   expertBio: text("expert_bio"),            // krótki opis eksperta (okno po dotknięciu)
+  certArea: text("cert_area"),             // obszar na certyfikacie („upadłość konsumencka”); puste = nazwa usługi
+  trainingVideos: jsonb("training_videos").$type<{ title: string; url: string }[]>().notNull().default([]), // filmy szkoleniowe do certyfikatu
+  quiz: jsonb("quiz").$type<{ q: string; options: string[]; correct: number }[]>().notNull().default([]),    // test wiedzy (10 pytań)
+  trainingDemo: boolean("training_demo").notNull().default(false), // szkolenie startowe do potwierdzenia — widoczne tylko w trybie demo
   reelUrl: text("reel_url"),              // pionowe wideo 9:16 o usłudze (adres pliku mp4/webm)
   reelPosterUrl: text("reel_poster_url"), // okładka wideo
   sensitive: boolean("sensitive").notNull().default(false), // zdrowie / sprawy rodzinne — dodatkowa minimalizacja danych
@@ -336,6 +340,21 @@ export const messages = pgTable("messages", {
   readAt: ts("read_at"), // kiedy druga strona przeczytała
   createdAt: createdAt(),
 }, (t) => [index("message_partner").on(t.partnerId, t.createdAt)]);
+
+/* ---------- szkolenia i certyfikaty ---------- */
+export const partnerTraining = pgTable("partner_training", {
+  id: id(),
+  partnerId: uuid("partner_id").notNull().references(() => partners.id, { onDelete: "cascade" }),
+  serviceId: uuid("service_id").notNull().references(() => services.id, { onDelete: "cascade" }),
+  watched: jsonb("watched").$type<number[]>().notNull().default([]), // numery obejrzanych filmów
+  attempts: integer("attempts").notNull().default(0),
+  bestScore: integer("best_score").notNull().default(0),
+  lastActivityAt: timestamp("last_activity_at", { withTimezone: true }).notNull().defaultNow(),
+  certifiedAt: ts("certified_at"),
+  certNumber: text("cert_number").unique(),
+  certArea: text("cert_area"),                                         // obszar zapisany w chwili wydania certyfikatu
+  createdAt: createdAt(),
+}, (t) => [uniqueIndex("partner_training_unique").on(t.partnerId, t.serviceId)]);
 
 /* ---------- logowanie numerem telefonu ---------- */
 export const phoneCodes = pgTable("phone_codes", {

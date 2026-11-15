@@ -108,6 +108,15 @@ export default async function EditService({ params }: { params: Promise<{ id: st
               <Field label="Wideo o usłudze — reel 9:16 (https://… lub /…)" hint="Bezpośredni adres pliku mp4/webm. Puste = brak sekcji wideo."><input name="reelUrl" defaultValue={s.reelUrl ?? ""} placeholder="https://…/usluga.mp4" className={inputCls} /></Field>
               <Field label="Okładka wideo (obraz, opcjonalnie)"><input name="reelPosterUrl" defaultValue={s.reelPosterUrl ?? ""} className={inputCls} /></Field>
             </div>
+            <div className="rounded-2xl border border-line p-3.5">
+              <p className="text-sm font-bold">Szkolenie i certyfikat „Certyfikowany Profesjonalista”</p>
+              <div className="mt-2 space-y-3">
+                <Field label="Obszar na certyfikacie" hint="Np. upadłość konsumencka. Puste = nazwa usługi."><input name="certArea" defaultValue={s.certArea ?? ""} className={inputCls} /></Field>
+                <TA name="trainingVideos" label="Filmy szkoleniowe" value={s.trainingVideos.map((v) => `${v.title} | ${v.url}`)} hint="Jeden wiersz = Tytuł | adres pliku mp4/webm (https://… lub /…)" rows={3} />
+                <TA name="quiz" label="Pytania testowe (zalecane 10)" value={s.quiz.map((q) => `${q.q} | ${q.options.join(" | ")} | ${q.correct + 1}`)} hint="Jeden wiersz = Pytanie | odpowiedź 1 | odpowiedź 2 | odpowiedź 3 | numer poprawnej. Puste = brak szkolenia." rows={10} />
+                {s.trainingDemo && <p className="rounded-xl bg-warn-bg px-3 py-2 text-xs font-medium text-warn">Szkolenie startowe do potwierdzenia — partnerzy widzą je tylko w trybie demo. Zapis tej usługi oznacza pytania jako potwierdzone.</p>}
+              </div>
+            </div>
             <Field label="Kto realizuje usługę"><input name="provider" defaultValue={s.provider} className={inputCls} /></Field>
           </div>
         </Panel>

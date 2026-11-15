@@ -1,4 +1,5 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
+import { quizFor } from "../src/db/seed-training";
 import { testEnv } from "../playwright.config";
 
 /**
@@ -523,6 +524,39 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await demo.goto("/app/polecenia");
   await expect(demo.getByTestId("referral-row")).toHaveCount(5);
   await expect(demo.getByText("Marta Kowalczyk (demo)")).toBeVisible();
+  // Certyfikaty: konto demo ma gotowy certyfikat; drugi zdobywa po obejrzeniu filmów i teście
+  await demo.goto("/app/konto?tab=certyfikaty");
+  await expect(demo.getByTestId("certificates-tab")).toContainText("Dlaczego warto?");
+  await expect(demo.getByTestId("certificates-count")).toHaveText("Twoje certyfikaty: 1 z 9");
+  await expect(demo.getByTestId("cert-row-upadlosc-konsumencka")).toHaveAttribute("data-state", "certified");
+  await demo.getByTestId("cert-row-upadlosc-konsumencka").click();
+  await expect(demo.getByTestId("certificate-title")).toHaveText("Certyfikowany Profesjonalista");
+  await expect(demo.getByTestId("certificate-area")).toHaveText("upadłość konsumencka");
+  await expect(demo.getByTestId("certificate-name")).toHaveText("Demo Partner");
+  await demo.goto("/app/uslugi/znak-towarowy");
+  await demo.getByTestId("service-training").click(); // wejście w szkolenie z wnętrza usługi
+  await expect(demo.getByTestId("training-page")).toContainText("znaki towarowe");
+  await expect(demo.getByTestId("quiz-locked")).toBeVisible(); // test dopiero po filmach
+  await demo.waitForLoadState("networkidle");
+  for (const i of [0, 1]) await demo.getByTestId("training-video").nth(i).locator("video").evaluate((v) => v.dispatchEvent(new Event("ended")));
+  await expect(demo.getByTestId("training-progress")).toHaveText("2/2");
+  await expect(demo.getByTestId("quiz-question")).toHaveCount(10);
+  expect(await demo.content()).not.toContain('"correct"'); // poprawne odpowiedzi nie trafiają do przeglądarki
+  const quiz = quizFor("znak-towarowy")!.quiz;
+  for (const [i, q] of quiz.entries()) await demo.getByTestId("quiz-question").nth(i).locator("label").nth((q.correct + (i < 5 ? 1 : 0)) % 3).click(); // 5 błędnych
+  await demo.getByTestId("quiz-submit").click();
+  await expect(demo.getByTestId("quiz-failed")).toContainText("Wynik: 5/10");
+  for (const [i, q] of quiz.entries()) await demo.getByTestId("quiz-question").nth(i).locator("label").nth(q.correct).click();
+  await demo.getByTestId("quiz-submit").click();
+  await expect(demo.getByTestId("certificate-area")).toHaveText("znaki towarowe");
+  await expect(demo.getByTestId("certificate")).toContainText(/nr CP-\d+-02/);
+  await demo.goto("/app/konto?tab=certyfikaty");
+  await expect(demo.getByTestId("certificates-count")).toHaveText("Twoje certyfikaty: 2 z 9");
+  await admin.goto("/admin/certyfikaty"); // administrator widzi zaangażowanie
+  const trainingRow = admin.getByTestId("admin-training-row").filter({ hasText: "znaki towarowe" });
+  await expect(trainingRow).toContainText("Demo Partner");
+  await expect(trainingRow).toContainText("10/10 · podejść: 2");
+  await expect(trainingRow).toContainText("2/2");
   await demo.goto("/admin");
   await expect(demo).toHaveURL(/\/app$/);
 

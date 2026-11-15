@@ -260,7 +260,19 @@ export const saveServiceAction = adminAction(async (fd, actor) => {
   const rateStatus = z.enum(["tbd", "demo", "approved"]).parse(str(fd, "rateStatus"));
   if (rateStatus !== "tbd" && rate.model !== "custom" && !rate.complete) throw new DomainError("Uzupełnij kwotę lub procent prowizji albo ustaw status stawki „Do ustalenia”");
   const faq = lines(fd, "faq").map((l) => { const [q, ...a] = l.split("|"); return { q: q.trim(), a: a.join("|").trim() }; }).filter((f) => f.q && f.a);
+  const quiz = lines(fd, "quiz").map((l, i) => {
+    const parts = l.split("|").map((x) => x.trim()).filter(Boolean);
+    const correct = Number(parts.at(-1)) - 1, options = parts.slice(1, -1);
+    if (parts.length < 4 || !Number.isInteger(correct) || correct < 0 || correct >= options.length) throw new DomainError(`Pytanie testowe nr ${i + 1}: użyj formatu „Pytanie | odpowiedź | odpowiedź | numer poprawnej”`);
+    return { q: parts[0], options, correct };
+  });
+  const trainingVideos = lines(fd, "trainingVideos").map((l, i) => {
+    const [title = "", url = ""] = l.split("|").map((x) => x.trim());
+    if (!title || !/^(https:\/\/|\/)\S+$/.test(url)) throw new DomainError(`Film szkoleniowy nr ${i + 1}: użyj formatu „Tytuł | adres” (https://… lub /…)`);
+    return { title, url };
+  });
   const values = {
+    quiz, trainingVideos, trainingDemo: false, certArea: str(fd, "certArea").slice(0, 120) || null,
     name: z.string().min(3).max(160).parse(str(fd, "name")),
     slug: z.string().regex(/^[a-z0-9-]{3,80}$/, "Adres (slug): małe litery, cyfry i myślniki").parse(str(fd, "slug")),
     companyId: str(fd, "companyId"), category: str(fd, "category") || "Inne",

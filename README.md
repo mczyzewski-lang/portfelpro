@@ -210,3 +210,10 @@ Następnie w Settings → Networking wygeneruj domenę (usługa jest domyślnie 
 - `/telefon` — wejście numerem telefonu: numer → kod → (nowe konto) pytanie „Prowadzisz działalność gospodarczą?”, przy odpowiedzi „Tak” wymagany NIP. Znany numer po wpisaniu kodu loguje.
 - **SMS-y wysyła SMSAPI.pl.** Ustaw `SMSAPI_TOKEN` (token OAuth z panelu SMSAPI) i opcjonalnie `SMSAPI_SENDER` (zarejestrowane pole nadawcy). Bez tokenu: przy `DEMO_MODE=true` kod jest pokazywany na ekranie, przy `DEMO_MODE=false` wejście telefonem zwraca komunikat o braku konfiguracji. Wysyłka nie była testowana na prawdziwym koncie SMSAPI.
 - `/admin/lejek` — każdy partner jako prospekt z etapami: Rejestracja → Płatność → Wysłano pakiet → Dodał zdjęcie → Wpisał kod → Obejrzał wideo → Onboarding → Pierwszy lead → Pierwszy klient → Pierwsza wypłata → gwiazdy (Szklana, Brązowa, Srebrna, Złota). „Płatność” i „Wysłano pakiet” oznacza ręcznie administrator (aplikacja nie obsługuje płatności ani wysyłek); pozostałe etapy wynikają z danych.
+
+## Szkolenia i certyfikaty
+
+- Każda usługa może mieć szkolenie: filmy + test (zalecane 10 pytań). Po obejrzeniu wszystkich filmów do końca odblokowuje się test; co najmniej 8 poprawnych odpowiedzi (`PASS_SCORE` w `src/lib/training.ts`) wystawia certyfikat **„Certyfikowany Profesjonalista, obszar: …”** z numerem `CP-<numer partnera>-<kolejny>`. Do testu można podchodzić wielokrotnie; odpowiedzi sprawdza serwer.
+- Partner: karta „Filmy o usłudze i certyfikat” wewnątrz usługi, zakładka **Konto → Certyfikaty** (opis, lista obszarów, wejście od razu w filmy i test), strona szkolenia `/app/certyfikaty/<usługa>`.
+- Administrator: `/admin/certyfikaty` (kto ogląda, ile podejść, wyniki, wydane certyfikaty); filmy, pytania i nazwę obszaru ustawia się w edycji usługi.
+- Treści startowe (`src/db/seed-training.ts`) są przykładowe: filmy to plansze z `public/demo/`, a pytania wymagają potwierdzenia przez ekspertów. Są widoczne tylko przy `DEMO_MODE=true`; zapis usługi w panelu oznacza szkolenie jako potwierdzone. Konto demo ma gotowy certyfikat z obszaru „upadłość konsumencka”.

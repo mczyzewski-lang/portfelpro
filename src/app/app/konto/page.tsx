@@ -1,4 +1,5 @@
 import { Stitch } from "@/components/stitch";
+import { CertificatesTab } from "@/components/certificates-tab";
 import { formatPhone } from "@/lib/phone";
 import { ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
@@ -21,7 +22,8 @@ import { getProfessions } from "@/lib/queries";
 export const metadata = { title: "Konto" };
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
-  const tab = (await searchParams).tab === "publiczny" ? "publiczny" : "profil";
+  const tabParam = (await searchParams).tab;
+  const tab = tabParam === "publiczny" || tabParam === "certyfikaty" ? tabParam : "profil";
   const { user, partner } = await requirePartner();
   const professions = await getProfessions();
   const pid = partnerId(partner.number);
@@ -34,12 +36,12 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
     <div className="mx-auto max-w-2xl space-y-5">
       <h1 className="text-[24px] font-extrabold leading-tight text-leather-dark">Konto</h1>
       <nav aria-label="Konto" className="flex gap-1 rounded-full bg-sand p-1">
-        {[["profil", "Profil", "/app/konto"], ["publiczny", "Portfel Publiczny", "/app/konto?tab=publiczny"]].map(([t, l, href]) => (
+        {[["profil", "Profil", "/app/konto"], ["publiczny", "Portfel Publiczny", "/app/konto?tab=publiczny"], ["certyfikaty", "Certyfikaty", "/app/konto?tab=certyfikaty"]].map(([t, l, href]) => (
           <Link key={t} href={href} aria-current={tab === t ? "page" : undefined} data-testid={`konto-tab-${t}`}
-            className={cn("flex min-h-10 flex-1 items-center justify-center rounded-full text-sm font-bold", tab === t ? "leather-grad" : "text-muted")}>{l}</Link>
+            className={cn("flex min-h-10 flex-1 items-center justify-center rounded-full px-1 text-center text-[13px] font-bold leading-tight", tab === t ? "leather-grad" : "text-muted")}>{l}</Link>
         ))}
       </nav>
-      {tab === "publiczny" ? (
+      {tab === "certyfikaty" ? <CertificatesTab partnerId={partner.id} /> : tab === "publiczny" ? (
         <PublicWalletManager enabled={partner.publicEnabled} bio={partner.publicBio ?? ""} canEnable={partner.status === "active"}
           url={partner.publicSlug ? `${env.appUrl}/p/${partner.publicSlug}` : null}
           services={(await publicServiceRows(partner)).map(({ s, c, on }) => ({ id: s.id, slug: s.slug, name: s.name, on, company: { name: c.name, color: c.color, iconUrl: c.iconUrl } }))} />
