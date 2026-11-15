@@ -87,6 +87,17 @@ export const setPartnerStatusAction = adminAction(async (fd, actor) => {
   return status === "active" ? "Konto partnera jest aktywne." : "Zmieniono status konta.";
 });
 
+/** Lejek prospektów: etapy, których system nie widzi sam (płatność, wysyłka pakietu), oznacza administrator. */
+export const setProspectFlagAction = adminAction(async (fd, actor) => {
+  const id = str(fd, "partnerId");
+  const flag = z.enum(["paid", "pack"]).parse(str(fd, "flag"));
+  const on = str(fd, "value") === "on";
+  const [p] = await db.update(partners).set(flag === "paid" ? { paidAt: on ? new Date() : null } : { packSentAt: on ? new Date() : null }).where(eq(partners.id, id)).returning({ id: partners.id });
+  if (!p) throw new DomainError("Nie znaleziono partnera");
+  await logAudit(db, actor, `partner.${flag === "paid" ? "paid" : "pack_sent"}`, "partner", id, { after: { set: on } });
+  return flag === "paid" ? (on ? "Oznaczono płatność." : "Cofnięto oznaczenie płatności.") : (on ? "Oznaczono wysyłkę pakietu." : "Cofnięto oznaczenie wysyłki.");
+});
+
 export const setStarterCodeAction = adminAction(async (fd, actor) => {
   const code = str(fd, "code").replace(/[\s-]/g, "").toUpperCase();
   if (code && !/^[A-Z0-9]{4,12}$/.test(code)) throw new DomainError("Kod pakietu: 4–12 liter i cyfr");

@@ -47,7 +47,7 @@ export function ProfessionMatcher({ professions, items }: { professions: P[]; it
           </ul>
         )}
         <p className="mt-3 text-xs text-muted">To propozycje dopasowania. Niektóre usługi wymagają dodatkowego zatwierdzenia współpracy.</p>
-        <Link href="/rejestracja" className={btn("primary", "mt-4 w-full sm:w-auto")}>Załóż bezpłatny Portfel</Link>
+        <Link href={sel ? `/dla/${sel}` : "/rejestracja"} className={btn("primary", "mt-4 w-full sm:w-auto")} data-testid="profession-landing-link">Załóż bezpłatny Portfel</Link>
       </div>
     </div>
   );

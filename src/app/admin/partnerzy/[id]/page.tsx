@@ -1,4 +1,5 @@
 import { asc, eq } from "drizzle-orm";
+import { contactOf } from "@/lib/phone";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { setPartnerManagerAction, setPartnerNoteAction, setStarterCodeAction, setPartnerStatusAction, setPartnerTermAction } from "@/app/actions/admin";
@@ -33,7 +34,7 @@ export default async function PartnerDetail({ params }: { params: Promise<{ id: 
 
   return (
     <>
-      <PageHeader title={`${u.firstName} ${u.lastName}`} sub={<><span className="tabular">{partnerId(p.number)}</span> · {u.email}</>}>
+      <PageHeader title={`${u.firstName} ${u.lastName}`} sub={<><span className="tabular">{partnerId(p.number)}</span> · {contactOf(u)}</>}>
         <PartnerStatusBadge status={p.status} />
       </PageHeader>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">

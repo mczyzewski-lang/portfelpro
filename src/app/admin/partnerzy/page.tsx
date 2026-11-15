@@ -8,6 +8,7 @@ import { partners, users } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
 import { formatPLN } from "@/lib/commission";
 import { fmtDate, partnerId } from "@/lib/labels";
+import { contactOf } from "@/lib/phone";
 
 export default async function PartnersPage({ searchParams }: { searchParams: Promise<{ q?: string; status?: string }> }) {
   await requireAdmin();
@@ -39,7 +40,7 @@ export default async function PartnersPage({ searchParams }: { searchParams: Pro
         {rows.map(({ p, u, clicks, leads, commission, requests }) => (
           <tr key={p.id}>
             <td><Link href={`/admin/partnerzy/${p.id}`} className="font-semibold hover:underline">{u.firstName} {u.lastName}</Link>
-              <span className="block text-xs text-muted"><span className="tabular">{partnerId(p.number)}</span> · {u.email}{p.companyName && ` · ${p.companyName}`}</span></td>
+              <span className="block text-xs text-muted"><span className="tabular">{partnerId(p.number)}</span> · {contactOf(u)}{p.companyName && ` · ${p.companyName}`}</span></td>
             <td><PartnerStatusBadge status={p.status} />{requests > 0 && <span className="mt-1 block text-xs font-semibold text-warn">wnioski o dostęp: {requests}</span>}</td>
             <td className="tabular whitespace-nowrap">{fmtDate(p.createdAt)}</td>
             <td className="tabular">{clicks}</td><td className="tabular">{leads}</td><td className="tabular whitespace-nowrap">{formatPLN(Number(commission))}</td>

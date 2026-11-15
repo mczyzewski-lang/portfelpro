@@ -41,6 +41,7 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   phone: text("phone"),          // telefon opiekuna pokazywany partnerom
+  loginPhone: text("login_phone").unique(), // numer do logowania kodem SMS (+48XXXXXXXXX)
   jobTitle: text("job_title"),   // np. „Opiekun partnerów”
   welcomeVideoUrl: text("welcome_video_url"), // pionowe wideo 9:16 z przywitaniem opiekuna
   avatar: text("avatar"),        // zdjęcie opiekuna (data URL JPEG) pokazywane partnerom
@@ -84,6 +85,8 @@ export const partners = pgTable("partners", {
   publicSlug: text("public_slug").unique(),                          // losowy adres /p/<slug>
   publicBio: text("public_bio"),
   publicServices: jsonb("public_services").$type<{ id: string; on: boolean }[]>(), // wybór i kolejność usług w Portfelu Publicznym; null = wszystkie                                     // podpis pod nazwiskiem
+  paidAt: ts("paid_at"),            // lejek prospektów: płatność (oznacza administrator)
+  packSentAt: ts("pack_sent_at"),   // lejek prospektów: wysłano pakiet startowy
   starterCode: text("starter_code"),          // kod z pakietu startowego (wpisywany przez partnera na pulpicie)
   starterVideoSeenAt: ts("starter_video_seen_at"), // partner obejrzał nagranie z pakietu startowego
   starterConfirmedAt: ts("starter_confirmed_at"),
@@ -333,6 +336,17 @@ export const messages = pgTable("messages", {
   readAt: ts("read_at"), // kiedy druga strona przeczytała
   createdAt: createdAt(),
 }, (t) => [index("message_partner").on(t.partnerId, t.createdAt)]);
+
+/* ---------- logowanie numerem telefonu ---------- */
+export const phoneCodes = pgTable("phone_codes", {
+  id: id(),
+  phone: text("phone").notNull(),
+  codeHash: text("code_hash").notNull(),
+  attempts: integer("attempts").notNull().default(0),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  consumedAt: ts("consumed_at"),
+  createdAt: createdAt(),
+}, (t) => [index("phone_code_phone").on(t.phone, t.createdAt)]);
 
 /* ---------- system ---------- */
 export const webhookEvents = pgTable("webhook_events", {

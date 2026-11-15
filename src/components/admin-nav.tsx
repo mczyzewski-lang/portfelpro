@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 
 const items = [
-  ["/admin", "Pulpit"], ["/admin/partnerzy", "Partnerzy"], ["/admin/uslugi", "Usługi i materiały"], ["/admin/spolki", "Spółki"],
+  ["/admin", "Pulpit"], ["/admin/partnerzy", "Partnerzy"], ["/admin/lejek", "Lejek prospektów"], ["/admin/uslugi", "Usługi i materiały"], ["/admin/spolki", "Spółki"],
   ["/admin/polecenia", "Leady i sprzedaż"], ["/admin/wiadomosci", "Wiadomości"], ["/admin/prowizje", "Prowizje i wypłaty"], ["/admin/import", "Import / eksport"],
   ["/admin/ustawienia", "Ustawienia"], ["/admin/dziennik", "Dziennik zmian"],
 ] as const;

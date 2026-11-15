@@ -526,6 +526,54 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await demo.goto("/admin");
   await expect(demo).toHaveURL(/\/app$/);
 
+  // Strona branżowa + rejestracja numerem telefonu (kod → przedsiębiorca? → NIP) i lejek prospektów w panelu admina
+  const phoneCtx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const ph = await phoneCtx.newPage();
+  await ph.goto("/dla/ksiegowosc");
+  await ph.waitForLoadState("networkidle");
+  await expect(ph.getByTestId("profession-services")).toBeVisible();
+  const form = ph.getByTestId("phone-signup").first();
+  await form.getByTestId("phone-input").fill("601 202 303");
+  await form.getByRole("checkbox").check();
+  await form.getByTestId("phone-send").click();
+  const smsCode = (await form.getByTestId("demo-code").textContent()) as string;
+  await form.getByTestId("code-input").fill("000000");
+  await form.getByTestId("code-confirm").click();
+  await expect(form.getByRole("alert")).toContainText("nieprawidłowy");
+  await form.getByTestId("code-input").fill(smsCode);
+  await form.getByTestId("code-confirm").click();
+  await form.getByTestId("signup-first").fill("Tomasz");
+  await form.getByTestId("signup-last").fill("Telefoniczny");
+  await form.getByTestId("business-yes").click();
+  await form.getByTestId("signup-nip").fill("123");
+  await form.getByTestId("signup-finish").click();
+  await expect(form.getByRole("alert")).toContainText("NIP");
+  await form.getByTestId("signup-nip").fill("5261040828");
+  await form.getByTestId("signup-finish").click();
+  await expect(ph).toHaveURL(/\/app\/onboarding/);
+  await ph.goto("/app");
+  await expect(ph.getByTestId("partner-name")).toContainText("Tomasz Telefoniczny");
+  await expect(ph.getByTestId("partner-id")).toHaveText(/^iqid-\d+$/);
+  await ph.goto("/app/konto");
+  await expect(ph.getByText("+48 601 202 303")).toBeVisible();
+  // ten sam numer loguje istniejące konto
+  await phoneCtx.clearCookies();
+  await ph.goto("/telefon");
+  await ph.waitForLoadState("networkidle");
+  await ph.getByTestId("phone-input").fill("601202303");
+  await ph.getByRole("checkbox").check();
+  await ph.getByTestId("phone-send").click();
+  await ph.getByTestId("code-input").fill((await ph.getByTestId("demo-code").textContent()) as string);
+  await ph.getByTestId("code-confirm").click();
+  await expect(ph).toHaveURL(/\/app$/);
+  await admin.goto("/admin/lejek");
+  const prospect = admin.getByTestId("prospect-row").filter({ hasText: "Tomasz Telefoniczny" });
+  await expect(prospect.getByTestId("prospect-next")).toHaveText("Następny krok: Płatność");
+  await prospect.getByTestId("flag-paid").click();
+  await expect(prospect.getByTestId("prospect-next")).toHaveText("Następny krok: Wysłano pakiet");
+  await prospect.getByTestId("flag-pack").click();
+  await expect(prospect.getByTestId("prospect-next")).toHaveText("Następny krok: Dodał zdjęcie");
+
   // Błędny link polecający
   await client.goto("/r/NieIstnieje1");
   await expect(client.getByRole("heading", { name: "Ten link jest nieaktywny" })).toBeVisible();

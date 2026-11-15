@@ -203,3 +203,10 @@ Następnie w Settings → Networking wygeneruj domenę (usługa jest domyślnie 
 - [ ] Podłączyć CRM spółek do webhooka.
 - [ ] Dodać e-maile transakcyjne (potwierdzenie rejestracji, reset hasła, powiadomienia) — obecnie nie ma wysyłki poczty ani resetu hasła przez e-mail.
 - [ ] Dane do wypłat i fakturowanie partnerów — obecnie wypłata jest oznaczana ręcznie z tytułem przelewu.
+
+## Rejestracja numerem telefonu, strony branżowe i lejek prospektów
+
+- `/dla/<slug-branży>` — strona docelowa dla każdej branży (usługi dopasowane do branży + rejestracja numerem telefonu). Linki prowadzą tam z sekcji branż na stronie głównej.
+- `/telefon` — wejście numerem telefonu: numer → kod → (nowe konto) pytanie „Prowadzisz działalność gospodarczą?”, przy odpowiedzi „Tak” wymagany NIP. Znany numer po wpisaniu kodu loguje.
+- **Bramka SMS nie jest podłączona.** Przy `DEMO_MODE=true` kod jest pokazywany na ekranie; przy `DEMO_MODE=false` wejście telefonem zwraca komunikat o braku konfiguracji, dopóki nie zostanie ustawione `SMS_PROVIDER` i dopisana wysyłka w `src/lib/phone.ts` (`issueCode`).
+- `/admin/lejek` — każdy partner jako prospekt z etapami: Rejestracja → Płatność → Wysłano pakiet → Dodał zdjęcie → Wpisał kod → Obejrzał wideo → Onboarding → Pierwszy lead → Pierwszy klient → Pierwsza wypłata → gwiazdy (Szklana, Brązowa, Srebrna, Złota). „Płatność” i „Wysłano pakiet” oznacza ręcznie administrator (aplikacja nie obsługuje płatności ani wysyłek); pozostałe etapy wynikają z danych.

@@ -1,4 +1,5 @@
 import { Stitch } from "@/components/stitch";
+import { formatPhone } from "@/lib/phone";
 import { ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
@@ -25,7 +26,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   const professions = await getProfessions();
   const pid = partnerId(partner.number);
   const rows: [string, React.ReactNode][] = [
-    ["Status konta", <PartnerStatusBadge key="s" status={partner.status} />], ["E-mail", user.email], ["Forma działania", activityLabel[partner.activityType]],
+    ["Status konta", <PartnerStatusBadge key="s" status={partner.status} />], user.loginPhone ? ["Telefon (logowanie kodem)", formatPhone(user.loginPhone)] : ["E-mail", user.email], ["Forma działania", activityLabel[partner.activityType]],
     ...(partner.nip ? [["NIP", partner.nip] as [string, string]] : []), ["W programie od", fmtDate(partner.createdAt)],
     ["Regulamin zaakceptowano", `${fmtDate(partner.termsAcceptedAt)} (wersja ${partner.termsVersion})`],
   ];
