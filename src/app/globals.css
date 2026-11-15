@@ -24,7 +24,8 @@
   --radius-card: 1.25rem;
 }
 
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+/* bez scroll-behavior: smooth — w przeglądarkach wbudowanych w aplikacje na iOS zakłóca przewijanie palcem */
+html { -webkit-text-size-adjust: 100%; }
 body { background: var(--color-cream); color: var(--color-ink); font-family: var(--font-sans); }
 h1, h2, h3 { letter-spacing: -0.02em; text-wrap: balance; }
 p { text-wrap: pretty; }

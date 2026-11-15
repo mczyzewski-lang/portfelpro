@@ -40,6 +40,7 @@ export function PublicFooter({ firstName, single = false }: { firstName: string;
       <Link href="/" className="inline-flex items-center gap-2 font-bold text-leather-dark"><Logo size={22} />Portfel.pro</Link>
       <p className="max-w-xs">{single ? "Usługę realizuje wskazana firma." : "Usługi realizują wskazane firmy."} Linki na tej stronie są linkami polecającymi — {firstName} może otrzymać wynagrodzenie za polecenie.</p>
       <Link href="/prywatnosc" className="underline">Prywatność i cookies</Link>
+      <p className="text-[10px] opacity-60" data-testid="public-version">wersja strony: 3</p>
     </footer>
   );
 }
