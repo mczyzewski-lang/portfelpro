@@ -384,9 +384,9 @@ test("pełny przepływ: od rejestracji partnera do wypłaty prowizji", async ({ 
   await expect(visitor.getByTestId("service-hook")).toHaveCount(0); // hasło „Słyszysz…” jest tylko dla partnera
   await expect(visitor.getByTestId("public-list")).toHaveCount(0);
   await expect(visitor.getByTestId("public-bar")).toContainText("Anna Testowa"); // partner zwinięty do białego paska u góry
-  await expect(visitor.getByTestId("public-bar")).toBeInViewport();
   await expect(visitor.getByText("Czego nie należy obiecywać")).toHaveCount(0); // bez treści dla partnera
-  expect(visitor.url()).toBe(publicUrl);
+  expect(visitor.url()).toBe(publicUrl + "/znak-towarowy?z=lista"); // zwykła osobna strona usługi
+  expect(await visitor.evaluate(() => [...document.querySelectorAll("*")].filter((e) => ["sticky", "fixed"].includes(getComputedStyle(e).position) && !e.closest("dialog, [aria-live], nextjs-portal")).length)).toBe(0); // nic przypiętego do ekranu (poza zamkniętymi oknami i pustym kontenerem powiadomień)
   await visitor.getByTestId("public-back").click();
   await expect(visitor.getByTestId("public-list")).toBeVisible();
   // ikona „otwórz w nowym oknie”: osobna strona jednej usługi, bez katalogu

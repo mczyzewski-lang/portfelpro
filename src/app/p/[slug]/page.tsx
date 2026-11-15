@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PublicWalletView } from "@/components/public-wallet-view";
-import { Logo } from "@/components/ui";
+import { PublicFooter, PublicList } from "@/components/public-wallet";
 import { getPublicWallet } from "@/lib/public-wallet";
 
 export const dynamic = "force-dynamic";
@@ -20,12 +18,8 @@ export default async function PublicWallet({ params }: { params: Promise<{ slug:
   void _internal;
   return (
     <>
-      <PublicWalletView wallet={publicData} slug={slug} photoUrl={w.hasPhoto ? `/p/${slug}/photo?v=${w.photoVersion}` : null} />
-      <footer className="mx-auto flex w-full max-w-xl flex-col items-center gap-2 px-5 pb-10 pt-6 text-center text-xs text-muted">
-        <Link href="/" className="inline-flex items-center gap-2 font-bold text-leather-dark"><Logo size={22} />Portfel.pro</Link>
-        <p className="max-w-xs">Usługi realizują wskazane firmy. Linki na tej stronie są linkami polecającymi — {w.name.split(" ")[0]} może otrzymać wynagrodzenie za polecenie.</p>
-        <Link href="/prywatnosc" className="underline">Prywatność i cookies</Link>
-      </footer>
+      <PublicList wallet={publicData} slug={slug} photoUrl={w.hasPhoto ? `/p/${slug}/photo?v=${w.photoVersion}` : null} />
+      <PublicFooter firstName={w.name.split(" ")[0]} />
     </>
   );
 }

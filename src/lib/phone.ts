@@ -21,16 +21,32 @@ export const contactOf = (u: { email: string; loginPhone: string | null }) => (u
 
 const codeHash = (phone: string, code: string) => hmac(`sms:${phone}:${code}`);
 
+/** Wysyłka SMS przez SMSAPI.pl (token OAuth w SMSAPI_TOKEN, opcjonalne pole nadawcy w SMSAPI_SENDER). */
+export async function sendSms(phone: string, message: string): Promise<boolean> {
+  const body = new URLSearchParams({ to: phone.replace(/^\+/, ""), message, format: "json", encoding: "utf-8" });
+  if (process.env.SMSAPI_SENDER) body.set("from", process.env.SMSAPI_SENDER);
+  try {
+    const res = await fetch("https://api.smsapi.pl/sms.do", { method: "POST", headers: { Authorization: `Bearer ${process.env.SMSAPI_TOKEN}` }, body, signal: AbortSignal.timeout(10_000) });
+    const json = (await res.json().catch(() => null)) as { error?: number; message?: string } | null;
+    if (res.ok && json && !json.error) return true;
+    console.error("[smsapi]", res.status, json?.error, json?.message);
+  } catch (e) { console.error("[smsapi]", e instanceof Error ? e.message : e); }
+  return false;
+}
+
 /**
- * Wysyła kod logowania. Bramka SMS nie jest podłączona: w trybie demo kod jest zwracany i pokazywany na ekranie,
- * poza trybem demo funkcja zgłasza brak konfiguracji (nie udajemy wysyłki).
+ * Wysyła kod logowania. Z ustawionym SMSAPI_TOKEN kod idzie SMS-em. Bez tokenu: w trybie demo kod jest
+ * pokazywany na ekranie, poza trybem demo funkcja zgłasza brak konfiguracji (nie udajemy wysyłki).
  */
 export async function issueCode(phone: string): Promise<{ ok: true; demoCode: string | null } | { ok: false; error: string }> {
-  if (!env.demoMode && !process.env.SMS_PROVIDER) return { ok: false, error: "Logowanie SMS nie jest jeszcze skonfigurowane. Załóż konto e-mailem." };
+  const sms = !!process.env.SMSAPI_TOKEN;
+  if (!sms && !env.demoMode) return { ok: false, error: "Logowanie SMS nie jest jeszcze skonfigurowane. Załóż konto e-mailem." };
   const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
-  await db.insert(phoneCodes).values({ phone, codeHash: codeHash(phone, code), expiresAt: new Date(Date.now() + 10 * 60_000) });
-  // TODO integracja: tu wywołanie bramki SMS (zmienna SMS_PROVIDER); do tego czasu kod widać tylko w trybie demo.
-  return { ok: true, demoCode: env.demoMode ? code : null };
+  const [row] = await db.insert(phoneCodes).values({ phone, codeHash: codeHash(phone, code), expiresAt: new Date(Date.now() + 10 * 60_000) }).returning({ id: phoneCodes.id });
+  if (!sms) return { ok: true, demoCode: code };
+  if (await sendSms(phone, `Portfel.pro: Twój kod to ${code}. Ważny 10 minut.`)) return { ok: true, demoCode: null };
+  await db.delete(phoneCodes).where(eq(phoneCodes.id, row.id));
+  return { ok: false, error: "Nie udało się wysłać SMS-a. Spróbuj ponownie za chwilę." };
 }
 
 /** Sprawdza kod (maks. 5 prób na kod). `consume` zużywa go — przy ostatnim kroku rejestracji lub logowaniu. */
